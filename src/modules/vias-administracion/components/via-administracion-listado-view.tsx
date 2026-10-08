@@ -1,0 +1,2 @@
+import { CatalogoListadoView } from '../../catalogos-base/components/catalogo-listado-view'; import { viaAdministracionApi } from '../via-administracion-api'; import { viaAdministracionConfig } from '../via-administracion.config'
+export function ViaAdministracionListadoView(props: { permisos: readonly string[]; onNavegar: (ruta: string) => void }) { return <CatalogoListadoView config={viaAdministracionConfig} api={viaAdministracionApi} {...props} /> }

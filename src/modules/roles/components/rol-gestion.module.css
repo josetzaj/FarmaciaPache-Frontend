@@ -1,0 +1,159 @@
+.pagina { display: grid; gap: 1.25rem; }
+.cabeceraPagina { display: grid; gap: 0.55rem; }
+.cabeceraPagina h1 { flex: 1 1 auto; margin: 0 auto 0 0; color: var(--color-text); font-size: clamp(1.65rem, 3vw, 2.1rem); }
+.filaCabecera { display: flex; align-items: flex-start; gap: 0.75rem; }
+
+.botonPrimario,
+.estadoVacio button,
+.errorPagina button {
+  display: inline-flex;
+  min-height: 2.7rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-small);
+  background: var(--color-surface);
+  color: var(--color-primary);
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.botonPrimario:hover { background: var(--color-surface-muted); }
+.botonPrimario img { width: 1.6rem; height: 1.6rem; object-fit: contain; }
+
+.busquedaGeneral { flex: 0 1 30rem; display: grid; gap: 0.25rem; width: min(30rem, 42vw); }
+.controlBusquedaGeneral { position: relative; display: flex; align-items: center; }
+.iconoBusquedaGeneral { position: absolute; left: 0.7rem; width: 1.4rem; height: 1.4rem; object-fit: contain; pointer-events: none; }
+.controlBusquedaGeneral input { width: 100%; min-height: 2.7rem; padding: 0.65rem 2.8rem 0.65rem 2.35rem; border: 1px solid var(--color-border-strong); border-radius: var(--radius-small); background: var(--color-surface); color: var(--color-text); font: inherit; font-size: 0.82rem; }
+.controlBusquedaGeneral input:focus-visible { border-color: var(--color-primary); outline: 2px solid var(--color-focus); outline-offset: 1px; }
+.controlBusquedaGeneral button { position: absolute; right: 0.35rem; display: grid; width: 2.1rem; height: 2.1rem; place-items: center; border: 0; border-radius: 50%; background: transparent; color: var(--color-text-muted); cursor: pointer; font-size: 1.2rem; }
+.busquedaGeneral > small { min-height: 1rem; color: var(--color-text-muted); font-size: 0.68rem; }
+.busquedaGeneral > .ayudaBusquedaInvalida { color: var(--color-warning); font-weight: 600; }
+
+.panelTabla,
+.tarjetaDetalle,
+.cabeceraDetalle { overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-medium); background: var(--color-surface); box-shadow: 0 0.35rem 1rem rgb(15 23 42 / 3%); }
+.resumenTabla,
+.tituloHistorial { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.9rem 1rem; border-bottom: 1px solid var(--color-border); }
+.resumenTabla strong { display: block; color: var(--color-text); font-size: 0.86rem; }
+.resumenTabla small,
+.tituloHistorial p { display: block; margin: 0.2rem 0 0; color: var(--color-text-muted); font-size: 0.68rem; }
+.accionesResumen { display: flex; align-items: center; justify-content: flex-end; gap: 0.75rem; }
+.accionesResumen span { color: var(--color-text-muted); font-size: 0.72rem; }
+.accionesResumen button { min-height: 2.2rem; padding: 0.35rem 0.65rem; border: 1px solid var(--color-secondary); border-radius: var(--radius-small); background: var(--color-surface); color: var(--color-secondary); cursor: pointer; font-size: 0.7rem; font-weight: 650; }
+
+.identidadRol,
+.resumenPermisos { display: grid; min-width: 10rem; gap: 0.2rem; }
+.identidadRol strong,
+.resumenPermisos strong { color: var(--color-text); }
+.identidadRol small,
+.resumenPermisos small { color: var(--color-text-muted); font-size: 0.67rem; }
+.resumenPermisos { min-width: 7rem; }
+.resumenPermisos strong { font-size: 1rem; }
+
+.estado { display: inline-flex; align-items: center; padding: 0.28rem 0.55rem; border-radius: 999px; font-size: 0.65rem; font-weight: 700; }
+.activo { background: var(--color-success-soft); color: var(--color-success); }
+.inactivo { background: var(--color-surface-muted); color: var(--color-text-muted); }
+.sinDato,
+.sinHistorial { color: var(--color-text-muted); font-style: italic; }
+
+.accionesFila { display: flex; justify-content: flex-end; gap: 0.35rem; white-space: nowrap; }
+.accionesFila button { display: grid; width: 2.35rem; height: 2.35rem; padding: 0.3rem; place-items: center; border: 1px solid var(--color-border-strong); border-radius: var(--radius-small); background: var(--color-surface); cursor: pointer; }
+.accionesFila button:hover { border-color: var(--color-primary); background: var(--color-surface-muted); transform: translateY(-1px); }
+.accionesFila img { width: 1.55rem; height: 1.55rem; object-fit: contain; }
+.accionesFila .accionPeligro { border-color: var(--color-danger); }
+
+.alertaError { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem; border: 1px solid var(--color-danger); border-radius: var(--radius-medium); background: var(--color-danger-soft); color: var(--color-danger); }
+.alertaError p { margin: 0; }
+.alertaError button { border: 0; background: transparent; color: inherit; cursor: pointer; font-weight: 700; }
+
+.estadoVacio,
+.errorPagina { display: grid; min-height: 20rem; justify-items: center; align-content: center; padding: 1rem; text-align: center; }
+.estadoVacio > span { display: grid; width: 3rem; height: 3rem; place-items: center; border-radius: 50%; background: var(--color-info-soft); color: var(--color-secondary); font-size: 1.5rem; }
+.estadoVacio h2,
+.errorPagina h1 { margin: 0.8rem 0 0; color: var(--color-text); }
+.estadoVacio p,
+.errorPagina p { margin: 0.35rem 0 1rem; color: var(--color-text-muted); }
+.errorPagina nav { justify-self: start; align-self: start; }
+.errorPagina div { display: flex; gap: 0.6rem; }
+.errorPagina button { background: var(--color-primary); color: var(--color-text-inverse); }
+
+.cabeceraDetalle { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; padding: 1.25rem; }
+.perfilRol { display: flex; align-items: center; gap: 1rem; }
+.perfilRol p { margin: 0 0 0.35rem; color: var(--color-primary); font-size: 0.72rem; font-weight: 700; text-transform: uppercase; }
+.perfilRol h1 { margin: 0; color: var(--color-text); font-size: clamp(1.65rem, 3vw, 2.1rem); }
+.perfilRol .estado { margin-top: 0.55rem; }
+.iconoRol { display: grid; width: 5.5rem; height: 5.5rem; flex: 0 0 auto; place-items: center; border-radius: 50%; background: var(--color-info-soft); color: var(--color-secondary); font-size: 1.25rem; font-weight: 750; }
+.accionesCabecera { display: flex; gap: 0.65rem; }
+.accionesCabecera button { display: inline-flex; min-height: 2.7rem; align-items: center; justify-content: center; gap: 0.45rem; padding: 0.6rem 0.9rem; border-radius: var(--radius-small); cursor: pointer; font-size: 0.78rem; font-weight: 650; }
+.accionesCabecera svg { width: 1.05rem; height: 1.05rem; }
+.botonEditar { border: 1px solid var(--color-secondary); background: var(--color-surface); color: var(--color-secondary); }
+.botonPeligro { border: 1px solid var(--color-danger); background: var(--color-danger); color: var(--color-text-inverse); }
+
+.grillaDetalle { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.tarjetaDetalle { padding: 1.15rem; }
+.tarjetaDetalle h2 { margin: 0; color: var(--color-text); font-size: 0.95rem; }
+.tarjetaDetalle dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin: 1rem 0 0; }
+.tarjetaDetalle dt { color: var(--color-text-muted); font-size: 0.67rem; font-weight: 650; text-transform: uppercase; }
+.tarjetaDetalle dd { overflow-wrap: anywhere; margin: 0.28rem 0 0; color: var(--color-text); font-size: 0.8rem; }
+.datoCompleto { grid-column: 1 / -1; }
+
+.tituloSeccionDetalle { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.tituloSeccionDetalle p { margin: 0.25rem 0 0; color: var(--color-text-muted); font-size: 0.72rem; }
+.tituloSeccionDetalle > span { display: grid; min-width: 2rem; height: 2rem; place-items: center; border-radius: 999px; background: var(--color-info-soft); color: var(--color-info); font-size: 0.75rem; font-weight: 700; }
+.gruposPermisosDetalle { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.9rem; margin-top: 1rem; }
+.gruposPermisosDetalle section { overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-small); }
+.gruposPermisosDetalle h3 { margin: 0; padding: 0.7rem 0.8rem; background: var(--color-surface-muted); color: var(--color-text); font-size: 0.72rem; }
+.gruposPermisosDetalle ul { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
+.gruposPermisosDetalle li { display: grid; gap: 0.18rem; padding: 0.65rem 0.8rem; border-top: 1px solid var(--color-border); }
+.gruposPermisosDetalle li:first-child { border-top: 0; }
+.gruposPermisosDetalle strong { color: var(--color-text); font-size: 0.72rem; }
+.gruposPermisosDetalle small { overflow-wrap: anywhere; color: var(--color-primary); font-size: 0.62rem; }
+
+.tituloHistorial { margin: -1.15rem -1.15rem 0; }
+.tituloHistorial h2 { margin: 0; }
+.tablaTanstackAuditoria { margin: 0 -1.15rem -1.15rem; }
+.accionAuditoria { display: inline-flex; padding: 0.28rem 0.55rem; border-radius: 999px; background: var(--color-info-soft); color: var(--color-info); font-size: 0.68rem; font-weight: 650; white-space: nowrap; }
+.botonCambiosAuditoria,
+.errorAuditoria button { min-height: 2.25rem; padding: 0.4rem 0.65rem; border: 1px solid var(--color-secondary); border-radius: var(--radius-small); background: var(--color-surface); color: var(--color-secondary); cursor: pointer; font-size: 0.7rem; font-weight: 650; }
+.detalleAuditoria { display: grid; gap: 0.65rem; padding: 0.9rem 1rem 1rem; }
+.detalleAuditoria h3 { margin: 0; color: var(--color-text); font-size: 0.8rem; }
+.tablaCambiosContenedor { overflow-x: auto; border: 1px solid var(--color-border); border-radius: var(--radius-small); }
+.tablaCambiosContenedor table { width: 100%; border-collapse: collapse; }
+.tablaCambiosContenedor th,
+.tablaCambiosContenedor td { min-width: 10rem; padding: 0.6rem 0.7rem; border-bottom: 1px solid var(--color-border); color: var(--color-text); font-size: 0.7rem; text-align: left; overflow-wrap: anywhere; }
+.tablaCambiosContenedor thead th { background: var(--color-surface-muted); color: var(--color-text-muted); font-size: 0.65rem; text-transform: uppercase; }
+.errorAuditoria { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 0.9rem; padding: 0.75rem; border: 1px solid var(--color-danger); border-radius: var(--radius-small); background: var(--color-danger-soft); color: var(--color-danger); font-size: 0.75rem; }
+.sinHistorial { margin-bottom: 0; font-size: 0.78rem; }
+
+.contenidoConfirmacion { display: grid; gap: 0.5rem; text-align: left; }
+.contenidoConfirmacion p { margin: 0 0 0.35rem; }
+.contenidoConfirmacion label { color: var(--color-text); font-size: 0.75rem; font-weight: 650; }
+.contenidoConfirmacion textarea { width: 100%; min-height: 5rem; padding: 0.6rem 0.7rem; border: 1px solid var(--color-border-strong); border-radius: var(--radius-small); background: var(--color-surface); color: var(--color-text); font: inherit; resize: vertical; }
+.contenidoConfirmacion small { color: var(--color-text-muted); font-size: 0.65rem; text-align: right; }
+.contenidoConfirmacion > span { color: var(--color-danger); font-size: 0.7rem; font-weight: 600; }
+
+@media (max-width: 58rem) {
+  .filaCabecera { flex-wrap: wrap; }
+  .busquedaGeneral { flex-grow: 1; width: min(100%, 30rem); }
+  .grillaDetalle,
+  .gruposPermisosDetalle { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 40rem) {
+  .filaCabecera h1,
+  .busquedaGeneral { flex-basis: 100%; }
+  .cabeceraDetalle,
+  .perfilRol,
+  .accionesCabecera,
+  .resumenTabla,
+  .accionesResumen { align-items: stretch; flex-direction: column; }
+  .accionesCabecera button,
+  .botonPrimario { width: 100%; }
+  .tarjetaDetalle dl { grid-template-columns: 1fr; }
+  .datoCompleto { grid-column: auto; }
+  .errorAuditoria { align-items: stretch; flex-direction: column; }
+}

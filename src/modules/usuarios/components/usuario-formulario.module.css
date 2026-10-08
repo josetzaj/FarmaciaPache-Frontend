@@ -1,0 +1,36 @@
+.empleadoSeleccionado { display: grid; gap: 0.25rem; padding: 0.85rem 1rem; border: 1px solid var(--color-border); border-radius: var(--radius-small); background: var(--color-surface-muted); }
+.empleadoSeleccionado strong { color: var(--color-text); font-size: 0.86rem; }
+.empleadoSeleccionado span { color: var(--color-text-muted); font-size: 0.72rem; }
+.cabeceraRoles { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; margin-bottom: 0.8rem; }
+.cabeceraRoles > div { display: grid; gap: 0.2rem; }
+.cabeceraRoles strong { color: var(--color-text); font-size: 0.86rem; }
+.cabeceraRoles small { color: var(--color-text-muted); font-size: 0.7rem; }
+.cabeceraRoles input { width: min(23rem, 50vw); min-height: 2.6rem; padding: 0.55rem 0.7rem; border: 1px solid var(--color-border-strong); border-radius: var(--radius-small); background: var(--color-surface); color: var(--color-text); font: inherit; }
+.cabeceraRoles input:focus { border: 2px solid var(--color-primary); outline: none; }
+.listaRoles { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.7rem; }
+.opcionRol { display: grid; gap: 0.65rem; padding: 0.8rem; border: 1px solid var(--color-border); border-radius: var(--radius-small); background: var(--color-surface); }
+.rolSeleccionado { border-color: var(--color-primary); background: color-mix(in srgb, var(--color-success-soft) 38%, var(--color-surface)); }
+.rolInactivo { opacity: 0.68; }
+.identidadRol { display: flex; align-items: flex-start; gap: 0.65rem; cursor: pointer; }
+.identidadRol input { width: 1rem; height: 1rem; margin-top: 0.15rem; accent-color: var(--color-primary); }
+.identidadRol span { display: grid; min-width: 0; gap: 0.15rem; }
+.identidadRol strong { color: var(--color-text); font-size: 0.78rem; }
+.identidadRol small { color: var(--color-primary); font-size: 0.64rem; overflow-wrap: anywhere; }
+.identidadRol em { color: var(--color-text-muted); font-size: 0.68rem; font-style: normal; line-height: 1.35; }
+.vigenciaRol { --alto-control-vigencia: 2.75rem; display: grid; gap: 0.3rem; padding-left: 1.65rem; }
+.vigenciaRol > label { color: var(--color-text); font-size: 0.7rem; font-weight: 600; }
+.filaVigencia { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 0.55rem; }
+.filaVigencia > input[type='date'] { width: 100%; min-width: 0; height: var(--alto-control-vigencia); padding: 0.45rem 0.6rem; border: 1px solid var(--color-border-strong); border-radius: var(--radius-small); background: var(--color-surface); color: var(--color-text); font: inherit; }
+.filaVigencia > input[type='date']:focus { border: 2px solid var(--color-primary); outline: none; }
+.filaVigencia > input[type='date']:disabled { border-color: var(--color-border); background: var(--color-surface-muted); color: var(--color-text-muted); cursor: not-allowed; }
+.opcionIndefinida { display: inline-flex; height: var(--alto-control-vigencia); align-items: center; gap: 0.45rem; color: var(--color-text); cursor: pointer; font-size: 0.72rem; font-weight: 600; }
+.opcionIndefinida input { display: grid; width: var(--alto-control-vigencia); height: var(--alto-control-vigencia); flex: 0 0 var(--alto-control-vigencia); margin: 0; appearance: none; border: 1px solid var(--color-border-strong); border-radius: var(--radius-small); background: var(--color-surface); color: var(--color-text-inverse); cursor: pointer; place-content: center; }
+.opcionIndefinida input::before { content: '✓'; font-size: 1.35rem; font-weight: 700; line-height: 1; transform: scale(0); transition: transform var(--transition-fast); }
+.opcionIndefinida input:checked { border-color: var(--color-primary); background: var(--color-primary); }
+.opcionIndefinida input:checked::before { transform: scale(1); }
+.opcionIndefinida input:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.error { color: var(--color-danger); font-size: 0.69rem; font-weight: 500; }
+.sinResultados { margin: 0; padding: 1.2rem; border-radius: var(--radius-small); background: var(--color-surface-muted); color: var(--color-text-muted); text-align: center; font-size: 0.76rem; }
+.avisoCorreo { margin: 0; padding: 0.8rem 1rem; border-radius: var(--radius-small); background: var(--color-info-soft); color: var(--color-info); font-size: 0.76rem; line-height: 1.5; }
+@media (max-width: 50rem) { .listaRoles { grid-template-columns: 1fr; } }
+@media (max-width: 38rem) { .cabeceraRoles { align-items: stretch; flex-direction: column; } .cabeceraRoles input { width: 100%; } }

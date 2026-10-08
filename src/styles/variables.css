@@ -1,0 +1,43 @@
+:root {
+  /* Marca e interacción */
+  --color-primary: #087f6d;
+  --color-primary-hover: #065f52;
+  --color-secondary: #2563eb;
+  --color-accent: #0e7490;
+
+  /* Superficies */
+  --color-background: #f8fafc;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f1f5f9;
+  --color-login-background-start: #9ac8c9;
+  --color-login-background-end: #9fc9cf;
+
+  /* Bordes y texto */
+  --color-border: #e2e8f0;
+  --color-border-strong: #8795a9;
+  --color-text: #1e293b;
+  --color-text-muted: #64748b;
+  --color-text-inverse: #ffffff;
+
+  /* Estados semánticos */
+  --color-success: #047857;
+  --color-success-soft: #d1fae5;
+  --color-warning: #b45309;
+  --color-warning-soft: #fef3c7;
+  --color-danger: #dc2626;
+  --color-danger-soft: #fee2e2;
+  --color-info: #2563eb;
+  --color-info-soft: #dbeafe;
+
+  /* Foco */
+  /* --color-focus: #2563eb; */
+  --color-focus: #008f7a;
+
+
+  /* Forma, profundidad y movimiento */
+  --radius-small: 0.5rem;
+  --radius-medium: 0.75rem;
+  --radius-large: 1.25rem;
+  --shadow-card: 0 1.5rem 4rem rgb(15 23 42 / 12%);
+  --transition-fast: 160ms ease;
+}

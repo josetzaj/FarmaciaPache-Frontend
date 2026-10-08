@@ -1,0 +1,2 @@
+import { CatalogoDetalleView } from '../../catalogos-base/components/catalogo-detalle-view'; import { presentacionApi } from '../presentacion-api'; import { presentacionConfig } from '../presentacion.config'
+export function PresentacionDetalleView({ presentacionId, ...props }: { presentacionId: string; permisos: readonly string[]; onNavegar: (ruta: string) => void }) { return <CatalogoDetalleView config={presentacionConfig} api={presentacionApi} itemId={presentacionId} {...props} /> }

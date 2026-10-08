@@ -1,0 +1,2 @@
+import { CatalogoFormularioView } from '../../catalogos-base/components/catalogo-formulario-view'; import { unidadMedidaApi } from '../unidad-medida-api'; import { unidadMedidaConfig } from '../unidad-medida.config'
+export function UnidadMedidaCrearView(props: { onNavegar: (ruta: string) => void; onCambiosPendientes: (p: boolean) => void }) { return <CatalogoFormularioView config={unidadMedidaConfig} api={unidadMedidaApi} {...props} /> }

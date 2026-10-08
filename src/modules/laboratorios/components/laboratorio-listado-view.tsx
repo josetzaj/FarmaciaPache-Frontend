@@ -1,0 +1,2 @@
+import { CatalogoListadoView } from '../../catalogos-base/components/catalogo-listado-view'; import { laboratorioApi } from '../laboratorio-api'; import { laboratorioConfig } from '../laboratorio.config'
+export function LaboratorioListadoView(props: { permisos: readonly string[]; onNavegar: (ruta: string) => void }) { return <CatalogoListadoView config={laboratorioConfig} api={laboratorioApi} {...props} /> }

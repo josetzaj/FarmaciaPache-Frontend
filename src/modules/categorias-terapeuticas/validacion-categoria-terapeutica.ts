@@ -1,0 +1,2 @@
+import type { DatosCatalogoMaestro } from '../catalogos-base/catalogo-maestro.types'
+export function validarCategoriaTerapeutica(d: DatosCatalogoMaestro) { const e: Record<string, string> = {}; if (!/^[A-Za-z0-9_-]{2,20}$/.test(String(d.codigo).trim())) e.codigo = 'Usa de 2 a 20 letras, números, guion o guion bajo.'; if (String(d.nombre).trim().length < 2) e.nombre = 'Ingresa el nombre de la categoría terapéutica.'; if (String(d.descripcion ?? '').length > 500) e.descripcion = 'La descripción no puede superar 500 caracteres.'; return e }

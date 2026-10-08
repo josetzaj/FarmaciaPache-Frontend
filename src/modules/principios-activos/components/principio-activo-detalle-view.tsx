@@ -1,0 +1,2 @@
+import { CatalogoDetalleView } from '../../catalogos-base/components/catalogo-detalle-view'; import { principioActivoApi } from '../principio-activo-api'; import { principioActivoConfig } from '../principio-activo.config'
+export function PrincipioActivoDetalleView({ principioActivoId, ...props }: { principioActivoId: string; permisos: readonly string[]; onNavegar: (ruta: string) => void }) { return <CatalogoDetalleView config={principioActivoConfig} api={principioActivoApi} itemId={principioActivoId} {...props} /> }

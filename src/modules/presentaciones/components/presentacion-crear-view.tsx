@@ -1,0 +1,2 @@
+import { CatalogoFormularioView } from '../../catalogos-base/components/catalogo-formulario-view'; import { presentacionApi } from '../presentacion-api'; import { presentacionConfig } from '../presentacion.config'
+export function PresentacionCrearView(props: { onNavegar: (ruta: string) => void; onCambiosPendientes: (p: boolean) => void }) { return <CatalogoFormularioView config={presentacionConfig} api={presentacionApi} {...props} /> }

@@ -1,0 +1,542 @@
+.encabezadoPagina {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.volver {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  gap: 0.45rem;
+  margin: -0.5rem 0 0.7rem;
+  padding: 0.4rem 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-secondary);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.volver:hover {
+  color: var(--color-primary-hover);
+  text-decoration: underline;
+  text-underline-offset: 0.2rem;
+}
+
+.volver span {
+  font-size: 1.15rem;
+}
+
+.ruta {
+  margin: 0 0 0.35rem;
+  color: var(--color-primary);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.encabezadoPagina h1 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: clamp(1.65rem, 3vw, 2.1rem);
+  line-height: 1.2;
+}
+
+.encabezadoPagina > div > p:last-child:not(.ruta) {
+  margin: 0.45rem 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+}
+
+.indicadorFormulario {
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: center;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  background: var(--color-info-soft);
+  color: var(--color-info);
+  font-size: 0.72rem;
+  font-weight: 600;
+  max-width: min(28rem, 48vw);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.alertaError {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  margin-bottom: 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-medium);
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.alertaError > span,
+.estadoCatalogos > span {
+  display: grid;
+  width: 1.45rem;
+  height: 1.45rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--color-danger);
+  color: var(--color-text-inverse);
+  font-size: 0.75rem;
+  font-weight: 700;
+  place-items: center;
+}
+
+.alertaError p {
+  margin: 0;
+  font-size: 0.84rem;
+}
+
+.formulario {
+  display: grid;
+  gap: 1rem;
+}
+
+.formulario fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 1.35rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: var(--color-surface);
+  box-shadow: 0 0.35rem 1rem rgb(15 23 42 / 3%);
+}
+
+.formulario fieldset:disabled {
+  opacity: 0.72;
+}
+
+.formulario legend {
+  padding: 0;
+  color: var(--color-text);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.descripcionSeccion {
+  margin: -0.15rem 0 1.1rem;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}
+
+.selectorFoto {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+  padding: 1rem;
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-medium);
+  background: var(--color-surface-muted);
+}
+
+.vistaPreviaFoto {
+  display: grid;
+  width: 7.5rem;
+  height: 7.5rem;
+  flex: 0 0 7.5rem;
+  overflow: hidden;
+  border: 0.25rem solid var(--color-surface);
+  border-radius: 50%;
+  background: var(--color-info-soft);
+  box-shadow: 0 0 0 1px var(--color-border);
+  place-items: center;
+}
+
+.vistaPreviaFoto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.vistaPreviaFoto svg {
+  width: 3.5rem;
+  fill: none;
+  stroke: var(--color-secondary);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.5;
+}
+
+.controlesFoto {
+  display: grid;
+  min-width: 0;
+  gap: 0.5rem;
+}
+
+.controlesFoto > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.controlesFoto strong {
+  color: var(--color-text);
+  font-size: 0.88rem;
+}
+
+.controlesFoto > div:first-child span {
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+.controlesFoto > p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+}
+
+.entradaFoto {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.accionesFoto {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.botonSeleccionFoto,
+.accionesFoto button {
+  min-height: 2.35rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-small);
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.botonSeleccionFoto {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.entradaFoto:focus + .accionesFoto .botonSeleccionFoto {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.accionesFoto button {
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+}
+
+.formulario fieldset:disabled .botonSeleccionFoto,
+.formulario fieldset:disabled .accionesFoto button {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.grillaTres,
+.grillaDos {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.grillaTres {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.grillaDos {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.grillaTres:last-child,
+.grillaDos:last-child {
+  margin-bottom: 0;
+}
+
+.campo {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: 0.4rem;
+}
+
+.campo label {
+  color: var(--color-text);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.campo label span,
+.accionesFormulario > p span {
+  color: var(--color-danger);
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+  width: 100%;
+  min-height: 2.85rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-small);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 0.84rem;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.campo textarea {
+  min-height: 5.5rem;
+  resize: vertical;
+}
+
+.campo input:hover:not(:disabled),
+.campo select:hover:not(:disabled),
+.campo textarea:hover:not(:disabled) {
+  border-color: var(--color-primary);
+}
+
+.campo input:focus,
+.campo input:focus-visible,
+.campo select:focus,
+.campo select:focus-visible,
+.campo textarea:focus,
+.campo textarea:focus-visible {
+  border-width: 2px;
+  border-color: var(--color-primary);
+  outline: none;
+  outline-offset: 0;
+  background: var(--color-surface);
+  box-shadow: none;
+}
+
+.campo input[aria-invalid='true'],
+.campo select[aria-invalid='true'],
+.campo textarea[aria-invalid='true'] {
+  border-color: var(--color-danger);
+}
+
+.campo input[aria-invalid='true']:focus,
+.campo input[aria-invalid='true']:focus-visible,
+.campo select[aria-invalid='true']:focus,
+.campo select[aria-invalid='true']:focus-visible,
+.campo textarea[aria-invalid='true']:focus,
+.campo textarea[aria-invalid='true']:focus-visible {
+  border-color: var(--color-primary);
+}
+
+.campo input:disabled,
+.campo select:disabled,
+.campo textarea:disabled {
+  cursor: not-allowed;
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+}
+
+.campo input::placeholder,
+.campo textarea::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.85;
+}
+
+.errorCampo,
+.ayudaCampo {
+  min-height: 1rem;
+  font-size: 0.69rem;
+  line-height: 1.4;
+}
+
+.errorCampo {
+  color: var(--color-danger);
+  font-weight: 500;
+}
+
+.ayudaCampo {
+  color: var(--color-text-muted);
+}
+
+.accionesFormulario {
+  position: sticky;
+  z-index: 5;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: rgb(255 255 255 / 96%);
+  box-shadow: 0 -0.4rem 1.2rem rgb(15 23 42 / 5%);
+  backdrop-filter: blur(10px);
+}
+
+.accionesFormulario > p {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+}
+
+.accionesFormulario > div,
+.estadoCatalogos > div {
+  display: flex;
+  gap: 0.65rem;
+}
+
+.botonPrincipal,
+.botonSecundario {
+  display: inline-flex;
+  min-height: 2.8rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.65rem 1rem;
+  border-radius: var(--radius-small);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.iconoBoton {
+  width: 1.05rem;
+  height: 1.05rem;
+  flex: 0 0 auto;
+}
+
+.botonPrincipal {
+  border: 1px solid var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.botonPrincipal:hover:not(:disabled) {
+  border-color: var(--color-primary-hover);
+  background: var(--color-primary-hover);
+}
+
+.botonSecundario {
+  border: 1px solid var(--color-secondary);
+  background: var(--color-surface);
+  color: var(--color-secondary);
+}
+
+.botonSecundario:hover:not(:disabled) {
+  background: var(--color-info-soft);
+}
+
+.botonPrincipal:active:not(:disabled),
+.botonSecundario:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.botonPrincipal:disabled,
+.botonSecundario:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.estadoCatalogos {
+  display: grid;
+  min-height: 25rem;
+  justify-items: center;
+  align-content: center;
+  padding: 2rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: var(--color-surface);
+  text-align: center;
+}
+
+.estadoCatalogos > span {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-bottom: 0.8rem;
+  font-size: 1rem;
+}
+
+.estadoCatalogos h1 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.estadoCatalogos p {
+  max-width: 33rem;
+  margin: 0.5rem 0 1.25rem;
+  color: var(--color-text-muted);
+  font-size: 0.84rem;
+}
+
+@media (max-width: 68rem) {
+  .grillaTres {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 42rem) {
+  .encabezadoPagina {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .indicadorFormulario {
+    max-width: 100%;
+  }
+
+  .grillaTres,
+  .grillaDos {
+    grid-template-columns: 1fr;
+  }
+
+  .formulario fieldset {
+    padding: 1.1rem 1rem;
+  }
+
+  .selectorFoto {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .vistaPreviaFoto {
+    width: 6.5rem;
+    height: 6.5rem;
+    flex-basis: 6.5rem;
+  }
+
+  .accionesFormulario {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .accionesFormulario > div {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .botonPrincipal,
+  .botonSecundario {
+    width: 100%;
+  }
+}

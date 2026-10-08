@@ -1,0 +1,2 @@
+import { CatalogoFormularioView } from '../../catalogos-base/components/catalogo-formulario-view'; import { formaFarmaceuticaApi } from '../forma-farmaceutica-api'; import { formaFarmaceuticaConfig } from '../forma-farmaceutica.config'
+export function FormaFarmaceuticaEditarView({ formaFarmaceuticaId, ...props }: { formaFarmaceuticaId: string; onNavegar: (ruta: string) => void; onCambiosPendientes: (p: boolean) => void }) { return <CatalogoFormularioView config={formaFarmaceuticaConfig} api={formaFarmaceuticaApi} itemId={formaFarmaceuticaId} {...props} /> }

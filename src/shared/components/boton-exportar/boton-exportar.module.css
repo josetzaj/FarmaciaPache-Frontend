@@ -1,0 +1,119 @@
+.contenedor {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.activador {
+  display: inline-flex;
+  min-height: 2.7rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.48rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-small);
+  background: var(--color-surface);
+  color: var(--color-accent);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.activador:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--color-accent) 8%, var(--color-surface));
+}
+
+.activador:focus-visible,
+.menu button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.activador:disabled {
+  cursor: not-allowed;
+  opacity: 0.58;
+}
+
+.iconoDescarga {
+  width: 1.35rem;
+  height: 1.35rem;
+  flex: 0 0 auto;
+  object-fit: contain;
+}
+
+.menu {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 0.4rem);
+  right: 0;
+  display: grid;
+  min-width: 15rem;
+  padding: 0.35rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: var(--color-surface);
+  box-shadow: 0 0.8rem 2rem rgb(15 23 42 / 14%);
+}
+
+.menu button {
+  display: grid;
+  grid-template-columns: 2.25rem 1fr;
+  gap: 0.65rem;
+  align-items: center;
+  padding: 0.6rem;
+  border: 0;
+  border-radius: var(--radius-small);
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.menu button:hover {
+  background: var(--color-surface-muted);
+}
+
+.menu button > span:last-child {
+  display: grid;
+  gap: 0.12rem;
+}
+
+.menu strong {
+  font-size: 0.78rem;
+}
+
+.menu small {
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+}
+
+.iconoExcel,
+.iconoPdf {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+}
+
+.iconoExcel img,
+.iconoPdf img {
+  width: 1.8rem;
+  height: 1.8rem;
+  object-fit: contain;
+}
+
+@media (max-width: 38rem) {
+  .contenedor,
+  .activador {
+    width: 100%;
+  }
+
+  .menu {
+    right: auto;
+    left: 0;
+    width: 100%;
+  }
+}

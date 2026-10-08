@@ -1,0 +1,2 @@
+import { CatalogoDetalleView } from '../../catalogos-base/components/catalogo-detalle-view'; import { viaAdministracionApi } from '../via-administracion-api'; import { viaAdministracionConfig } from '../via-administracion.config'
+export function ViaAdministracionDetalleView({ viaAdministracionId, ...props }: { viaAdministracionId: string; permisos: readonly string[]; onNavegar: (ruta: string) => void }) { return <CatalogoDetalleView config={viaAdministracionConfig} api={viaAdministracionApi} itemId={viaAdministracionId} {...props} /> }

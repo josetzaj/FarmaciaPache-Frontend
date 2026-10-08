@@ -1,0 +1,2 @@
+import { CatalogoDetalleView } from '../../catalogos-base/components/catalogo-detalle-view'; import { formaFarmaceuticaApi } from '../forma-farmaceutica-api'; import { formaFarmaceuticaConfig } from '../forma-farmaceutica.config'
+export function FormaFarmaceuticaDetalleView({ formaFarmaceuticaId, ...props }: { formaFarmaceuticaId: string; permisos: readonly string[]; onNavegar: (ruta: string) => void }) { return <CatalogoDetalleView config={formaFarmaceuticaConfig} api={formaFarmaceuticaApi} itemId={formaFarmaceuticaId} {...props} /> }

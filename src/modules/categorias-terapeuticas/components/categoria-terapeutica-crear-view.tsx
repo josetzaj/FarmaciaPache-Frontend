@@ -1,0 +1,2 @@
+import { CatalogoFormularioView } from '../../catalogos-base/components/catalogo-formulario-view'; import { categoriaTerapeuticaApi } from '../categoria-terapeutica-api'; import { categoriaTerapeuticaConfig } from '../categoria-terapeutica.config'
+export function CategoriaTerapeuticaCrearView(props: { onNavegar: (ruta: string) => void; onCambiosPendientes: (p: boolean) => void }) { return <CatalogoFormularioView config={categoriaTerapeuticaConfig} api={categoriaTerapeuticaApi} {...props} /> }

@@ -1,0 +1,2 @@
+import { CatalogoDetalleView } from '../../catalogos-base/components/catalogo-detalle-view'; import { unidadMedidaApi } from '../unidad-medida-api'; import { unidadMedidaConfig } from '../unidad-medida.config'
+export function UnidadMedidaDetalleView({ unidadMedidaId, ...props }: { unidadMedidaId: string; permisos: readonly string[]; onNavegar: (ruta: string) => void }) { return <CatalogoDetalleView config={unidadMedidaConfig} api={unidadMedidaApi} itemId={unidadMedidaId} {...props} /> }

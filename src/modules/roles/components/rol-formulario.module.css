@@ -1,0 +1,411 @@
+.paginaFormulario,
+.formulario {
+  display: grid;
+  gap: 1rem;
+}
+
+.encabezadoPagina {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.encabezadoPagina h1 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: clamp(1.65rem, 3vw, 2.1rem);
+}
+
+.indicadorFormulario {
+  display: inline-flex;
+  max-width: min(28rem, 48vw);
+  min-height: 2rem;
+  align-items: center;
+  overflow: hidden;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  background: var(--color-info-soft);
+  color: var(--color-info);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.alertaError {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-medium);
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.alertaError > span {
+  display: grid;
+  width: 1.45rem;
+  height: 1.45rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--color-danger);
+  color: var(--color-text-inverse);
+  font-weight: 700;
+  place-items: center;
+}
+
+.alertaError p { margin: 0; font-size: 0.84rem; }
+
+.formulario fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: 1.35rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: var(--color-surface);
+  box-shadow: 0 0.35rem 1rem rgb(15 23 42 / 3%);
+}
+
+.formulario fieldset:disabled { opacity: 0.72; }
+.formulario legend { padding: 0; color: var(--color-text); font-size: 1rem; font-weight: 600; }
+
+.grillaDos {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.campo { display: grid; min-width: 0; align-content: start; gap: 0.4rem; }
+.campo label { color: var(--color-text); font-size: 0.78rem; font-weight: 600; }
+.campo label span,
+.accionesFormulario > p span { color: var(--color-danger); }
+
+.campo input,
+.campo select,
+.campo textarea,
+.busquedaPermisosCompacta input {
+  width: 100%;
+  min-height: 2.85rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-small);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 0.84rem;
+  transition: border-color var(--transition-fast);
+}
+
+.campo textarea { height: 2.85rem; min-height: 2.85rem; resize: vertical; }
+.campo input:hover:not(:disabled),
+.campo select:hover:not(:disabled),
+.campo textarea:hover:not(:disabled),
+.busquedaPermisosCompacta input:hover:not(:disabled) { border-color: var(--color-primary); }
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus,
+.busquedaPermisosCompacta input:focus {
+  border-width: 2px;
+  border-color: var(--color-primary);
+  outline: none;
+  box-shadow: none;
+}
+.campo input[aria-invalid='true'],
+.campo select[aria-invalid='true'],
+.campo textarea[aria-invalid='true'] { border-color: var(--color-danger); }
+
+.errorCampo,
+.ayudaCampo { min-height: 1rem; font-size: 0.69rem; line-height: 1.4; }
+.errorCampo { color: var(--color-danger); font-weight: 500; }
+.ayudaCampo { color: var(--color-text-muted); }
+
+.selectorPermisos {
+  display: grid;
+  gap: 1rem;
+  margin-top: 0.75rem;
+}
+
+.cabeceraSelectorPermisos {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1.25rem;
+}
+
+.cabeceraSelectorPermisos > div { display: grid; gap: 0.2rem; }
+.cabeceraSelectorPermisos strong { color: var(--color-text); font-size: 0.86rem; }
+.cabeceraSelectorPermisos span { color: var(--color-text-muted); font-size: 0.7rem; }
+
+.exploradorPermisos {
+  display: grid;
+  min-height: 30rem;
+  grid-template-columns: minmax(11rem, 22%) minmax(12rem, 25%) minmax(0, 1fr);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: var(--color-surface);
+}
+
+.navegacionPermisos,
+.columnaSubmodulos {
+  min-width: 0;
+  border-right: 1px solid var(--color-border);
+  background: var(--color-background);
+}
+
+.columnaSubmodulos { background: var(--color-surface); }
+
+.cabeceraColumnaPermisos,
+.cabeceraPanelAcciones {
+  min-height: 5.25rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.cabeceraColumnaPermisos { display: grid; align-content: center; gap: 0.65rem; }
+.cabeceraColumnaPermisos > div { display: grid; gap: 0.2rem; }
+.cabeceraColumnaPermisos strong { color: var(--color-text); font-size: 0.9rem; }
+.cabeceraColumnaPermisos span { color: var(--color-text-muted); font-size: 0.7rem; }
+
+.busquedaPermisosCompacta { position: relative; display: block; max-width: 11.5rem; }
+.busquedaPermisosCompacta img {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 0.65rem;
+  width: 1rem;
+  height: 1rem;
+  object-fit: contain;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+.busquedaPermisosCompacta input {
+  min-height: 2.3rem;
+  padding: 0.45rem 0.65rem 0.45rem 2rem;
+  font-size: 0.74rem;
+}
+
+.listaMenusPermisos { display: grid; padding: 0.65rem; }
+.listaMenusPermisos { align-content: start; gap: 0.35rem; }
+
+.botonMenuPermisos,
+.botonSubmenuPermisos {
+  width: 100%;
+  border: 0;
+  color: var(--color-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.botonMenuPermisos {
+  display: grid;
+  min-height: 3.65rem;
+  grid-template-columns: 2.35rem minmax(0, 1fr) 1.1rem;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.6rem 0.7rem;
+  border-radius: var(--radius-small);
+  background: transparent;
+}
+
+.botonMenuPermisos:hover,
+.botonMenuPermisosActivo { background: var(--color-surface-muted); }
+
+.iconoMenuPermisos {
+  display: grid;
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 50%;
+  background: var(--color-info-soft);
+  color: var(--color-secondary);
+  place-items: center;
+}
+
+.iconoMenuPermisos svg { width: 1.2rem; height: 1.2rem; }
+.textoMenuPermisos { display: grid; min-width: 0; gap: 0.12rem; }
+.textoMenuPermisos strong { overflow: hidden; font-size: 0.76rem; text-overflow: ellipsis; white-space: nowrap; }
+.textoMenuPermisos small { color: var(--color-text-muted); font-size: 0.65rem; }
+.chevronMenuPermisos,
+.chevronSubmenuPermisos { width: 1rem; height: 1rem; color: var(--color-text-muted); }
+
+.listaSubmenusPermisos {
+  display: grid;
+  align-content: start;
+  gap: 0.35rem;
+  padding: 0.65rem;
+}
+
+.botonSubmenuPermisos {
+  display: grid;
+  min-height: 3.65rem;
+  grid-template-columns: 0.55rem minmax(0, 1fr) 1rem;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.6rem 0.7rem;
+  border-radius: var(--radius-small);
+  background: transparent;
+}
+
+.botonSubmenuPermisos:hover { background: var(--color-surface-muted); }
+.botonSubmenuPermisosActivo { background: var(--color-success-soft); color: var(--color-primary-hover); }
+.indicadorSubmenuPermisos { width: 0.38rem; height: 0.38rem; border-radius: 50%; background: var(--color-border-strong); }
+.botonSubmenuPermisosActivo .indicadorSubmenuPermisos { background: var(--color-primary); }
+.botonSubmenuPermisos > span:nth-child(2) { display: grid; min-width: 0; gap: 0.12rem; }
+.botonSubmenuPermisos strong { overflow: hidden; font-size: 0.73rem; text-overflow: ellipsis; white-space: nowrap; }
+.botonSubmenuPermisos small { color: var(--color-text-muted); font-size: 0.62rem; }
+.botonSubmenuPermisosActivo .chevronSubmenuPermisos { color: var(--color-primary-hover); }
+
+.panelAccionesPermisos { min-width: 0; background: var(--color-surface); }
+.cabeceraPanelAcciones { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.cabeceraPanelAcciones > div { display: grid; min-width: 0; gap: 0.18rem; }
+.cabeceraPanelAcciones h3 { margin: 0; color: var(--color-text); font-size: 1rem; }
+
+.seleccionarGrupoPermisos {
+  display: inline-flex;
+  min-height: 2.5rem;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-small);
+  color: var(--color-text);
+  cursor: pointer;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.seleccionarGrupoPermisos:hover { border-color: var(--color-primary); }
+.seleccionarGrupoPermisos input,
+.opcionPermiso input { width: 1.05rem; height: 1.05rem; flex: 0 0 auto; accent-color: var(--color-primary); }
+
+.grillaAccionesPermisos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(13rem, 100%), 1fr));
+  gap: 0.7rem;
+  padding: 1rem;
+}
+
+.opcionPermiso {
+  display: grid;
+  min-height: 6.25rem;
+  grid-template-columns: 2.25rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-surface);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+.opcionPermiso:hover { border-color: var(--color-primary); }
+.opcionPermisoSeleccionada { border-color: var(--color-primary); background: color-mix(in srgb, var(--color-success-soft) 45%, var(--color-surface)); }
+.iconoAccionPermiso {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: var(--color-surface-muted);
+  color: var(--color-primary);
+  place-items: center;
+}
+.iconoAccionPermiso svg { width: 1.1rem; height: 1.1rem; }
+.contenidoAccionPermiso { display: grid; min-width: 0; gap: 0.18rem; }
+.opcionPermiso strong { color: var(--color-text); font-size: 0.78rem; }
+.opcionPermiso em { color: var(--color-text-muted); font-size: 0.66rem; font-style: normal; line-height: 1.35; }
+.estadoPanelPermisos { display: grid; min-height: 24rem; justify-items: center; align-content: center; padding: 2rem; text-align: center; }
+.estadoPanelPermisos svg { width: 2rem; height: 2rem; color: var(--color-primary); }
+.estadoPanelPermisos h3 { margin: 0.75rem 0 0; color: var(--color-text); font-size: 1rem; }
+.estadoPanelPermisos p { margin: 0.35rem 0 0; color: var(--color-text-muted); font-size: 0.75rem; }
+.sinCoincidenciasColumna { margin: 0; padding: 1.5rem 0.75rem; color: var(--color-text-muted); font-size: 0.72rem; text-align: center; }
+.avisoPermisosLectura { margin: 0.6rem 0 0; padding: 0.75rem; border-radius: var(--radius-small); background: var(--color-info-soft); color: var(--color-info); font-size: 0.75rem; }
+
+.accionesFormulario {
+  position: sticky;
+  z-index: 5;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: rgb(255 255 255 / 96%);
+  box-shadow: 0 -0.4rem 1.2rem rgb(15 23 42 / 5%);
+  backdrop-filter: blur(10px);
+}
+.accionesFormulario > p { margin: 0; color: var(--color-text-muted); font-size: 0.7rem; }
+.accionesFormulario > div { display: flex; gap: 0.65rem; }
+
+.botonPrincipal,
+.botonSecundario,
+.estadoCargaFormulario button {
+  display: inline-flex;
+  min-height: 2.8rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.65rem 1rem;
+  border-radius: var(--radius-small);
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.botonPrincipal { border: 1px solid var(--color-primary); background: var(--color-primary); color: var(--color-text-inverse); }
+.botonPrincipal:hover:not(:disabled) { border-color: var(--color-primary-hover); background: var(--color-primary-hover); }
+.botonSecundario { border: 1px solid var(--color-secondary); background: var(--color-surface); color: var(--color-secondary); }
+.botonSecundario:hover:not(:disabled) { background: var(--color-info-soft); }
+.botonPrincipal:disabled,
+.botonSecundario:disabled { cursor: wait; opacity: 0.65; }
+.iconoBoton { width: 1.05rem; height: 1.05rem; }
+
+.estadoCargaFormulario {
+  display: grid;
+  min-height: 24rem;
+  justify-items: center;
+  align-content: center;
+  padding: 2rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: var(--color-surface);
+  text-align: center;
+}
+.estadoCargaFormulario nav { justify-self: start; align-self: start; }
+.estadoCargaFormulario h1 { margin: 1rem 0 0; color: var(--color-text); font-size: 1.25rem; }
+.estadoCargaFormulario p { max-width: 32rem; margin: 0.5rem 0 1rem; color: var(--color-text-muted); }
+.estadoCargaFormulario button { border: 1px solid var(--color-primary); background: var(--color-primary); color: var(--color-text-inverse); }
+
+.soloLectores { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+@media (max-width: 64rem) {
+  .exploradorPermisos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .columnaSubmodulos { border-right: 0; }
+  .panelAccionesPermisos { grid-column: 1 / -1; border-top: 1px solid var(--color-border); }
+  .cabeceraPanelAcciones { align-items: flex-start; flex-direction: column; }
+  .seleccionarGrupoPermisos { width: 100%; }
+}
+
+@media (max-width: 42rem) {
+  .encabezadoPagina { align-items: flex-start; flex-direction: column; }
+  .indicadorFormulario { max-width: 100%; }
+  .formulario fieldset { padding: 1rem; }
+  .cabeceraSelectorPermisos { align-items: stretch; flex-direction: column; }
+  .exploradorPermisos { grid-template-columns: 1fr; }
+  .navegacionPermisos { border-right: 0; border-bottom: 1px solid var(--color-border); }
+  .columnaSubmodulos { border-bottom: 1px solid var(--color-border); }
+  .panelAccionesPermisos { grid-column: auto; border-top: 0; }
+  .cabeceraColumnaPermisos,
+  .cabeceraPanelAcciones { min-height: auto; }
+  .busquedaPermisosCompacta { max-width: 100%; }
+  .accionesFormulario { align-items: stretch; flex-direction: column; }
+  .accionesFormulario > div { display: grid; }
+  .botonPrincipal,
+  .botonSecundario { width: 100%; }
+}

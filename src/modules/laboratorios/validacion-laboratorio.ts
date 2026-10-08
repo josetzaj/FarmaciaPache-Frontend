@@ -1,0 +1,2 @@
+import type { DatosCatalogoMaestro } from '../catalogos-base/catalogo-maestro.types'
+export function validarLaboratorio(d: DatosCatalogoMaestro) { const e: Record<string, string> = {}; if (!/^[A-Za-z0-9_-]{2,20}$/.test(String(d.codigo).trim())) e.codigo = 'Usa de 2 a 20 letras, números, guion o guion bajo.'; if (String(d.nombre).trim().length < 2) e.nombre = 'Ingresa el nombre del laboratorio.'; if (String(d.paisOrigen ?? '').length > 100) e.paisOrigen = 'El país no puede superar 100 caracteres.'; return e }

@@ -1,0 +1,2 @@
+import { CatalogoListadoView } from '../../catalogos-base/components/catalogo-listado-view'; import { principioActivoApi } from '../principio-activo-api'; import { principioActivoConfig } from '../principio-activo.config'
+export function PrincipioActivoListadoView(props: { permisos: readonly string[]; onNavegar: (ruta: string) => void }) { return <CatalogoListadoView config={principioActivoConfig} api={principioActivoApi} {...props} /> }

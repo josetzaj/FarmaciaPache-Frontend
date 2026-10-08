@@ -1,0 +1,2 @@
+import { CatalogoDetalleView } from '../../catalogos-base/components/catalogo-detalle-view'; import { categoriaTerapeuticaApi } from '../categoria-terapeutica-api'; import { categoriaTerapeuticaConfig } from '../categoria-terapeutica.config'
+export function CategoriaTerapeuticaDetalleView({ categoriaTerapeuticaId, ...props }: { categoriaTerapeuticaId: string; permisos: readonly string[]; onNavegar: (ruta: string) => void }) { return <CatalogoDetalleView config={categoriaTerapeuticaConfig} api={categoriaTerapeuticaApi} itemId={categoriaTerapeuticaId} {...props} /> }

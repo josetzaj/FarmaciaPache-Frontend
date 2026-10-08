@@ -1,0 +1,2 @@
+import { CatalogoFormularioView } from '../../catalogos-base/components/catalogo-formulario-view'; import { laboratorioApi } from '../laboratorio-api'; import { laboratorioConfig } from '../laboratorio.config'
+export function LaboratorioCrearView(props: { onNavegar: (ruta: string) => void; onCambiosPendientes: (p: boolean) => void }) { return <CatalogoFormularioView config={laboratorioConfig} api={laboratorioApi} {...props} /> }

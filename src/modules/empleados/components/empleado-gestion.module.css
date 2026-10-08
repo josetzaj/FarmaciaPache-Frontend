@@ -1,0 +1,1033 @@
+.pagina {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.cabeceraDetalle {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.cabeceraPagina {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.cabeceraPagina p,
+.perfilEmpleado p {
+  margin: 0 0 0.35rem;
+  color: var(--color-primary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.cabeceraPagina h1,
+.perfilEmpleado h1 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: clamp(1.65rem, 3vw, 2.1rem);
+  line-height: 1.2;
+}
+
+.filaCabeceraEmpleados {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.filaCabeceraEmpleados h1 {
+  flex: 1 1 auto;
+  margin-right: auto;
+}
+
+.botonPrimario,
+.botonPeligro,
+.accionesCabecera button,
+.estadoVacio button,
+.errorPagina button {
+  min-height: 2.7rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--color-primary);
+  border-radius: var(--radius-small);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.botonPrimario {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.75rem;
+  background: var(--color-surface);
+  color: var(--color-primary);
+  white-space: nowrap;
+}
+
+.botonPrimario:hover {
+  background: var(--color-surface-muted);
+}
+
+.botonPrimario:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.botonPrimario img {
+  width: 1.6rem;
+  height: 1.6rem;
+  object-fit: contain;
+}
+
+.busquedaGeneral {
+  flex: 0 1 30rem;
+  display: grid;
+  gap: 0.25rem;
+  width: min(30rem, 42vw);
+}
+
+.controlBusquedaGeneral {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.iconoBusquedaGeneral {
+  position: absolute;
+  left: 0.7rem;
+  width: 1.4rem;
+  height: 1.4rem;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.controlBusquedaGeneral input {
+  width: 100%;
+  min-height: 2.7rem;
+  padding: 0.65rem 2.8rem 0.65rem 2.35rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-small);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 0.82rem;
+}
+
+.controlBusquedaGeneral input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.controlBusquedaGeneral input:focus-visible {
+  border-color: var(--color-primary);
+  outline: 2px solid var(--color-focus);
+  outline-offset: 1px;
+}
+
+.controlBusquedaGeneral button {
+  position: absolute;
+  right: 0.35rem;
+  display: grid;
+  width: 2.1rem;
+  height: 2.1rem;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.controlBusquedaGeneral button:hover,
+.controlBusquedaGeneral button:focus-visible {
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+}
+
+.controlBusquedaGeneral button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 1px;
+}
+
+.busquedaGeneral > small {
+  min-height: 1rem;
+  padding-left: 0.1rem;
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+}
+
+.busquedaGeneral > .ayudaBusquedaInvalida {
+  color: var(--color-warning);
+  font-weight: 600;
+}
+
+.panelFiltros {
+  display: grid;
+  grid-template-columns: minmax(17rem, 1fr) minmax(12rem, 16rem) auto;
+  align-items: end;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: var(--color-surface);
+}
+
+.panelFiltros form,
+.filtroEstado {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.panelFiltros label {
+  color: var(--color-text);
+  font-size: 0.72rem;
+  font-weight: 650;
+}
+
+.controlBusqueda {
+  display: flex;
+}
+
+.panelFiltros input,
+.panelFiltros select,
+.contenidoConfirmacion textarea {
+  width: 100%;
+  min-height: 2.65rem;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-small);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+  font-size: 0.8rem;
+}
+
+.controlBusqueda input {
+  border-radius: var(--radius-small) 0 0 var(--radius-small);
+}
+
+.controlBusqueda button {
+  padding: 0.55rem 0.85rem;
+  border: 1px solid var(--color-secondary);
+  border-radius: 0 var(--radius-small) var(--radius-small) 0;
+  background: var(--color-secondary);
+  color: var(--color-text-inverse);
+  cursor: pointer;
+  font-size: 0.76rem;
+  font-weight: 650;
+}
+
+.limpiarFiltros {
+  min-height: 2.65rem;
+  padding: 0.55rem 0.75rem;
+  border: 0;
+  background: transparent;
+  color: var(--color-secondary);
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-weight: 650;
+  text-decoration: underline;
+  text-underline-offset: 0.2rem;
+}
+
+.panelTabla,
+.tarjetaDetalle {
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: var(--color-surface);
+  box-shadow: 0 0.35rem 1rem rgb(15 23 42 / 3%);
+}
+
+.resumenTabla,
+.tituloHistorial {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.resumenTabla strong {
+  display: block;
+  color: var(--color-text);
+  font-size: 0.86rem;
+}
+
+.resumenContenido small {
+  display: block;
+  margin-top: 0.18rem;
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+}
+
+.accionesResumen {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+.accionesResumen button {
+  min-height: 2.2rem;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid var(--color-secondary);
+  border-radius: var(--radius-small);
+  background: var(--color-surface);
+  color: var(--color-secondary);
+  cursor: pointer;
+  font-size: 0.7rem;
+  font-weight: 650;
+}
+
+.accionesResumen button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.resumenTabla span,
+.tituloHistorial .accionesResumen > span {
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+}
+
+.tablaContenedor {
+  overflow-x: auto;
+}
+
+.tablaContenedor table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tablaContenedor th,
+.tablaContenedor td {
+  padding: 0.8rem 0.9rem;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.tablaContenedor th {
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.tablaContenedor td {
+  color: var(--color-text);
+  font-size: 0.75rem;
+}
+
+.tablaContenedor tbody tr:hover {
+  background: color-mix(in srgb, var(--color-info-soft) 45%, transparent);
+}
+
+.tablaContenedor td > strong,
+.tablaContenedor td > small,
+.tablaContenedor td > span:not(.estado) {
+  display: block;
+}
+
+.tablaContenedor td > small,
+.identidadEmpleado small {
+  margin-top: 0.2rem;
+  color: var(--color-text-muted);
+  font-size: 0.67rem;
+}
+
+.identidadEmpleado {
+  display: flex;
+  min-width: 15rem;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.identidadEmpleado > span:last-child {
+  min-width: 0;
+}
+
+.identidadEmpleado strong {
+  display: block;
+  overflow: hidden;
+  max-width: 17rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.avatarEmpleado,
+.fotoDetalle {
+  position: relative;
+  display: grid;
+  overflow: hidden;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--color-info-soft);
+  color: var(--color-secondary);
+  font-weight: 750;
+  place-items: center;
+}
+
+.avatarEmpleado {
+  width: 2.65rem;
+  height: 2.65rem;
+  font-size: 0.72rem;
+}
+
+.avatarEmpleado img,
+.fotoDetalle img {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  inset: 0;
+  object-fit: cover;
+}
+
+.estado {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.28rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.activo {
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.suspendido {
+  background: var(--color-warning-soft);
+  color: var(--color-warning);
+}
+
+.inactivo {
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+}
+
+.retirado {
+  background: color-mix(in srgb, var(--color-danger) 12%, white);
+  color: var(--color-danger);
+}
+
+.sinDato,
+.sinHistorial {
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
+.accionesFila {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.35rem;
+  white-space: nowrap;
+}
+
+.accionesFila button {
+  display: grid;
+  width: 2.35rem;
+  height: 2.35rem;
+  padding: 0.3rem;
+  place-items: center;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-small);
+  background: var(--color-surface);
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.accionesFila button:hover {
+  border-color: var(--color-primary);
+  background: var(--color-surface-muted);
+  transform: translateY(-1px);
+}
+
+.accionesFila button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.accionesFila img {
+  width: 1.55rem;
+  height: 1.55rem;
+  object-fit: contain;
+}
+
+.accionesFila svg {
+  width: 1.35rem;
+  height: 1.35rem;
+}
+
+.accionesFila .accionEstado {
+  border-color: var(--color-warning);
+  color: var(--color-warning);
+}
+
+.accionesFila .accionPeligro,
+.botonPeligro {
+  border-color: var(--color-danger);
+  background: var(--color-surface);
+  color: var(--color-danger);
+}
+
+.paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+}
+
+.paginacion > span {
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+}
+
+.paginacion > div,
+.numeroPaginaGrupo {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.paginacion button {
+  min-width: 2rem;
+  min-height: 2rem;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-surface);
+  color: var(--color-secondary);
+  cursor: pointer;
+  font-size: 0.68rem;
+}
+
+.paginacion button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.paginacion .paginaActiva {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.alertaError,
+.alertaAdvertencia,
+.errorPagina {
+  padding: 1rem;
+  border-radius: var(--radius-medium);
+}
+
+.alertaError,
+.alertaAdvertencia {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.alertaError,
+.errorPagina {
+  border: 1px solid var(--color-danger);
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.alertaAdvertencia {
+  border: 1px solid var(--color-warning);
+  background: var(--color-warning-soft);
+  color: var(--color-warning);
+}
+
+.alertaError p,
+.alertaAdvertencia p {
+  margin: 0;
+}
+
+.alertaError button,
+.alertaAdvertencia button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.estadoVacio,
+.errorPagina {
+  display: grid;
+  min-height: 20rem;
+  justify-items: center;
+  align-content: center;
+  text-align: center;
+}
+
+.estadoVacio > span {
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: var(--color-info-soft);
+  color: var(--color-secondary);
+  font-size: 1.5rem;
+  place-items: center;
+}
+
+.estadoVacio h2,
+.errorPagina h1 {
+  margin: 0.8rem 0 0;
+  color: var(--color-text);
+}
+
+.estadoVacio p,
+.errorPagina p {
+  margin: 0.35rem 0 1rem;
+  color: var(--color-text-muted);
+}
+
+.errorPagina div {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.volver {
+  justify-self: start;
+  padding: 0.4rem 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-secondary);
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 650;
+}
+
+.cabeceraDetalle {
+  align-items: center;
+  padding: 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: var(--color-surface);
+}
+
+.perfilEmpleado {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.fotoDetalle {
+  width: 5.5rem;
+  height: 5.5rem;
+  font-size: 1.3rem;
+}
+
+.perfilEmpleado .estado {
+  margin-top: 0.55rem;
+}
+
+.accionesCabecera {
+  display: flex;
+  gap: 0.65rem;
+}
+
+.accionesCabecera .botonEditar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border-color: var(--color-secondary);
+  background: var(--color-surface);
+  color: var(--color-secondary);
+}
+
+.accionesCabecera .botonEditar svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.accionesCabecera .botonPeligro {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border-color: var(--color-danger);
+  background: var(--color-danger);
+  color: var(--color-text-inverse);
+}
+
+.accionesCabecera .botonEstado {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border-color: var(--color-warning);
+  background: var(--color-warning);
+  color: var(--color-text-inverse);
+}
+
+.accionesCabecera .botonEstado svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.accionesCabecera .botonPeligro svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.accionesCabecera .botonPeligro:hover {
+  border-color: color-mix(in srgb, var(--color-danger) 82%, black);
+  background: color-mix(in srgb, var(--color-danger) 82%, black);
+}
+
+.grillaDetalle {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.tarjetaDetalle {
+  padding: 1.15rem;
+}
+
+.tarjetaDetalle h2 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 0.95rem;
+}
+
+.tarjetaDetalle dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin: 1rem 0 0;
+}
+
+.tarjetaDetalle dl div {
+  min-width: 0;
+}
+
+.tarjetaDetalle dt {
+  color: var(--color-text-muted);
+  font-size: 0.67rem;
+  font-weight: 650;
+  text-transform: uppercase;
+}
+
+.tarjetaDetalle dd {
+  overflow-wrap: anywhere;
+  margin: 0.28rem 0 0;
+  color: var(--color-text);
+  font-size: 0.8rem;
+}
+
+.tarjetaDetalle .datoCompleto {
+  grid-column: 1 / -1;
+}
+
+.tituloHistorial {
+  margin: -1.15rem -1.15rem 0;
+}
+
+.tituloHistorial p {
+  margin: 0.25rem 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+}
+
+.tarjetaDetalle > .tablaTanstackHistorial {
+  margin: 0 -1.15rem -1.15rem;
+}
+
+.tarjetaDetalle > .tablaTanstackAuditoria {
+  margin: 0 -1.15rem -1.15rem;
+}
+
+.accionAuditoria {
+  width: fit-content;
+  padding: 0.28rem 0.55rem;
+  border-radius: 999px;
+  background: var(--color-info-soft);
+  color: var(--color-info);
+  font-size: 0.68rem;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.botonCambiosAuditoria,
+.errorAuditoria button {
+  min-height: 2.25rem;
+  padding: 0.4rem 0.65rem;
+  border: 1px solid var(--color-secondary);
+  border-radius: var(--radius-small);
+  background: var(--color-surface);
+  color: var(--color-secondary);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.botonCambiosAuditoria:hover,
+.errorAuditoria button:hover {
+  background: var(--color-info-soft);
+}
+
+.botonCambiosAuditoria:focus-visible,
+.errorAuditoria button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.detalleAuditoria {
+  display: grid;
+  gap: 0.65rem;
+  padding: 0.9rem 1rem 1rem;
+}
+
+.detalleAuditoria h3 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 0.8rem;
+}
+
+.tablaCambiosContenedor {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-surface);
+}
+
+.tablaCambiosContenedor table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tablaCambiosContenedor th,
+.tablaCambiosContenedor td {
+  min-width: 10rem;
+  padding: 0.6rem 0.7rem;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-size: 0.7rem;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.tablaCambiosContenedor thead th {
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+  font-size: 0.65rem;
+  text-transform: uppercase;
+}
+
+.tablaCambiosContenedor tbody th {
+  font-weight: 650;
+}
+
+.tablaCambiosContenedor tbody tr:last-child th,
+.tablaCambiosContenedor tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.errorAuditoria {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0.9rem 0 0;
+  padding: 0.75rem;
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-small);
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+  font-size: 0.75rem;
+}
+
+.sinHistorial {
+  margin-bottom: 0;
+  font-size: 0.78rem;
+}
+
+.contenidoConfirmacion {
+  display: grid;
+  gap: 0.5rem;
+  text-align: left;
+}
+
+.contenidoConfirmacion p {
+  margin: 0 0 0.35rem;
+}
+
+.contenidoConfirmacion label {
+  color: var(--color-text);
+  font-size: 0.75rem;
+  font-weight: 650;
+}
+
+.contenidoConfirmacion textarea {
+  min-height: 5rem;
+  resize: vertical;
+}
+
+.contenidoConfirmacion select {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-small);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.contenidoConfirmacion select:focus {
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+.contenidoConfirmacion .explicacionEstado {
+  margin: 0 0 0.35rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid transparent;
+  border-left-width: 0.3rem;
+  border-radius: var(--radius-small);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.explicacionActiva {
+  border-color: var(--color-success);
+  background: var(--color-success-soft);
+  color: var(--color-success);
+}
+
+.explicacionSuspendida {
+  border-color: var(--color-warning);
+  background: var(--color-warning-soft);
+  color: var(--color-warning);
+}
+
+.explicacionDesactivada {
+  border-color: var(--color-danger);
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+.explicacionRetirada {
+  border-color: var(--color-danger);
+  background: var(--color-danger);
+  color: var(--color-text-inverse);
+}
+
+.contenidoConfirmacion small {
+  color: var(--color-text-muted);
+  font-size: 0.65rem;
+  text-align: right;
+}
+
+.contenidoConfirmacion > span {
+  color: var(--color-danger);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.soloLectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (max-width: 70rem) {
+  .panelFiltros {
+    grid-template-columns: minmax(15rem, 1fr) minmax(11rem, 14rem);
+  }
+
+  .limpiarFiltros {
+    justify-self: start;
+  }
+}
+
+@media (max-width: 52rem) {
+  .cabeceraDetalle,
+  .paginacion {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .filaCabeceraEmpleados {
+    flex-wrap: wrap;
+  }
+
+  .busquedaGeneral {
+    flex-grow: 1;
+    width: min(100%, 30rem);
+  }
+
+  .grillaDetalle {
+    grid-template-columns: 1fr;
+  }
+
+  .paginacion > div {
+    flex-wrap: wrap;
+  }
+
+  .resumenTabla,
+  .accionesResumen {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 38rem) {
+  .panelFiltros,
+  .tarjetaDetalle dl {
+    grid-template-columns: 1fr;
+  }
+
+  .perfilEmpleado,
+  .accionesCabecera {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .accionesCabecera button,
+  .botonPrimario {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .filaCabeceraEmpleados h1,
+  .busquedaGeneral {
+    flex-basis: 100%;
+  }
+
+  .errorAuditoria {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

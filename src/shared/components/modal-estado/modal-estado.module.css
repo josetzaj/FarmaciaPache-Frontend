@@ -1,0 +1,627 @@
+.fondo {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  padding: 1.25rem;
+  overflow-y: auto;
+  background: rgb(15 23 42 / 52%);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  place-items: center;
+  animation: mostrarFondo 180ms ease-out;
+}
+
+.modal {
+  position: relative;
+  width: min(100%, 27rem);
+  padding: 2rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-large);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  text-align: center;
+  animation: mostrarModal 220ms ease-out;
+}
+
+.modalAmplio {
+  width: min(100%, 42rem);
+  max-height: calc(100dvh - 2.5rem);
+  overflow-y: auto;
+}
+
+.cerrar {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-small);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  place-items: center;
+}
+
+.cerrar:hover:not(:disabled) {
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+}
+
+.cerrar svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-width: 1.8;
+}
+
+.animacionLottie,
+.ilustracion {
+  width: 7.5rem;
+  height: 7.5rem;
+  margin: 0 auto 1rem;
+}
+
+.animacionLottie canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.ilustracion {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+}
+
+.ilustracion svg {
+  position: relative;
+  z-index: 2;
+  width: 6rem;
+  height: 6rem;
+  overflow: visible;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.halo {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.14;
+  animation: expandirHalo 700ms ease-out both;
+}
+
+.ilustracion.exito .halo {
+  opacity: 0.14;
+  animation: latirHalo 1800ms ease-in-out infinite;
+}
+
+.ilustracion.informacion .halo {
+  opacity: 0;
+  animation: ondaInformacion 1200ms ease-out both;
+}
+
+.contorno {
+  fill: currentColor;
+  stroke: none;
+  opacity: 0.14;
+  transform-origin: center;
+  animation: aparecerContorno 420ms ease-out both;
+}
+
+.circuloRelleno {
+  fill: currentColor;
+  stroke: none;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: aparecerCirculoRelleno 520ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.circuloInformacion {
+  fill: currentColor;
+  stroke: none;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pulsoInformacion 950ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.circuloError {
+  fill: currentColor;
+  stroke: none;
+}
+
+.trianguloRelleno {
+  fill: currentColor;
+  stroke: none;
+}
+
+.simbolo {
+  stroke-width: 2.2;
+  animation: dibujarSimbolo 420ms 180ms ease-out both;
+}
+
+.ilustracion.exito .simbolo {
+  stroke: var(--color-text-inverse);
+  animation: none;
+}
+
+.ilustracion.exito .simbolo path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: dibujarCheck 500ms 320ms ease-out forwards;
+}
+
+.ilustracion.advertencia svg {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: entrarAdvertencia 820ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ilustracion.advertencia {
+  margin-bottom: 0.15rem;
+}
+
+.ilustracion.advertencia .simbolo {
+  stroke: var(--color-text-inverse);
+  stroke-width: 2.5;
+  animation: none;
+}
+
+.ilustracion.informacion .simbolo {
+  stroke: var(--color-text-inverse);
+  stroke-width: 2.5;
+  animation: none;
+}
+
+.ilustracion.error svg {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: sacudirError 820ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.ilustracion.error .simbolo {
+  stroke: var(--color-text-inverse);
+  stroke-width: 2.5;
+  animation: none;
+}
+
+.fantasmaError {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: desdoblarError 820ms ease-out both;
+}
+
+.fantasmaError circle {
+  fill: currentColor;
+  stroke: none;
+}
+
+.fantasmaError path {
+  fill: none;
+  stroke: var(--color-text-inverse);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.5;
+}
+
+.exito {
+  color: var(--color-success);
+}
+
+.error {
+  color: var(--color-danger);
+}
+
+.advertencia {
+  color: var(--color-warning);
+}
+
+.informacion {
+  color: var(--color-info);
+}
+
+.etiqueta {
+  display: block;
+  margin-bottom: 0.35rem;
+  color: currentColor;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.modal h2 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.mensaje {
+  min-width: 0;
+  margin-top: 0.75rem;
+  color: var(--color-text-muted);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.mensaje p {
+  margin: 0;
+}
+
+.acciones {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+}
+
+.principal,
+.secundario {
+  display: inline-flex;
+  min-width: 7.5rem;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  border-radius: var(--radius-medium);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition:
+    border-color var(--transition-fast),
+    background var(--transition-fast),
+    transform var(--transition-fast);
+}
+
+.principal {
+  border: 1px solid var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.principal:hover:not(:disabled) {
+  border-color: var(--color-primary-hover);
+  background: var(--color-primary-hover);
+}
+
+.principalPeligro {
+  border-color: var(--color-danger);
+  background: var(--color-danger);
+}
+
+.principalPeligro:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--color-danger) 82%, black);
+  background: color-mix(in srgb, var(--color-danger) 82%, black);
+}
+
+.secundario {
+  border: 1px solid var(--color-secondary);
+  background: var(--color-surface);
+  color: var(--color-secondary);
+}
+
+.secundario:hover:not(:disabled) {
+  background: var(--color-info-soft);
+}
+
+.principal:active:not(:disabled),
+.secundario:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.principal:disabled,
+.secundario:disabled,
+.cerrar:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.principal > svg,
+.secundario > svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  flex: 0 0 auto;
+}
+
+@keyframes mostrarFondo {
+  from { opacity: 0; }
+}
+
+@keyframes mostrarModal {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.98);
+  }
+}
+
+@keyframes expandirHalo {
+  from {
+    opacity: 0;
+    transform: scale(0.55);
+  }
+  60% { opacity: 0.2; }
+}
+
+@keyframes latirHalo {
+  0%,
+  100% {
+    opacity: 0.12;
+    transform: scale(0.88);
+  }
+
+  50% {
+    opacity: 0.25;
+    transform: scale(1);
+  }
+}
+
+@keyframes aparecerCirculoRelleno {
+  0% {
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  72% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes ondaInformacion {
+  0% {
+    opacity: 0.28;
+    transform: scale(0.62);
+  }
+
+  45% {
+    opacity: 0.2;
+    transform: scale(0.92);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.14);
+  }
+}
+
+@keyframes pulsoInformacion {
+  0% {
+    opacity: 0;
+    transform: scale(0.78);
+  }
+
+  45% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+
+  68% {
+    transform: scale(0.97);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes sacudirError {
+  0% {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+
+  18% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+
+  31% {
+    transform: translateX(-0.48rem) rotate(-3deg) scale(1);
+  }
+
+  43% {
+    transform: translateX(0.44rem) rotate(2.5deg) scale(1);
+  }
+
+  55% {
+    transform: translateX(-0.3rem) rotate(-1.75deg) scale(1);
+  }
+
+  67% {
+    transform: translateX(0.2rem) rotate(1.25deg) scale(1);
+  }
+
+  80% {
+    transform: translateX(-0.08rem) rotate(-0.5deg) scale(1);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateX(0) rotate(0) scale(1);
+  }
+}
+
+@keyframes desdoblarError {
+  0%,
+  18% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+
+  31% {
+    opacity: 0.28;
+    transform: translate(0.65rem, 0.08rem);
+  }
+
+  43% {
+    opacity: 0.2;
+    transform: translate(-0.55rem, -0.05rem);
+  }
+
+  55% {
+    opacity: 0.14;
+    transform: translate(0.4rem, 0.03rem);
+  }
+
+  72% {
+    opacity: 0.08;
+    transform: translate(-0.22rem, 0);
+  }
+
+  86%,
+  100% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+}
+
+@keyframes dibujarCheck {
+  from {
+    stroke-dashoffset: 1;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes entrarAdvertencia {
+  0% {
+    opacity: 0;
+    transform: translateY(2.25rem) scale(0.78);
+  }
+
+  45% {
+    opacity: 1;
+    transform: translateY(-0.45rem) scale(1.04);
+  }
+
+  58% {
+    transform: translateY(0.12rem) rotate(-2.5deg) scale(0.99);
+  }
+
+  70% {
+    transform: translateY(-0.08rem) rotate(2deg) scale(1.01);
+  }
+
+  82% {
+    transform: translateY(0) rotate(-1deg) scale(1);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotate(0) scale(1);
+  }
+}
+
+@keyframes aparecerContorno {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  70% { transform: scale(1.08); }
+}
+
+@keyframes dibujarSimbolo {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 30rem) {
+  .fondo {
+    align-items: end;
+    padding: 0.75rem;
+  }
+
+  .modal {
+    padding: 1.75rem 1.25rem 1.25rem;
+    border-radius: var(--radius-large) var(--radius-large) var(--radius-medium) var(--radius-medium);
+  }
+
+  .modalAmplio {
+    max-height: calc(100dvh - 1.5rem);
+  }
+
+  .animacionLottie,
+  .ilustracion {
+    width: 6.5rem;
+    height: 6.5rem;
+  }
+
+  .ilustracion svg {
+    width: 5.25rem;
+    height: 5.25rem;
+  }
+
+  .acciones {
+    flex-direction: column-reverse;
+  }
+
+  .principal,
+  .secundario {
+    width: 100%;
+    min-height: 3rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fondo,
+  .modal,
+  .halo,
+  .contorno,
+  .circuloRelleno,
+  .circuloInformacion,
+  .simbolo,
+  .simbolo path,
+  .ilustracion.advertencia svg,
+  .ilustracion.error svg,
+  .fantasmaError {
+    animation: none;
+  }
+
+  .fantasmaError {
+    opacity: 0;
+  }
+
+  .ilustracion.exito .halo {
+    opacity: 0.14;
+    transform: none;
+  }
+
+  .ilustracion.exito .simbolo path {
+    stroke-dashoffset: 0;
+  }
+
+  .ilustracion.informacion .halo {
+    opacity: 0;
+    transform: none;
+  }
+}

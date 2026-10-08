@@ -1,0 +1,2 @@
+import { CatalogoListadoView } from '../../catalogos-base/components/catalogo-listado-view'; import { presentacionApi } from '../presentacion-api'; import { presentacionConfig } from '../presentacion.config'
+export function PresentacionListadoView(props: { permisos: readonly string[]; onNavegar: (ruta: string) => void }) { return <CatalogoListadoView config={presentacionConfig} api={presentacionApi} {...props} /> }

@@ -1,0 +1,419 @@
+.contenedorTabla {
+  overflow-x: auto;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla th,
+.tabla td {
+  padding: 0.8rem 0.9rem;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.tabla th {
+  padding: 0;
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.tabla td {
+  color: var(--color-text);
+  font-size: 0.75rem;
+}
+
+.tabla tbody tr:hover {
+  background: color-mix(in srgb, var(--color-info-soft) 45%, transparent);
+}
+
+.tabla .filaExpandida:hover,
+.filaExpandida {
+  background: var(--color-surface-muted);
+}
+
+.tabla .filaExpandida > td {
+  padding: 0;
+}
+
+.tabla td > strong,
+.tabla td > small,
+.tabla td > span {
+  display: block;
+}
+
+.tabla td > small {
+  margin-top: 0.2rem;
+  color: var(--color-text-muted);
+  font-size: 0.67rem;
+}
+
+.botonEncabezado {
+  position: relative;
+  display: flex;
+  width: 100%;
+  min-width: 7rem;
+  min-height: 2.9rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.55rem;
+  padding: 0.65rem 0.75rem 0.65rem 0.9rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+
+.botonEncabezado:hover {
+  background: color-mix(in srgb, var(--color-info-soft) 55%, transparent);
+  color: var(--color-secondary);
+}
+
+.botonEncabezado:focus-visible,
+.menuFiltro button:focus-visible,
+.menuFiltro input:focus-visible,
+.paginacion button:focus-visible,
+.paginacion select:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.botonEncabezadoActivo {
+  background: var(--color-info-soft);
+  color: var(--color-secondary);
+}
+
+.iconoFiltro {
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.puntoFiltro {
+  position: absolute;
+  width: 0.42rem;
+  height: 0.42rem;
+  right: 0.38rem;
+  bottom: 0.38rem;
+  border: 1px solid var(--color-surface);
+  border-radius: 50%;
+  background: var(--color-secondary);
+}
+
+.menuFiltro {
+  position: fixed;
+  z-index: 1200;
+  display: grid;
+  width: min(19rem, calc(100vw - 1rem));
+  overflow: hidden;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-medium);
+  background: var(--color-surface);
+  box-shadow: 0 1rem 2rem rgb(15 23 42 / 18%);
+  color: var(--color-text);
+  font-size: 0.78rem;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.menuTitulo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 0.85rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.menuTitulo strong {
+  font-size: 0.82rem;
+}
+
+.menuTitulo button {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  border: 0;
+  border-radius: var(--radius-small);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  font-size: 1.25rem;
+  place-items: center;
+}
+
+.grupoOrden {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.55rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.grupoOrden button {
+  display: flex;
+  min-height: 2.35rem;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 0.6rem;
+  border: 0;
+  border-radius: var(--radius-small);
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.grupoOrden button:hover,
+.grupoOrden .accionActiva {
+  background: var(--color-info-soft);
+  color: var(--color-secondary);
+}
+
+.grupoOrden button span {
+  min-width: 2.2rem;
+  color: var(--color-secondary);
+  font-size: 0.67rem;
+  font-weight: 700;
+}
+
+.formularioFiltro {
+  display: grid;
+}
+
+.formularioFiltro > label {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.75rem 0.85rem;
+}
+
+.formularioFiltro label > span:first-child {
+  color: var(--color-text);
+  font-size: 0.72rem;
+  font-weight: 650;
+}
+
+.formularioFiltro input[type='text'],
+.formularioFiltro input[type='search'],
+.formularioFiltro input[type='date'],
+.formularioFiltro input:not([type]) {
+  width: 100%;
+  min-height: 2.65rem;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-small);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.cabeceraOpciones {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0 0.85rem 0.55rem;
+  color: var(--color-text-muted);
+  font-size: 0.66rem;
+}
+
+.cabeceraOpciones button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-secondary);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 650;
+}
+
+.cabeceraOpciones button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.listaOpciones {
+  display: grid;
+  max-height: min(16rem, 34vh);
+  overflow-y: auto;
+  border-block: 1px solid var(--color-border);
+}
+
+.opcionFiltro {
+  display: flex;
+  min-height: 2.65rem;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.55rem 0.85rem;
+  cursor: pointer;
+}
+
+.opcionFiltro:hover {
+  background: var(--color-surface-muted);
+}
+
+.opcionFiltro input {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+  margin-top: 0.1rem;
+  accent-color: var(--color-primary);
+}
+
+.opcionFiltro span,
+.opcionFiltro strong,
+.opcionFiltro small {
+  display: block;
+}
+
+.opcionFiltro strong {
+  font-size: 0.74rem;
+}
+
+.opcionFiltro small {
+  margin-top: 0.15rem;
+  color: var(--color-text-muted);
+  font-size: 0.65rem;
+}
+
+.sinOpciones {
+  margin: 0;
+  padding: 1rem;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.accionesFiltro {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.7rem 0.85rem;
+}
+
+.accionesFiltro button {
+  min-height: 2.35rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: var(--radius-small);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 650;
+}
+
+.accionesFiltro button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.botonLimpiar {
+  border: 1px solid var(--color-border-strong);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+}
+
+.botonAplicar {
+  border: 1px solid var(--color-secondary);
+  background: var(--color-secondary);
+  color: var(--color-text-inverse);
+}
+
+.paginacion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85rem 1rem;
+}
+
+.resumenPaginacion > span,
+.paginacion label {
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+}
+
+.resumenPaginacion {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+}
+
+.paginacion label {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.paginacion select {
+  min-height: 2rem;
+  padding: 0.25rem 1.7rem 0.25rem 0.45rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-small);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.controlesPagina,
+.numeroPaginaGrupo {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.paginacion button {
+  min-width: 2rem;
+  min-height: 2rem;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: var(--color-surface);
+  color: var(--color-secondary);
+  cursor: pointer;
+  font-size: 0.68rem;
+}
+
+.paginacion button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
+.paginacion .paginaActiva {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.soloLectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+@media (max-width: 52rem) {
+  .paginacion {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .paginacion label {
+    justify-content: flex-start;
+  }
+
+  .controlesPagina {
+    flex-wrap: wrap;
+  }
+}

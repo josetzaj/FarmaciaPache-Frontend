@@ -1,0 +1,2 @@
+import { CatalogoFormularioView } from '../../catalogos-base/components/catalogo-formulario-view'; import { principioActivoApi } from '../principio-activo-api'; import { principioActivoConfig } from '../principio-activo.config'
+export function PrincipioActivoEditarView({ principioActivoId, ...props }: { principioActivoId: string; onNavegar: (ruta: string) => void; onCambiosPendientes: (p: boolean) => void }) { return <CatalogoFormularioView config={principioActivoConfig} api={principioActivoApi} itemId={principioActivoId} {...props} /> }

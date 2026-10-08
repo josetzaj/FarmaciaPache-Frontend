@@ -1,0 +1,30 @@
+import { useMemo, useState } from 'react'
+import iconoVer from '../../../assets/acciones/ver.png'
+import { TablaDatos, type ColumnaTabla, type ColumnFiltersState, type SortingState } from '../../../shared/components/tabla-datos'
+import type { RecetaVenta, VentaComercial, VentaDetalleLinea } from '../comercial.types'
+import styles from './comercial.module.css'
+
+const moneda = (valor: number) => new Intl.NumberFormat('es-GT', { style: 'currency', currency: 'GTQ' }).format(valor)
+
+export function VentaDetalleTablas({ venta, permisos, onNavegar }: { venta: VentaComercial; permisos: readonly string[]; onNavegar: (ruta: string) => void }) {
+  const [filtrosProductos, setFiltrosProductos] = useState<ColumnFiltersState>([])
+  const [ordenProductos, setOrdenProductos] = useState<SortingState>([])
+  const [filtrosRecetas, setFiltrosRecetas] = useState<ColumnFiltersState>([])
+  const [ordenRecetas, setOrdenRecetas] = useState<SortingState>([])
+  const columnasProductos = useMemo<ColumnaTabla<VentaDetalleLinea>[]>(() => [
+    { id: 'producto', titulo: 'Producto', obtenerValor: (item) => item.producto, ordenable: true, filtro: { tipo: 'texto', etiqueta: 'Filtrar producto', placeholder: 'Código o nombre' }, celda: (item) => <div className={styles.identidad}><strong>{item.producto}</strong><small>{item.codigo}</small></div> },
+    { id: 'cantidad', titulo: 'Cantidad', obtenerValor: (item) => item.cantidad, ordenable: true, celda: (item) => item.cantidad },
+    { id: 'precio', titulo: 'Precio unitario', obtenerValor: (item) => item.precioUnitario, ordenable: true, celda: (item) => moneda(item.precioUnitario) },
+    { id: 'total', titulo: 'Total', obtenerValor: (item) => item.total, ordenable: true, celda: (item) => <strong>{moneda(item.total)}</strong> },
+    { id: 'receta', titulo: 'Condición de venta', obtenerValor: (item) => item.requiereReceta ? 'RECETA' : 'LIBRE', filtro: { tipo: 'opciones', etiqueta: 'Condición de venta', multiple: true, buscable: false, opciones: [{ valor: 'RECETA', etiqueta: 'Requiere receta' }, { valor: 'LIBRE', etiqueta: 'Venta libre' }] }, celda: (item) => item.requiereReceta ? 'Requiere receta' : 'Venta libre' },
+  ], [])
+  const columnasRecetas = useMemo<ColumnaTabla<RecetaVenta>[]>(() => [
+    { id: 'referencia', titulo: 'Referencia', obtenerValor: (item) => item.referencia, ordenable: true, filtro: { tipo: 'texto', etiqueta: 'Filtrar referencia', placeholder: 'Número o referencia' }, celda: (item) => <div className={styles.identidad}><strong>{item.referencia}</strong><small>{String(item.fechaEmision).slice(0, 10)}</small></div> },
+    { id: 'paciente', titulo: 'Paciente', obtenerValor: (item) => item.pacienteNombre, ordenable: true, filtro: { tipo: 'texto', etiqueta: 'Filtrar paciente', placeholder: 'Nombre o identificación' }, celda: (item) => <div className={styles.identidad}><strong>{item.pacienteNombre}</strong><small>{item.pacienteIdentificacion}</small></div> },
+    { id: 'prescriptor', titulo: 'Prescriptor', obtenerValor: (item) => item.prescriptorNombre, ordenable: true, filtro: { tipo: 'texto', etiqueta: 'Filtrar prescriptor', placeholder: 'Nombre o colegiado' }, celda: (item) => <div className={styles.identidad}><strong>{item.prescriptorNombre}</strong><small>{item.prescriptorColegiado}</small></div> },
+    { id: 'tratamiento', titulo: 'Tratamiento', obtenerValor: (item) => item.detalleMedicacion, celda: (item) => <div className={styles.identidad}><strong>{item.detalleMedicacion}</strong><small>{item.dosis} · {item.frecuencia} · {item.via} · {item.duracion}</small></div> },
+    { id: 'estado', titulo: 'Validación', obtenerValor: (item) => item.resultadoValidacion, filtro: { tipo: 'opciones', etiqueta: 'Resultado', multiple: true, buscable: false, opciones: [{ valor: 'PENDIENTE', etiqueta: 'Pendiente' }, { valor: 'VALIDA', etiqueta: 'Válida' }, { valor: 'RECHAZADA', etiqueta: 'Rechazada' }] }, celda: (item) => <span className={`${styles.estado} ${item.resultadoValidacion === 'VALIDA' ? styles.estadoActivo : item.resultadoValidacion === 'RECHAZADA' ? styles.estadoPeligro : styles.estadoAdvertencia}`}>{item.resultadoValidacion === 'VALIDA' ? 'Válida' : item.resultadoValidacion === 'RECHAZADA' ? 'Rechazada' : 'Pendiente'}</span> },
+    { id: 'acciones', titulo: 'Acciones', tituloSoloLectores: true, obtenerValor: () => '', celda: (item) => <div className={styles.accionesFila}>{permisos.includes('COMERCIAL.RECETAS.VER') && <button type="button" title="Ver receta" aria-label={`Ver receta ${item.referencia}`} onClick={() => onNavegar(`/ventas/recetas/${item.id}`)}><img src={iconoVer} alt="" /></button>}</div> },
+  ], [onNavegar, permisos])
+  return <><article className={styles.tarjetaDetalle}><div className={styles.encabezadoSubformulario}><div><h2>Productos</h2><p className={styles.descripcionSeccion}>Filtra u ordena desde el encabezado de cada columna.</p></div>{filtrosProductos.length > 0 && <button className={styles.botonNeutral} type="button" onClick={() => setFiltrosProductos([])}>Limpiar filtros</button>}</div><TablaDatos descripcion={`Productos de la venta ${venta.numero}`} datos={venta.detalles ?? []} columnas={columnasProductos} filtros={filtrosProductos} ordenamiento={ordenProductos} obtenerIdFila={(item) => item.id} onFiltrosChange={setFiltrosProductos} onOrdenamientoChange={setOrdenProductos} /></article>{Boolean(venta.recetas?.length) && <article className={styles.tarjetaDetalle}><div className={styles.encabezadoSubformulario}><div><h2>Recetas</h2><p className={styles.descripcionSeccion}>La validación clínica se realiza desde el detalle de cada receta.</p></div>{filtrosRecetas.length > 0 && <button className={styles.botonNeutral} type="button" onClick={() => setFiltrosRecetas([])}>Limpiar filtros</button>}</div><TablaDatos descripcion={`Recetas de la venta ${venta.numero}`} datos={venta.recetas ?? []} columnas={columnasRecetas} filtros={filtrosRecetas} ordenamiento={ordenRecetas} obtenerIdFila={(item) => item.id} onFiltrosChange={setFiltrosRecetas} onOrdenamientoChange={setOrdenRecetas} /></article>}</>
+}

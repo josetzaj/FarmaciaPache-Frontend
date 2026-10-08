@@ -1,0 +1,2 @@
+import { CatalogoListadoView } from '../../catalogos-base/components/catalogo-listado-view'; import { formaFarmaceuticaApi } from '../forma-farmaceutica-api'; import { formaFarmaceuticaConfig } from '../forma-farmaceutica.config'
+export function FormaFarmaceuticaListadoView(props: { permisos: readonly string[]; onNavegar: (ruta: string) => void }) { return <CatalogoListadoView config={formaFarmaceuticaConfig} api={formaFarmaceuticaApi} {...props} /> }

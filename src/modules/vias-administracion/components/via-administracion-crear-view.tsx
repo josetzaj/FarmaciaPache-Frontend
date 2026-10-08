@@ -1,0 +1,2 @@
+import { CatalogoFormularioView } from '../../catalogos-base/components/catalogo-formulario-view'; import { viaAdministracionApi } from '../via-administracion-api'; import { viaAdministracionConfig } from '../via-administracion.config'
+export function ViaAdministracionCrearView(props: { onNavegar: (ruta: string) => void; onCambiosPendientes: (p: boolean) => void }) { return <CatalogoFormularioView config={viaAdministracionConfig} api={viaAdministracionApi} {...props} /> }

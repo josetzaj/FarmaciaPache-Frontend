@@ -1,0 +1,2 @@
+import { CatalogoDetalleView } from '../../catalogos-base/components/catalogo-detalle-view'; import { laboratorioApi } from '../laboratorio-api'; import { laboratorioConfig } from '../laboratorio.config'
+export function LaboratorioDetalleView({ laboratorioId, ...props }: { laboratorioId: string; permisos: readonly string[]; onNavegar: (ruta: string) => void }) { return <CatalogoDetalleView config={laboratorioConfig} api={laboratorioApi} itemId={laboratorioId} {...props} /> }
