@@ -1,5 +1,5 @@
 type IconoAccionProps = {
-  nombre: 'guardar' | 'cancelar' | 'editar' | 'desactivar' | 'enviar' | 'estado' | 'agregar'
+  nombre: 'guardar' | 'cancelar' | 'editar' | 'desactivar' | 'enviar' | 'estado' | 'agregar' | 'cobrar' | 'carrito'
   className?: string
 }
 
@@ -9,6 +9,20 @@ const trazos = {
     <>
       <path d="M5 3h11l3 3v15H5V3Z" />
       <path d="M8 3v6h8V3M8 21v-7h8v7" />
+    </>
+  ),
+  cobrar: (
+    <>
+      <rect x="3" y="6" width="18" height="12" rx="2" />
+      <circle cx="12" cy="12" r="2.5" />
+      <path d="M7 10h.01M17 14h.01" />
+    </>
+  ),
+  carrito: (
+    <>
+      <path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 2-1.6L20.5 8H6" />
+      <circle cx="9.5" cy="20" r="1" />
+      <circle cx="17.5" cy="20" r="1" />
     </>
   ),
   cancelar: <path d="m6 6 12 12M18 6 6 18" />,

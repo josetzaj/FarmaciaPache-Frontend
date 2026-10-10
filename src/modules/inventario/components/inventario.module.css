@@ -191,6 +191,57 @@
   accent-color: var(--color-primary);
 }
 
+.selectorVistaInventario {
+  display: flex;
+  min-width: 0;
+  margin: 0;
+  padding: 0.2rem 1rem 0.2rem 0;
+  align-items: center;
+  gap: 0.75rem;
+  border: 0;
+  border-right: 1px solid var(--color-border);
+}
+
+.selectorVistaInventario legend {
+  float: left;
+  margin-right: 0.15rem;
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.filtrosVencimientoInventario {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.panelOpciones .filtrosVencimientoInventario label {
+  display: grid;
+  gap: 0.25rem;
+  cursor: default;
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+}
+
+.panelOpciones .filtrosVencimientoInventario input {
+  width: 9.5rem;
+  height: 2.35rem;
+  padding: 0.4rem 0.55rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-small);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.panelOpciones .filtrosVencimientoInventario input:focus-visible {
+  border-color: var(--color-primary);
+  outline: 2px solid var(--color-focus);
+  outline-offset: 1px;
+}
+
 .panelFiltros,
 .formularioOperacion > fieldset {
   min-width: 0;
@@ -268,9 +319,9 @@
 
 .accionesFormulario { justify-content: flex-end; }
 .etiquetaCampo { color: var(--color-text); font-size: 0.73rem; font-weight: 650; }
-.opcionesTipo { display: flex; flex-wrap: wrap; gap: 0.75rem 1.5rem; }
-.opcionesTipo label { display: inline-flex; min-height: 2.4rem; align-items: center; gap: 0.45rem; color: var(--color-text); cursor: pointer; font-size: 0.78rem; }
-.opcionesTipo input { width: 1rem; height: 1rem; accent-color: var(--color-primary); }
+.campo .opcionesTipo { display: flex; flex-wrap: nowrap; align-items: center; gap: 0.75rem 2rem; }
+.campo .opcionesTipo label { display: inline-flex; width: auto; min-height: 2.4rem; align-items: center; gap: 0.45rem; color: var(--color-text); cursor: pointer; font-size: 0.78rem; white-space: nowrap; }
+.campo .opcionesTipo input { width: 1rem; min-height: 1rem; height: 1rem; flex: 0 0 1rem; padding: 0; accent-color: var(--color-primary); }
 
 .panelTabla,
 .panelAuditoria {
@@ -339,6 +390,17 @@
 
 .identidad strong { color: var(--color-text); }
 .identidad small { color: var(--color-text-muted); font-size: 0.68rem; }
+
+.identidadConteo {
+  display: flex;
+  min-width: 12rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+}
+
+.identidadConteo strong { color: var(--color-text); }
+.identidadConteo small { color: var(--color-text-muted); font-size: 0.68rem; }
 
 .identidadProductoInventario,
 .encabezadoProductoInventario {
@@ -542,6 +604,12 @@
   color: var(--color-text);
   font: inherit;
   font-size: 0.8rem;
+}
+.campoSoloLectura input {
+  cursor: not-allowed;
+  border-color: var(--color-border);
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
 }
 .campo textarea { min-height: 5rem; resize: vertical; }
 .campo input:focus-visible,
@@ -770,6 +838,7 @@
   .resumenConteo > div:nth-child(2n) { border-right: 0; }
   .resumenConteo > div:nth-last-child(-n + 4) { border-bottom: 1px solid var(--color-border); }
   .resumenConteo > div:last-child { border-bottom: 0; }
+  .selectorVistaInventario { width: 100%; padding-right: 0; padding-bottom: 0.7rem; border-right: 0; border-bottom: 1px solid var(--color-border); }
 }
 
 @media (max-width: 38rem) {
@@ -794,4 +863,9 @@
   .detalleMasivo dl { grid-template-columns: 1fr; }
   .detalleMasivo dl > div { border-right: 0; }
   .imagenProductoInventario { width: 4.75rem; height: 4.75rem; }
+  .selectorVistaInventario,
+  .filtrosVencimientoInventario { align-items: stretch; flex-direction: column; }
+  .panelOpciones .filtrosVencimientoInventario,
+  .panelOpciones .filtrosVencimientoInventario label,
+  .panelOpciones .filtrosVencimientoInventario input { width: 100%; }
 }

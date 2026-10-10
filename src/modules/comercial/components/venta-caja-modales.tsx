@@ -2,7 +2,7 @@ import { useEffect, useId, useMemo, useState } from 'react'
 import { ErrorApi } from '../../../shared/api/cliente-api'
 import { IconoAccion } from '../../../shared/components/icono-accion'
 import { ModalEstado } from '../../../shared/components/modal-estado'
-import { anularVentaCobradaCaja, cobrarVentaCaja, listarCaja } from '../../caja/caja-api'
+import { anularVentaCobradaCaja, cobrarVentaCaja, listarCaja, obtenerTurnoVentasActualCaja } from '../../caja/caja-api'
 import { convertirQuetzalesACentavos, crearClaveIdempotencia, formatearCentavos } from '../../caja/caja-formatos'
 import type { MovimientoCaja, TurnoCaja } from '../../caja/caja.types'
 import { obtenerVenta } from '../comercial-api'
@@ -15,6 +15,8 @@ export type ResultadoCobroVenta = {
   turno: TurnoCaja
   recibidoCentavos: number
   cambioCentavos: number
+  requiereRetiro: boolean
+  montoRetiroSugeridoCentavos: number
 }
 
 type PropiedadesBase = {
@@ -27,7 +29,7 @@ function mensajeError(error: unknown, alternativo: string) {
   return error instanceof ErrorApi ? error.message : alternativo
 }
 
-function useTurnosCajaVenta(abierto: boolean, venta: VentaComercial) {
+function useTurnosCajaVenta(abierto: boolean, venta: VentaComercial, soloTurnoActual = false) {
   const [turnos, setTurnos] = useState<TurnoCaja[]>([])
   const [cargando, setCargando] = useState(abierto)
   const [error, setError] = useState<string | null>(null)
@@ -35,20 +37,20 @@ function useTurnosCajaVenta(abierto: boolean, venta: VentaComercial) {
   useEffect(() => {
     if (!abierto) return
     const controlador = new AbortController()
-    void listarCaja<TurnoCaja>('turnos', {
-      pagina: 1,
-      tamanoPagina: 200,
-      sucursalIds: venta.sucursal?.id ? [venta.sucursal.id] : undefined,
-      estados: ['ABIERTO', 'REABIERTO'],
-      tipos: ['VENTAS'],
-      orden: 'fecha',
-      direccion: 'desc',
-    }, controlador.signal)
-      .then((respuesta) => {
-        const disponibles = respuesta.items.filter((turno) =>
-          turno.caja?.tipo === 'VENTAS'
-          && (!venta.sucursal?.id || turno.sucursalId === venta.sucursal.id),
-        )
+    const solicitud = soloTurnoActual
+      ? obtenerTurnoVentasActualCaja(controlador.signal).then((turno) => turno ? [turno] : [])
+      : listarCaja<TurnoCaja>('turnos', {
+        pagina: 1,
+        tamanoPagina: 200,
+        sucursalIds: venta.sucursal?.id ? [venta.sucursal.id] : undefined,
+        estados: ['ABIERTO', 'REABIERTO'],
+        tipos: ['VENTAS'],
+        orden: 'fecha',
+        direccion: 'desc',
+      }, controlador.signal).then((respuesta) => respuesta.items)
+    void solicitud
+      .then((items) => {
+        const disponibles = items.filter((turno) => turno.caja?.tipo === 'VENTAS' && (!venta.sucursal?.id || turno.sucursalId === venta.sucursal.id))
         setTurnos(disponibles)
       })
       .catch((actual: unknown) => {
@@ -58,7 +60,7 @@ function useTurnosCajaVenta(abierto: boolean, venta: VentaComercial) {
         if (!controlador.signal.aborted) setCargando(false)
       })
     return () => controlador.abort()
-  }, [abierto, venta.id, venta.sucursal?.id])
+  }, [abierto, soloTurnoActual, venta.id, venta.sucursal?.id])
 
   return { turnos, cargando, error }
 }
@@ -82,7 +84,7 @@ function SelectorTurno({ id, turnos, turnoId, cargando, onCambiar }: {
 export function CobrarVentaModal({ abierto, venta, onCerrar, onCobrada }: PropiedadesBase & { onCobrada: (resultado: ResultadoCobroVenta) => void }) {
   const turnoIdCampo = useId()
   const efectivoCampo = useId()
-  const { turnos, cargando: cargandoTurnos, error: errorTurnos } = useTurnosCajaVenta(abierto, venta)
+  const { turnos, cargando: cargandoTurnos, error: errorTurnos } = useTurnosCajaVenta(abierto, venta, true)
   const [turnoId, setTurnoId] = useState('')
   const [efectivo, setEfectivo] = useState('')
   const [guardando, setGuardando] = useState(false)
@@ -117,6 +119,8 @@ export function CobrarVentaModal({ abierto, venta, onCerrar, onCobrada }: Propie
         turno,
         recibidoCentavos,
         cambioCentavos: recibidoCentavos - totalCentavos,
+        requiereRetiro: Boolean(resultado.requiereRetiro),
+        montoRetiroSugeridoCentavos: resultado.montoRetiroSugeridoCentavos ?? 0,
       })
     } catch (actual: unknown) {
       setError(mensajeError(actual, 'No fue posible cobrar la venta.'))

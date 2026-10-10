@@ -6,15 +6,17 @@ import { ErrorApi } from '../../../shared/api/cliente-api'
 import { BotonExportar, type FormatoExportacion } from '../../../shared/components/boton-exportar'
 import { PaginacionTabla, TablaDatos, type ColumnaTabla, type ColumnFiltersState, type SortingState } from '../../../shared/components/tabla-datos'
 import { ModalEstado } from '../../../shared/components/modal-estado'
-import { exportarCaja, listarCaja, obtenerOpcionesCaja } from '../caja-api'
+import { exportarCaja, listarCaja, obtenerOpcionesCaja, obtenerResumenOperativoCaja } from '../caja-api'
 import { convertirDiferenciaACentavos, convertirQuetzalesACentavos, etiquetasEstadoArqueo, etiquetasEstadoCierre, etiquetasTipoArqueo, etiquetasTipoCaja, formatearCentavos, formatearFechaHora } from '../caja-formatos'
-import type { ArqueoCaja, CierreCaja, ConsultaCaja, EstadoArqueoCaja, EstadoCierreCaja, OpcionesFiltrosCaja, ResultadoPaginado } from '../caja.types'
+import type { ArqueoCaja, CierreCaja, ConsultaCaja, EstadoArqueoCaja, EstadoCierreCaja, OpcionesFiltrosCaja, ResultadoPaginado, ResumenOperativoCaja } from '../caja.types'
 import { CajaBreadcrumb } from './caja-breadcrumb'
+import { ResumenOperativoCaja as TarjetasResumenCaja } from './resumen-operativo-caja'
 import styles from './caja.module.css'
 
 type Props = { permisos: readonly string[]; onNavegar: (ruta: string) => void }
 type RecursoControl = 'arqueos' | 'cierres'
 type RegistroControl = ArqueoCaja | CierreCaja
+type ResumenControl = Extract<ResumenOperativoCaja, { recurso: RecursoControl }>
 
 const opcionesIniciales: OpcionesFiltrosCaja = {
   cajas: { opciones: [], estados: [], tipos: [] }, sucursales: [], turnos: { estados: [] },
@@ -63,6 +65,9 @@ function ControlCajaListadoView({ recurso, permisos, onNavegar }: Props & { recu
   const [error, setError] = useState<string | null>(null)
   const [errorOpciones, setErrorOpciones] = useState<string | null>(null)
   const [errorExportacion, setErrorExportacion] = useState<string | null>(null)
+  const [resumen, setResumen] = useState<ResumenControl | null>(null)
+  const [solicitudResumenFinalizada, setSolicitudResumenFinalizada] = useState('')
+  const [errorResumen, setErrorResumen] = useState<string | null>(null)
   const [revision, setRevision] = useState(0)
 
   const cajaIdsFiltradas = useMemo(() => {
@@ -86,6 +91,7 @@ function ControlCajaListadoView({ recurso, permisos, onNavegar }: Props & { recu
   }), [busqueda, cajaIdsFiltradas, desde, diferenciaMaxima, diferenciaMinima, esArqueo, filtros, hasta, montoMaximo, montoMinimo, ordenamiento, pagina, tamanoPagina])
   const claveSolicitud = useMemo(() => JSON.stringify({ recurso, parametros, revision }), [parametros, recurso, revision])
   const cargando = solicitudFinalizada !== claveSolicitud
+  const cargandoResumen = solicitudResumenFinalizada !== claveSolicitud
 
   useEffect(() => {
     const controlador = new AbortController()
@@ -111,6 +117,17 @@ function ControlCajaListadoView({ recurso, permisos, onNavegar }: Props & { recu
     return () => controlador.abort()
   }, [claveSolicitud, esArqueo, pagina, parametros, recurso])
 
+  useEffect(() => {
+    const controlador = new AbortController()
+    void obtenerResumenOperativoCaja<ResumenControl>(recurso, parametros, controlador.signal)
+      .then((datos) => { setResumen(datos); setErrorResumen(null) })
+      .catch((errorActual: unknown) => {
+        if (!controlador.signal.aborted) setErrorResumen(errorActual instanceof ErrorApi ? errorActual.message : 'No fue posible cargar el resumen monetario.')
+      })
+      .finally(() => { if (!controlador.signal.aborted) setSolicitudResumenFinalizada(claveSolicitud) })
+    return () => controlador.abort()
+  }, [claveSolicitud, parametros, recurso])
+
   const opcionesSucursales = useMemo(() => opciones.sucursales.map((sucursal) => ({ valor: sucursal.id, etiqueta: sucursal.nombre, descripcion: sucursal.codigo })), [opciones.sucursales])
   const columnaSucursal = useMemo(() => opcionesSucursales.length ? [{
     id: 'sucursal', titulo: 'Sucursal', obtenerValor: (registro: RegistroControl) => opciones.sucursales.find((x) => x.id === ('sucursalId' in registro ? registro.sucursalId : ''))?.nombre ?? '',
@@ -127,8 +144,8 @@ function ControlCajaListadoView({ recurso, permisos, onNavegar }: Props & { recu
     { id: 'diferencia', titulo: 'Diferencia', obtenerValor: (item) => item.diferenciaCentavos, ordenable: true, celda: (item) => <strong className={item.diferenciaCentavos === 0 ? undefined : styles.montoSalida}>{formatearCentavos(item.diferenciaCentavos)}</strong> },
     { id: 'estado', titulo: 'Estado', obtenerValor: (item) => item.estado, ordenable: true, filtro: { tipo: 'opciones', etiqueta: 'Seleccionar estados', multiple: true, buscable: false, opciones: opciones.arqueos.estados.map((estado) => ({ valor: estado, etiqueta: etiquetasEstadoArqueo[estado] })) }, celda: (item) => <span className={`${styles.estado} ${claseEstadoArqueo(item.estado)}`}>{etiquetasEstadoArqueo[item.estado]}</span> },
     { id: 'fecha', titulo: 'Registro', obtenerValor: (item) => item.ocurridoEn, ordenable: true, celda: (item) => formatearFechaHora(item.ocurridoEn) },
-    { id: 'acciones', titulo: 'Acciones', tituloSoloLectores: true, obtenerValor: (item) => item.id, celda: (item) => <div className={styles.accionesFila}><button type="button" title="Ver detalle" aria-label={`Ver arqueo ${item.numero}`} onClick={() => onNavegar(`/caja/arqueos/${item.id}`)}><img src={iconoVer} alt="" /></button></div> },
-  ], [columnaSucursal, onNavegar, opciones.arqueos, opciones.cajas.tipos])
+    { id: 'acciones', titulo: 'Acciones', tituloSoloLectores: true, obtenerValor: (item) => item.id, celda: (item) => <div className={styles.accionesFila}><button type="button" title="Ver detalle" aria-label={`Ver arqueo ${item.numero}`} onClick={() => onNavegar(`/caja/arqueos/${item.id}`)}><img src={iconoVer} alt="" /></button>{permisos.includes('CAJA.ARQUEOS.APROBAR') && item.estado === 'PENDIENTE_APROBACION' && <button className={styles.accionTexto} type="button" onClick={() => onNavegar(`/caja/arqueos/${item.id}?accion=aprobar`)}>Autorizar</button>}{permisos.includes('CAJA.ARQUEOS.REGISTRAR') && item.requiereReposicionFaltante && <button className={styles.accionTexto} type="button" onClick={() => onNavegar(`/caja/arqueos/${item.id}`)}>Reponer</button>}{permisos.includes('CAJA.TRANSFERENCIAS.CREAR') && item.requiereTrasladoCierre && <button className={styles.accionTexto} type="button" onClick={() => onNavegar(`/caja/transferencias/nueva?turnoId=${encodeURIComponent(item.turnoId)}&arqueoId=${encodeURIComponent(item.id)}&monto=${item.montoTrasladoCierreCentavos}`)}>Trasladar</button>}{permisos.includes('CAJA.TURNOS.CERRAR') && item.puedeCerrarTurno && <button className={styles.accionTexto} type="button" onClick={() => onNavegar(`/caja/cierres/nuevo?arqueoId=${encodeURIComponent(item.id)}`)}>Cerrar</button>}</div> },
+  ], [columnaSucursal, onNavegar, opciones.arqueos, opciones.cajas.tipos, permisos])
   const columnasCierres = useMemo<ColumnaTabla<CierreCaja>[]>(() => [
     { id: 'numero', titulo: 'Cierre', obtenerValor: (item) => item.numero, ordenable: true, celda: (item) => <div className={styles.identidad}><strong>{item.numero}</strong><small>Versión {item.versionCierre}</small></div> },
     { id: 'turno', titulo: 'Turno', obtenerValor: (item) => item.turnoNumero ?? item.turnoId, celda: (item) => item.turnoNumero ?? item.turnoId },
@@ -156,10 +173,10 @@ function ControlCajaListadoView({ recurso, permisos, onNavegar }: Props & { recu
   return <section className={styles.pagina} aria-labelledby="titulo-listado-control-caja">
     <header className={styles.cabeceraPagina}>
       <CajaBreadcrumb seccion={esArqueo ? 'Arqueos' : 'Cierres'} onNavegar={onNavegar} />
-      <div className={styles.filaCabecera}><div><h1 id="titulo-listado-control-caja">{titulo}</h1><p>{esArqueo ? 'Consulta conteos, diferencias, aprobaciones y trazabilidad.' : 'Consulta cierres, reaperturas y versiones conservadas por turno.'}</p></div>
+      <div className={styles.filaCabecera}><h1 id="titulo-listado-control-caja">{titulo}</h1>
         {puedeCrear && <button className={styles.botonNuevo} type="button" onClick={() => onNavegar(rutaNueva)}><img src={iconoAgregar} alt="" />{esArqueo ? 'Registrar arqueo' : 'Cerrar turno'}</button>}
         {puedeExportar && <BotonExportar deshabilitado={cargando} onExportar={exportar} />}
-        <label className={styles.busquedaGeneral}><span>Búsqueda general</span><span className={styles.controlBusqueda}><img src={iconoBusqueda} alt="" /><input type="search" value={busquedaEntrada} maxLength={150} placeholder={esArqueo ? 'Número o explicación' : 'Número o motivo'} onChange={(evento) => setBusquedaEntrada(evento.target.value)} /></span></label>
+        <div className={styles.busquedaGeneral}><span className={styles.controlBusqueda}><img src={iconoBusqueda} alt="" /><input type="search" value={busquedaEntrada} maxLength={150} placeholder={esArqueo ? 'Número o explicación' : 'Número o motivo'} aria-label="Búsqueda general" onChange={(evento) => setBusquedaEntrada(evento.target.value)} /></span></div>
       </div>
     </header>
     <div className={`${styles.filtrosGenerales} ${styles.filtrosSeis}`} aria-label="Filtros generales">
@@ -172,6 +189,19 @@ function ControlCajaListadoView({ recurso, permisos, onNavegar }: Props & { recu
     </div>
     {errorOpciones && <div className={styles.alertaError} role="alert"><p>{errorOpciones}</p><button type="button" onClick={() => setRevision((v) => v + 1)}>Reintentar</button></div>}
     {error && <div className={styles.alertaError} role="alert"><p>{error}</p><button type="button" onClick={() => setRevision((v) => v + 1)}>Reintentar</button></div>}
+    <TarjetasResumenCaja
+      cargando={cargandoResumen}
+      error={cargandoResumen ? null : errorResumen}
+      onReintentar={() => setRevision((valor) => valor + 1)}
+      indicadores={esArqueo ? [
+        { etiqueta: 'Esperado', valor: formatearCentavos(resumen?.recurso === 'arqueos' ? resumen.esperadoCentavos : 0), detalle: `${resumen?.recurso === 'arqueos' ? resumen.arqueosCantidad : 0} arqueos filtrados`, tono: 'informacion' },
+        { etiqueta: 'Declarado', valor: formatearCentavos(resumen?.recurso === 'arqueos' ? resumen.declaradoCentavos : 0), detalle: 'Efectivo declarado en los arqueos', tono: 'entrada' },
+        { etiqueta: 'Diferencia', valor: formatearCentavos(resumen?.recurso === 'arqueos' ? resumen.diferenciaCentavos : 0), detalle: 'Diferencias absolutas detectadas', tono: 'salida' },
+      ] : [
+        { etiqueta: 'Saldo final', valor: formatearCentavos(resumen?.recurso === 'cierres' ? resumen.saldoFinalCentavos : 0), detalle: `${resumen?.recurso === 'cierres' ? resumen.cierresCantidad : 0} cierres filtrados`, tono: 'entrada' },
+        { etiqueta: 'Diferencia', valor: formatearCentavos(resumen?.recurso === 'cierres' ? resumen.diferenciaCentavos : 0), detalle: 'Diferencias absolutas de los cierres', tono: 'salida' },
+      ]}
+    />
     <article className={styles.panelTabla} aria-busy={cargando}><div className={styles.resumenTabla}><div><strong>{titulo}</strong><small>{cargando ? 'Actualizando información…' : 'Los filtros y la exportación se procesan en el servidor.'}</small></div><div className={styles.accionesResumen}>{resultado && <span>{resultado.total} registros</span>}{hayFiltros && <button type="button" onClick={limpiarFiltros}>Limpiar filtros</button>}</div></div>
       {resultado?.items.length ? <><TablaDatos descripcion={`${titulo} con filtros por columna`} datos={resultado.items} columnas={(esArqueo ? columnasArqueos : columnasCierres) as ColumnaTabla<RegistroControl>[]} filtros={filtros} ordenamiento={ordenamiento} obtenerIdFila={(item) => item.id} onFiltrosChange={(s) => { setFiltros(s); setPagina(1) }} onOrdenamientoChange={(s) => { setOrdenamiento(s.length ? s : [{ id: 'fecha', desc: true }]); setPagina(1) }} /><PaginacionTabla pagina={resultado.pagina} tamanoPagina={resultado.tamanoPagina} total={resultado.total} totalPaginas={resultado.totalPaginas} unidadSingular={esArqueo ? 'arqueo' : 'cierre'} unidadPlural={esArqueo ? 'arqueos' : 'cierres'} onPaginaChange={setPagina} onTamanoPaginaChange={(tamano) => { setTamanoPagina(tamano); setPagina(1) }} /></> : !cargando && !error ? <div className={styles.estadoVacio}><h2>{hayFiltros ? 'Sin coincidencias' : `No hay ${esArqueo ? 'arqueos' : 'cierres'} registrados`}</h2><p>{hayFiltros ? 'Ajusta o limpia los filtros aplicados.' : `Los ${esArqueo ? 'arqueos' : 'cierres'} aparecerán conforme se complete la operación.`}</p>{puedeCrear && !hayFiltros && <button type="button" onClick={() => onNavegar(rutaNueva)}>{esArqueo ? 'Registrar arqueo' : 'Cerrar turno'}</button>}</div> : null}
     </article>

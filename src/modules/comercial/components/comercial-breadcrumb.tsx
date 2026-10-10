@@ -1,7 +1,7 @@
 import styles from './comercial.module.css'
 
 type ComercialBreadcrumbProps = {
-  seccion: 'Clientes' | 'Políticas de margen' | 'Precios' | 'Ventas' | 'Validación de recetas'
+  seccion: 'Clientes' | 'Políticas de margen' | 'Precios' | 'Ventas' | 'Ventas realizadas' | 'Validación de recetas'
   rutaListado: string
   actual?: string
   onNavegar: (ruta: string) => void

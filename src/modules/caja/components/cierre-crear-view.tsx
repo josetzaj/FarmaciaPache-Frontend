@@ -8,11 +8,11 @@ import type { ArqueoCaja, CierreCaja } from '../caja.types'
 import { CajaBreadcrumb } from './caja-breadcrumb'
 import styles from './caja.module.css'
 
-type Props = { onNavegar: (ruta: string) => void; onCambiosPendientes: (pendientes: boolean) => void }
+type Props = { arqueoInicialId?: string; onNavegar: (ruta: string) => void; onCambiosPendientes: (pendientes: boolean) => void }
 
-export function CierreCrearView({ onNavegar, onCambiosPendientes }: Props) {
+export function CierreCrearView({ arqueoInicialId, onNavegar, onCambiosPendientes }: Props) {
   const [arqueos, setArqueos] = useState<ArqueoCaja[]>([])
-  const [arqueoId, setArqueoId] = useState('')
+  const [arqueoId, setArqueoId] = useState(arqueoInicialId ?? '')
   const [motivo, setMotivo] = useState('')
   const [errorCarga, setErrorCarga] = useState<string | null>(null)
   const [errorFormulario, setErrorFormulario] = useState<string | null>(null)
@@ -23,7 +23,7 @@ export function CierreCrearView({ onNavegar, onCambiosPendientes }: Props) {
 
   useEffect(() => {
     const controlador = new AbortController()
-    void listarCaja<ArqueoCaja>('arqueos', { pagina: 1, tamanoPagina: 200, estados: ['APROBADO'], tipos: ['CIERRE'], orden: 'fecha', direccion: 'desc' }, controlador.signal).then((respuesta) => { setArqueos(respuesta.items); setErrorCarga(null) }).catch((errorActual: unknown) => { if (!controlador.signal.aborted) setErrorCarga(errorActual instanceof ErrorApi ? errorActual.message : 'No fue posible cargar los arqueos de cierre aprobados.') })
+    void listarCaja<ArqueoCaja>('arqueos', { pagina: 1, tamanoPagina: 200, estados: ['APROBADO'], tipos: ['CIERRE'], orden: 'fecha', direccion: 'desc' }, controlador.signal).then((respuesta) => { setArqueos(respuesta.items.filter((item) => item.puedeCerrarTurno)); setErrorCarga(null) }).catch((errorActual: unknown) => { if (!controlador.signal.aborted) setErrorCarga(errorActual instanceof ErrorApi ? errorActual.message : 'No fue posible cargar los arqueos de cierre listos.') })
     return () => controlador.abort()
   }, [revision])
   const arqueo = arqueos.find((item) => item.id === arqueoId)

@@ -47,6 +47,7 @@ export function SelectorProductoInventario({
     void listarExistenciasInventario({
       pagina: 1,
       tamanoPagina: 50,
+      vista: 'CONSOLIDADA',
       busqueda: busqueda || undefined,
       ubicacionId,
       soloConExistencia,
@@ -54,7 +55,11 @@ export function SelectorProductoInventario({
       orden: 'producto',
       direccion: 'asc',
     }, controlador.signal)
-      .then((respuesta) => { setOpciones(soloActivos ? respuesta.items.filter((item) => item.producto.activo) : respuesta.items); setError(null) })
+      .then((respuesta) => {
+        if (respuesta.vista !== 'CONSOLIDADA') return
+        setOpciones(soloActivos ? respuesta.items.filter((item) => item.producto.activo) : respuesta.items)
+        setError(null)
+      })
       .catch((errorActual: unknown) => {
         if (!controlador.signal.aborted) setError(errorActual instanceof ErrorApi ? errorActual.message : 'No fue posible buscar medicamentos.')
       })

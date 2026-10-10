@@ -2,48 +2,145 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { ErrorApi } from '../../../shared/api/cliente-api'
 import { IconoAccion } from '../../../shared/components/icono-accion'
 import { ModalEstado } from '../../../shared/components/modal-estado'
-import { ejecutarAccionAbastecimiento, listarLotesAbastecimiento, obtenerRegistroAbastecimiento } from '../abastecimiento-api'
+import { ejecutarAccionAbastecimiento, listarLotesAbastecimiento, listarUbicacionesAbastecimiento, obtenerRegistroAbastecimiento } from '../abastecimiento-api'
 import { etiquetaCodigo } from '../abastecimiento-config'
-import type { LoteAbastecimiento, TrasladoInterno } from '../abastecimiento.types'
+import type { LoteAbastecimiento, TrasladoInterno, UbicacionAbastecimiento } from '../abastecimiento.types'
 import { AbastecimientoBreadcrumb } from './abastecimiento-breadcrumb'
 import styles from './abastecimiento.module.css'
 
 type Modo = 'aprobar' | 'preparar' | 'despachar' | 'recibir' | 'cerrar' | 'cancelar'
-const n = (v: unknown) => Number(v ?? 0)
+const numero = (valor: unknown) => Number(valor ?? 0)
 const tituloModo: Record<Modo, string> = { aprobar: 'Resolver traslado', preparar: 'Preparar despacho', despachar: 'Registrar despacho', recibir: 'Recibir traslado', cerrar: 'Cerrar traslado', cancelar: 'Cancelar traslado' }
+const accionApi: Record<Modo, string> = { aprobar: 'aprobacion', preparar: 'preparacion', despachar: 'despacho', recibir: 'recepcion', cerrar: 'cierre', cancelar: 'cancelacion' }
 
-export function TrasladoAccionView({ trasladoId, modo, onNavegar, onCambiosPendientes }: { trasladoId: string; modo: Modo; onNavegar: (ruta: string) => void; onCambiosPendientes: (pendientes: boolean) => void }) {
-  const [traslado, setTraslado] = useState<TrasladoInterno | null>(null); const [error, setError] = useState<string | null>(null); const [guardando, setGuardando] = useState(false); const [guardado, setGuardado] = useState<TrasladoInterno | null>(null)
-  const [aprobar, setAprobar] = useState(true); const [motivo, setMotivo] = useState(''); const [transportista, setTransportista] = useState(''); const [referencia, setReferencia] = useState(''); const [evidencia, setEvidencia] = useState(''); const [costo, setCosto] = useState('')
-  const [cantidades, setCantidades] = useState<Record<string, string>>({}); const [rechazadas, setRechazadas] = useState<Record<string, string>>({}); const [incidencias, setIncidencias] = useState<Record<string, string>>({}); const [lotes, setLotes] = useState<Record<string, string>>({}); const [motivosLote, setMotivosLote] = useState<Record<string, string>>({}); const [catalogosLote, setCatalogosLote] = useState<Record<string, LoteAbastecimiento[]>>({}); const [errores, setErrores] = useState<Record<string, string>>({})
-  useEffect(() => { const c = new AbortController(); void obtenerRegistroAbastecimiento<TrasladoInterno>('traslados', trasladoId, c.signal).then((r) => { setTraslado(r); const inicial: Record<string, string> = {}; const rechazo: Record<string, string> = {}; r.detalles.forEach((d) => { inicial[d.id] = String(modo === 'aprobar' ? n(d.cantidadSolicitada) : modo === 'preparar' ? Math.max(0, n(d.cantidadAprobada) - n(d.cantidadDespachada)) : n(d.cantidadEnDespacho)); rechazo[d.id] = '0' }); setCantidades(inicial); setRechazadas(rechazo); if (modo === 'preparar') void Promise.all(r.detalles.map(async (d) => [d.id, await listarLotesAbastecimiento(r.sucursalOrigenId, r.ubicacionOrigenId, d.productoId, c.signal)] as const)).then((pares) => { const mapa = Object.fromEntries(pares); setCatalogosLote(mapa); setLotes(Object.fromEntries(pares.map(([id, ls]) => [id, ls[0]?.id ?? '']))) }).catch((e: unknown) => { if (!c.signal.aborted) setError(e instanceof ErrorApi ? e.message : 'No fue posible cargar los lotes disponibles.') }) }).catch((e: unknown) => { if (!c.signal.aborted) setError(e instanceof ErrorApi ? e.message : 'No fue posible cargar el traslado.') }); return () => c.abort() }, [modo, trasladoId])
-  const tieneCambios = Boolean(motivo || transportista || referencia || evidencia || costo || !aprobar || Object.values(cantidades).some(Boolean) || Object.values(rechazadas).some((x) => n(x) > 0))
-  useEffect(() => onCambiosPendientes(!guardado && tieneCambios), [guardado, onCambiosPendientes, tieneCambios]); useEffect(() => () => onCambiosPendientes(false), [onCambiosPendientes])
+export function TrasladoAccionView({ trasladoId, modo, rutaBase = '/abastecimiento/traslados', onNavegar, onCambiosPendientes }: { trasladoId: string; modo: Modo; rutaBase?: '/abastecimiento/traslados' | '/abastecimiento/devoluciones-internas'; onNavegar: (ruta: string) => void; onCambiosPendientes: (pendientes: boolean) => void }) {
+  const [traslado, setTraslado] = useState<TrasladoInterno | null>(null)
+  const [ubicaciones, setUbicaciones] = useState<UbicacionAbastecimiento[]>([])
+  const [ubicacionOrigenId, setUbicacionOrigenId] = useState('')
+  const [catalogosLote, setCatalogosLote] = useState<Record<string, LoteAbastecimiento[]>>({})
+  const [lotes, setLotes] = useState<Record<string, string>>({})
+  const [motivosLote, setMotivosLote] = useState<Record<string, string>>({})
+  const [cantidades, setCantidades] = useState<Record<string, string>>({})
+  const [rechazadas, setRechazadas] = useState<Record<string, string>>({})
+  const [incidencias, setIncidencias] = useState<Record<string, string>>({})
+  const [aprobar, setAprobar] = useState(true)
+  const [motivo, setMotivo] = useState('')
+  const [transportista, setTransportista] = useState('')
+  const [referencia, setReferencia] = useState('')
+  const [evidencia, setEvidencia] = useState('')
+  const [costo, setCosto] = useState('')
+  const [errores, setErrores] = useState<Record<string, string>>({})
+  const [error, setError] = useState<string | null>(null)
+  const [guardando, setGuardando] = useState(false)
+  const [guardado, setGuardado] = useState<TrasladoInterno | null>(null)
+
+  useEffect(() => {
+    const controlador = new AbortController()
+    void obtenerRegistroAbastecimiento<TrasladoInterno>('traslados', trasladoId, controlador.signal)
+      .then(async (registro) => {
+        setTraslado(registro)
+        const inicial: Record<string, string> = {}
+        const rechazo: Record<string, string> = {}
+        registro.detalles.forEach((detalle) => {
+          inicial[detalle.id] = String(modo === 'aprobar' ? numero(detalle.cantidadSolicitada) : modo === 'preparar' ? Math.max(0, numero(detalle.cantidadAprobada) - numero(detalle.cantidadDespachada)) : numero(detalle.cantidadEnDespacho))
+          rechazo[detalle.id] = '0'
+        })
+        setCantidades(inicial)
+        setRechazadas(rechazo)
+        if (modo === 'preparar') {
+          const disponibles = await listarUbicacionesAbastecimiento(registro.sucursalOrigenId, controlador.signal)
+          setUbicaciones(disponibles.filter((ubicacion) => ubicacion.activa !== false && !ubicacion.bloqueada && ['BODEGA', 'VENTA'].includes(ubicacion.tipo)))
+          if (registro.tipo === 'DEVOLUCION_INTERNA' && registro.ubicacionOrigenId) setUbicacionOrigenId(registro.ubicacionOrigenId)
+        }
+      })
+      .catch((errorActual: unknown) => {
+        if (!controlador.signal.aborted) setError(errorActual instanceof ErrorApi ? errorActual.message : 'No fue posible cargar el traslado.')
+      })
+    return () => controlador.abort()
+  }, [modo, trasladoId])
+
+  useEffect(() => {
+    if (modo !== 'preparar' || !traslado || !ubicacionOrigenId) return
+    const controlador = new AbortController()
+    void Promise.all(traslado.detalles.map(async (detalle) => [detalle.id, await listarLotesAbastecimiento(traslado.sucursalOrigenId, ubicacionOrigenId, detalle.productoId, controlador.signal)] as const))
+      .then((pares) => {
+        setCatalogosLote(Object.fromEntries(pares))
+        setLotes(Object.fromEntries(pares.map(([detalleId, catalogo]) => {
+          const detalle = traslado.detalles.find((item) => item.id === detalleId)
+          return [detalleId, detalle?.loteId ?? catalogo[0]?.id ?? (catalogo.length ? 'SIN_LOTE' : '')]
+        })))
+      })
+      .catch((errorActual: unknown) => {
+        if (!controlador.signal.aborted) setError(errorActual instanceof ErrorApi ? errorActual.message : 'No fue posible cargar los lotes disponibles.')
+      })
+    return () => controlador.abort()
+  }, [modo, traslado, ubicacionOrigenId])
+
+  const tieneCambios = Boolean(motivo || transportista || referencia || evidencia || costo || ubicacionOrigenId || !aprobar || Object.values(cantidades).some(Boolean) || Object.values(rechazadas).some((valor) => numero(valor) > 0))
+  useEffect(() => onCambiosPendientes(!guardado && tieneCambios), [guardado, onCambiosPendientes, tieneCambios])
+  useEffect(() => () => onCambiosPendientes(false), [onCambiosPendientes])
   const disponible = useMemo(() => traslado && (modo === 'aprobar' ? traslado.estado === 'SOLICITADO' : modo === 'preparar' ? ['APROBADO', 'RECIBIDO'].includes(traslado.estado) : modo === 'despachar' ? traslado.estado === 'PREPARADO' : modo === 'recibir' ? traslado.estado === 'EN_TRANSITO' : modo === 'cerrar' ? traslado.estado === 'RECIBIDO' : ['SOLICITADO', 'APROBADO', 'PREPARADO'].includes(traslado.estado)), [modo, traslado])
-  const enviar = async (e: FormEvent<HTMLFormElement>) => { e.preventDefault(); if (!traslado || !disponible) return; const x: Record<string, string> = {}
-    if (modo !== 'preparar' && motivo.trim().length < 5) x.motivo = 'El motivo debe contener al menos 5 caracteres.'
-    if (modo === 'aprobar' && aprobar && traslado.detalles.every((d) => n(cantidades[d.id]) <= 0)) x.detalles = 'Aprueba una cantidad mayor que cero.'
-    if (modo === 'aprobar' && traslado.detalles.some((d) => n(cantidades[d.id]) < 0 || n(cantidades[d.id]) > n(d.cantidadSolicitada))) x.detalles = 'Las cantidades aprobadas deben estar entre cero y lo solicitado.'
-    if (modo === 'preparar' && traslado.detalles.some((d) => n(cantidades[d.id]) > 0 && n(cantidades[d.id]) > n(catalogosLote[d.id]?.find((l) => (l.id ?? '') === (lotes[d.id] ?? ''))?.cantidadDisponible))) x.detalles = 'Selecciona lotes con existencia suficiente para cada cantidad preparada.'
-    if (modo === 'preparar' && traslado.detalles.every((d) => n(cantidades[d.id]) <= 0)) x.detalles = 'Prepara al menos una cantidad mayor que cero.'
-    if (modo === 'despachar') { if (transportista.trim().length < 2) x.transportista = 'Ingresa el transportista.'; if (referencia.trim().length < 2) x.referencia = 'Ingresa la referencia de transporte.'; if (evidencia.trim().length < 3) x.evidencia = 'Ingresa la evidencia de despacho.'; if (costo && n(costo) < 0) x.costo = 'El costo no puede ser negativo.' }
-    if (modo === 'recibir' && (evidencia.trim().length < 3 || evidencia.trim().length > 500)) x.evidencia = 'La evidencia debe contener de 3 a 500 caracteres.'
-    if (modo === 'recibir' && traslado.detalles.some((d) => n(cantidades[d.id]) + n(rechazadas[d.id]) !== n(d.cantidadEnDespacho))) x.detalles = 'En cada producto, recibido más rechazado debe coincidir con lo enviado.'
-    if (modo === 'recibir' && traslado.detalles.some((d) => n(rechazadas[d.id]) > 0 && (incidencias[d.id] ?? '').trim().length < 5)) x.detalles = 'Documenta la incidencia de cada cantidad rechazada.'
-    setErrores(x); if (Object.keys(x).length) return
-    let accion = ''; let datos: unknown
-    if (modo === 'aprobar') { accion = 'aprobacion'; datos = { version: traslado.version, aprobar, motivo: motivo.trim(), detalles: traslado.detalles.map((d) => ({ detalleId: d.id, cantidadAprobada: aprobar ? n(cantidades[d.id]) : 0 })) } }
-    else if (modo === 'preparar') { accion = 'preparacion'; datos = { version: traslado.version, detalles: traslado.detalles.filter((d) => n(cantidades[d.id]) > 0).map((d) => ({ detalleId: d.id, loteId: lotes[d.id] || null, cantidadDespachada: n(cantidades[d.id]), motivoSeleccionLote: (motivosLote[d.id] ?? '').trim() || null })) } }
-    else if (modo === 'despachar') { accion = 'despacho'; datos = { version: traslado.version, transportista: transportista.trim(), transporteReferencia: referencia.trim(), evidenciaReferencia: evidencia.trim(), costoTransporte: costo ? n(costo) : null } }
-    else if (modo === 'recibir') { accion = 'recepcion'; datos = { version: traslado.version, motivo: motivo.trim(), evidenciaReferencia: evidencia.trim(), detalles: traslado.detalles.map((d) => ({ detalleId: d.id, cantidadRecibida: n(cantidades[d.id]), cantidadRechazada: n(rechazadas[d.id]), incidencia: (incidencias[d.id] ?? '').trim() || null })) } }
-    else { accion = modo === 'cerrar' ? 'cierre' : 'cancelacion'; datos = { version: traslado.version, motivo: motivo.trim() } }
-    setGuardando(true); setError(null); try { setGuardado(await ejecutarAccionAbastecimiento<TrasladoInterno>('traslados', traslado.id, accion, datos)); onCambiosPendientes(false) } catch (err) { setError(err instanceof ErrorApi ? err.message : 'No fue posible completar la acción.') } finally { setGuardando(false) }
+
+  const enviar = async (evento: FormEvent<HTMLFormElement>) => {
+    evento.preventDefault()
+    if (!traslado || !disponible) return
+    const siguientes: Record<string, string> = {}
+    if (['aprobar', 'recibir', 'cerrar', 'cancelar'].includes(modo) && motivo.trim().length < 5) siguientes.motivo = 'El motivo debe contener al menos 5 caracteres.'
+    if (modo === 'aprobar' && aprobar && traslado.detalles.every((detalle) => numero(cantidades[detalle.id]) <= 0)) siguientes.detalles = 'Aprueba una cantidad mayor que cero.'
+    if (modo === 'aprobar' && traslado.detalles.some((detalle) => numero(cantidades[detalle.id]) < 0 || numero(cantidades[detalle.id]) > numero(detalle.cantidadSolicitada))) siguientes.detalles = 'Las cantidades aprobadas deben estar entre cero y lo solicitado.'
+    if (modo === 'preparar' && !ubicacionOrigenId) siguientes.ubicacionOrigenId = 'Selecciona la ubicación desde la que se preparará el despacho.'
+    if (modo === 'preparar' && traslado.detalles.every((detalle) => numero(cantidades[detalle.id]) <= 0)) siguientes.detalles = 'Prepara una cantidad mayor que cero.'
+    if (modo === 'preparar' && traslado.detalles.some((detalle) => numero(cantidades[detalle.id]) < 0 || numero(cantidades[detalle.id]) > numero(detalle.cantidadAprobada) - numero(detalle.cantidadDespachada))) siguientes.detalles = 'Las cantidades superan el saldo aprobado pendiente.'
+    if (modo === 'preparar' && traslado.detalles.some((detalle) => numero(cantidades[detalle.id]) > 0 && (catalogosLote[detalle.id]?.length ?? 0) > 0 && !lotes[detalle.id])) siguientes.detalles = 'Selecciona el lote de cada producto preparado.'
+    if (modo === 'despachar' && transportista.trim().length < 2) siguientes.transportista = 'Registra el transportista.'
+    if (modo === 'despachar' && referencia.trim().length < 2) siguientes.referencia = 'Registra la referencia del transporte.'
+    if (['despachar', 'recibir'].includes(modo) && evidencia.trim().length < 3) siguientes.evidencia = 'Registra una referencia de evidencia.'
+    if (modo === 'recibir' && traslado.detalles.some((detalle) => Math.abs(numero(cantidades[detalle.id]) + numero(rechazadas[detalle.id]) - numero(detalle.cantidadEnDespacho)) > 0.000001)) siguientes.detalles = 'Lo aceptado más lo rechazado debe coincidir con lo despachado.'
+    if (modo === 'recibir' && traslado.detalles.some((detalle) => numero(rechazadas[detalle.id]) > 0 && !incidencias[detalle.id]?.trim())) siguientes.detalles = 'Describe la incidencia de cada cantidad rechazada.'
+    setErrores(siguientes)
+    if (Object.keys(siguientes).length) return
+
+    let datos: unknown
+    if (modo === 'aprobar') datos = { version: traslado.version, aprobar, motivo: motivo.trim(), detalles: traslado.detalles.map((detalle) => ({ detalleId: detalle.id, cantidadAprobada: aprobar ? numero(cantidades[detalle.id]) : 0 })) }
+    else if (modo === 'preparar') datos = { version: traslado.version, ubicacionOrigenId, detalles: traslado.detalles.map((detalle) => ({ detalleId: detalle.id, loteId: lotes[detalle.id] === 'SIN_LOTE' || !lotes[detalle.id] ? null : lotes[detalle.id], cantidadDespachada: numero(cantidades[detalle.id]), motivoSeleccionLote: motivosLote[detalle.id]?.trim() || null })) }
+    else if (modo === 'despachar') datos = { version: traslado.version, transportista: transportista.trim(), transporteReferencia: referencia.trim(), evidenciaReferencia: evidencia.trim(), costoTransporte: costo ? numero(costo) : null }
+    else if (modo === 'recibir') datos = { version: traslado.version, motivo: motivo.trim(), evidenciaReferencia: evidencia.trim(), detalles: traslado.detalles.map((detalle) => ({ detalleId: detalle.id, cantidadRecibida: numero(cantidades[detalle.id]), cantidadRechazada: numero(rechazadas[detalle.id]), incidencia: incidencias[detalle.id]?.trim() || null })) }
+    else datos = { version: traslado.version, motivo: motivo.trim() }
+
+    setGuardando(true)
+    setError(null)
+    try {
+      setGuardado(await ejecutarAccionAbastecimiento<TrasladoInterno>('traslados', traslado.id, accionApi[modo], datos))
+      onCambiosPendientes(false)
+    } catch (errorActual) {
+      setError(errorActual instanceof ErrorApi ? errorActual.message : 'No fue posible completar la operación.')
+    } finally {
+      setGuardando(false)
+    }
   }
-  if (!traslado && !error) return <section className={styles.pagina} aria-busy="true"><AbastecimientoBreadcrumb recurso="traslados" actual={tituloModo[modo]} onNavegar={onNavegar} /><div className={styles.estadoVacio}><h1>Cargando traslado</h1></div></section>
-  return <><section className={styles.pagina} aria-labelledby="titulo-accion-traslado"><AbastecimientoBreadcrumb recurso="traslados" actual={tituloModo[modo]} onNavegar={onNavegar} /><header className={styles.encabezadoPagina}><div><p className={styles.sobretitulo}>Traslado {traslado?.numero ?? ''}</p><h1 id="titulo-accion-traslado">{tituloModo[modo]}</h1><p>Cada etapa conserva su responsable, versión y evidencia; los saldos se actualizan únicamente por el proceso de inventario del backend.</p></div></header>{error && <div className={styles.alertaError}>{error}</div>}{traslado && !disponible && <div className={styles.alertaAdvertencia}>El traslado está {etiquetaCodigo(traslado.estado).toLowerCase()} y ya no admite esta acción.</div>}{traslado && <form className={styles.formulario} onSubmit={enviar}><section className={styles.resumenDocumento}><div><span>Estado</span><strong>{etiquetaCodigo(traslado.estado)}</strong></div><div><span>Origen</span><strong>{traslado.sucursalOrigen?.nombre}</strong></div><div><span>Destino</span><strong>{traslado.sucursalDestino?.nombre}</strong></div><div><span>Productos</span><strong>{traslado.detalles.length}</strong></div></section><fieldset disabled={guardando || !disponible}><legend>{tituloModo[modo]}</legend>
-    {modo === 'aprobar' && <div className={styles.opcionesDecision}><label className={aprobar ? styles.decisionSeleccionada : styles.decision}><input type="radio" checked={aprobar} onChange={() => setAprobar(true)} />Aprobar traslado</label><label className={!aprobar ? styles.decisionSeleccionada : styles.decision}><input type="radio" checked={!aprobar} onChange={() => setAprobar(false)} />Rechazar traslado</label></div>}
-    {['aprobar', 'preparar', 'recibir'].includes(modo) && <div className={styles.lineasRecepcion}>{traslado.detalles.map((d) => { const maximo = modo === 'aprobar' ? n(d.cantidadSolicitada) : modo === 'preparar' ? Math.max(0, n(d.cantidadAprobada) - n(d.cantidadDespachada)) : n(d.cantidadEnDespacho); return <article className={styles.lineaRecepcion} key={d.id}><strong>{d.producto?.codigo} — {d.producto?.nombre}</strong><small className={styles.ayudaCampo}>Máximo de esta etapa: {maximo}</small><div className={styles.grillaRecepcionCampos}><div className={styles.campo}><label>Cantidad {modo === 'aprobar' ? 'aprobada' : modo === 'preparar' ? 'a preparar' : 'recibida'}</label><input type="number" min="0" max={maximo} step="0.000001" value={cantidades[d.id] ?? ''} onChange={(e) => setCantidades((a) => ({ ...a, [d.id]: e.target.value }))} /></div>{modo === 'preparar' && <><div className={styles.campo}><label>Lote</label><select value={lotes[d.id] ?? ''} onChange={(e) => setLotes((a) => ({ ...a, [d.id]: e.target.value }))}><option value="">Selecciona lote</option>{(catalogosLote[d.id] ?? []).map((l) => <option key={l.id ?? 'sin-lote'} value={l.id ?? ''}>{l.numeroLote} · disponible {l.cantidadDisponible}</option>)}</select></div><div className={`${styles.campo} ${styles.campoRecepcionCompleto}`}><label>Motivo si no se respeta FEFO</label><input maxLength={500} value={motivosLote[d.id] ?? ''} onChange={(e) => setMotivosLote((a) => ({ ...a, [d.id]: e.target.value }))} /></div></>}{modo === 'recibir' && <><div className={styles.campo}><label>Cantidad rechazada</label><input type="number" min="0" max={maximo} step="0.000001" value={rechazadas[d.id] ?? ''} onChange={(e) => setRechazadas((a) => ({ ...a, [d.id]: e.target.value }))} /></div><div className={`${styles.campo} ${styles.campoRecepcionCompleto}`}><label>Incidencia</label><input maxLength={500} value={incidencias[d.id] ?? ''} onChange={(e) => setIncidencias((a) => ({ ...a, [d.id]: e.target.value }))} /></div></>}</div></article> })}</div>}
-    {modo === 'despachar' && <div className={styles.grillaDos}><div className={styles.campo}><label>Transportista <span>*</span></label><input value={transportista} maxLength={150} onChange={(e) => setTransportista(e.target.value)} />{errores.transportista && <small className={styles.errorCampo}>{errores.transportista}</small>}</div><div className={styles.campo}><label>Referencia de transporte <span>*</span></label><input value={referencia} maxLength={150} onChange={(e) => setReferencia(e.target.value)} />{errores.referencia && <small className={styles.errorCampo}>{errores.referencia}</small>}</div><div className={styles.campo}><label>Evidencia <span>*</span></label><input value={evidencia} maxLength={500} onChange={(e) => setEvidencia(e.target.value)} />{errores.evidencia && <small className={styles.errorCampo}>{errores.evidencia}</small>}</div><div className={styles.campo}><label>Costo de transporte</label><input type="number" min="0" step="0.0001" value={costo} onChange={(e) => setCosto(e.target.value)} />{errores.costo && <small className={styles.errorCampo}>{errores.costo}</small>}</div></div>}
-    {modo === 'recibir' && <div className={styles.campo}><label>Evidencia de recepción <span>*</span></label><input value={evidencia} maxLength={500} onChange={(e) => setEvidencia(e.target.value)} />{errores.evidencia && <small className={styles.errorCampo}>{errores.evidencia}</small>}</div>}{modo !== 'preparar' && modo !== 'despachar' && <div className={styles.campo}><label>Motivo <span>*</span></label><textarea rows={5} maxLength={500} value={motivo} onChange={(e) => setMotivo(e.target.value)} />{errores.motivo && <small className={styles.errorCampo}>{errores.motivo}</small>}</div>}{errores.detalles && <small className={styles.errorCampo}>{errores.detalles}</small>}
-  </fieldset><div className={styles.accionesFormulario}><p>* Campos obligatorios</p><div><button className={styles.botonNeutral} type="button" onClick={() => onNavegar(`/abastecimiento/traslados/${traslado.id}`)}><IconoAccion nombre="cancelar" />Volver</button><button className={modo === 'cancelar' || (modo === 'aprobar' && !aprobar) ? styles.botonPeligro : styles.botonPrimario} type="submit" disabled={guardando || !disponible}><IconoAccion nombre="guardar" />{guardando ? 'Procesando…' : tituloModo[modo]}</button></div></div></form>}</section><ModalEstado abierto={Boolean(guardado)} tipo="exito" titulo="Traslado actualizado" mensaje={guardado ? `El traslado ${guardado.numero} ahora está ${etiquetaCodigo(guardado.estado).toLowerCase()}.` : ''} textoAccionPrincipal="Ver traslado" onAccionPrincipal={() => onNavegar(`/abastecimiento/traslados/${trasladoId}`)} onCerrar={() => onNavegar(`/abastecimiento/traslados/${trasladoId}`)} /></>
+
+  if (error && !traslado) return <section className={styles.pagina}><div className={styles.alertaError} role="alert">{error}</div></section>
+  if (!traslado) return <section className={styles.pagina} aria-busy="true"><div className={styles.estadoVacio}><h1>Cargando traslado</h1></div></section>
+  return <>
+    <section className={styles.pagina} aria-labelledby="titulo-accion-traslado">
+      <AbastecimientoBreadcrumb recurso={rutaBase === '/abastecimiento/devoluciones-internas' ? 'devoluciones-internas' : 'traslados'} actual={tituloModo[modo]} onNavegar={onNavegar} />
+      <header className={styles.encabezadoPagina}><div><p className={styles.sobretitulo}>Traslado {traslado.numero} · {etiquetaCodigo(traslado.estado)}</p><h1 id="titulo-accion-traslado">{tituloModo[modo]}</h1><p>Origen: {traslado.sucursalOrigen?.nombre ?? traslado.sucursalOrigenId} · Destino: {traslado.sucursalDestino?.nombre ?? traslado.sucursalDestinoId}</p></div></header>
+      {error && <div className={styles.alertaError} role="alert">{error}</div>}
+      {!disponible && <div className={styles.alertaAdvertencia} role="alert">El estado actual ya no permite esta operación.</div>}
+      <form className={styles.formulario} noValidate onSubmit={enviar}>
+        {modo === 'aprobar' && <fieldset disabled={guardando || !disponible}><legend>Decisión</legend><div className={styles.grillaDos}><label className={styles.campo}><span>Resultado</span><select value={aprobar ? 'APROBAR' : 'RECHAZAR'} onChange={(evento) => setAprobar(evento.target.value === 'APROBAR')}><option value="APROBAR">Aprobar solicitud</option><option value="RECHAZAR">Rechazar solicitud</option></select></label><CampoMotivo motivo={motivo} error={errores.motivo} onChange={setMotivo} /></div></fieldset>}
+        {modo === 'preparar' && <fieldset disabled={guardando || !disponible}><legend>Ubicación de salida</legend><div className={styles.campo}><label htmlFor="traslado-ubicacion-origen">Ubicación origen <span>*</span></label><select id="traslado-ubicacion-origen" value={ubicacionOrigenId} disabled={traslado.tipo === 'DEVOLUCION_INTERNA'} aria-invalid={Boolean(errores.ubicacionOrigenId)} onChange={(evento) => { setUbicacionOrigenId(evento.target.value); setCatalogosLote({}); setLotes({}) }}><option value="">Selecciona una ubicación</option>{ubicaciones.map((ubicacion) => <option key={ubicacion.id} value={ubicacion.id}>{ubicacion.codigo} — {ubicacion.nombre}</option>)}</select>{errores.ubicacionOrigenId && <small className={styles.errorCampo}>{errores.ubicacionOrigenId}</small>}<small className={styles.ayudaCampo}>{traslado.tipo === 'DEVOLUCION_INTERNA' ? 'La ubicación y el lote fueron identificados por la farmacia al solicitar la devolución.' : 'El lote y la disponibilidad se consultan desde esta ubicación.'}</small></div></fieldset>}
+        {['aprobar', 'preparar', 'recibir'].includes(modo) && <fieldset disabled={guardando || !disponible}><legend>{modo === 'aprobar' ? 'Cantidades a aprobar' : modo === 'preparar' ? 'Productos del despacho' : 'Conteo físico recibido'}</legend><div className={styles.lineasProductos}>{traslado.detalles.map((detalle, indice) => <div className={styles.lineaProducto} key={detalle.id}><span className={styles.numeroLinea}>{indice + 1}</span><div className={styles.campoProducto}><strong>{detalle.producto?.nombre ?? detalle.productoId}</strong><small>{detalle.producto?.codigo ?? ''}</small></div><div className={styles.campo}><label htmlFor={`cantidad-${detalle.id}`}>{modo === 'recibir' ? 'Aceptado' : 'Cantidad'}</label><input id={`cantidad-${detalle.id}`} type="number" min="0" step="0.000001" value={cantidades[detalle.id] ?? '0'} disabled={modo === 'aprobar' && !aprobar} onChange={(evento) => setCantidades((actuales) => ({ ...actuales, [detalle.id]: evento.target.value }))} /></div>{modo === 'preparar' && <><div className={styles.campo}><label htmlFor={`lote-${detalle.id}`}>Lote</label><select id={`lote-${detalle.id}`} value={lotes[detalle.id] ?? ''} disabled={!ubicacionOrigenId || numero(cantidades[detalle.id]) <= 0} onChange={(evento) => setLotes((actuales) => ({ ...actuales, [detalle.id]: evento.target.value }))}><option value="">Selecciona un lote</option>{(catalogosLote[detalle.id] ?? []).map((lote) => <option key={lote.id ?? 'SIN_LOTE'} value={lote.id ?? 'SIN_LOTE'}>{lote.numeroLote} · disponible {lote.cantidadDisponible}</option>)}</select></div><div className={styles.campo}><label htmlFor={`motivo-lote-${detalle.id}`}>Criterio de selección</label><input id={`motivo-lote-${detalle.id}`} maxLength={500} value={motivosLote[detalle.id] ?? ''} onChange={(evento) => setMotivosLote((actuales) => ({ ...actuales, [detalle.id]: evento.target.value }))} /></div></>}{modo === 'recibir' && <><div className={styles.campo}><label htmlFor={`rechazada-${detalle.id}`}>Rechazado</label><input id={`rechazada-${detalle.id}`} type="number" min="0" step="0.000001" value={rechazadas[detalle.id] ?? '0'} onChange={(evento) => setRechazadas((actuales) => ({ ...actuales, [detalle.id]: evento.target.value }))} /></div><div className={styles.campo}><label htmlFor={`incidencia-${detalle.id}`}>Incidencia</label><input id={`incidencia-${detalle.id}`} maxLength={500} value={incidencias[detalle.id] ?? ''} onChange={(evento) => setIncidencias((actuales) => ({ ...actuales, [detalle.id]: evento.target.value }))} /></div></>}</div>)}</div>{errores.detalles && <small className={styles.errorCampo}>{errores.detalles}</small>}</fieldset>}
+        {modo === 'despachar' && <fieldset disabled={guardando || !disponible}><legend>Transporte y evidencia</legend><div className={styles.grillaDos}><div className={styles.campo}><label htmlFor="traslado-transportista">Transportista <span>*</span></label><input id="traslado-transportista" maxLength={150} value={transportista} onChange={(evento) => setTransportista(evento.target.value)} />{errores.transportista && <small className={styles.errorCampo}>{errores.transportista}</small>}</div><div className={styles.campo}><label htmlFor="traslado-referencia">Referencia del transporte <span>*</span></label><input id="traslado-referencia" maxLength={150} value={referencia} onChange={(evento) => setReferencia(evento.target.value)} />{errores.referencia && <small className={styles.errorCampo}>{errores.referencia}</small>}</div><div className={styles.campo}><label htmlFor="traslado-evidencia">Referencia de evidencia <span>*</span></label><input id="traslado-evidencia" maxLength={500} value={evidencia} onChange={(evento) => setEvidencia(evento.target.value)} />{errores.evidencia && <small className={styles.errorCampo}>{errores.evidencia}</small>}</div><div className={styles.campo}><label htmlFor="traslado-costo">Costo de transporte</label><input id="traslado-costo" type="number" min="0" step="0.01" value={costo} onChange={(evento) => setCosto(evento.target.value)} /></div></div></fieldset>}
+        {modo === 'recibir' && <fieldset disabled={guardando || !disponible}><legend>Acta de recepción</legend><div className={styles.grillaDos}><CampoMotivo motivo={motivo} error={errores.motivo} onChange={setMotivo} /><div className={styles.campo}><label htmlFor="traslado-evidencia">Referencia de evidencia <span>*</span></label><input id="traslado-evidencia" maxLength={500} value={evidencia} onChange={(evento) => setEvidencia(evento.target.value)} />{errores.evidencia && <small className={styles.errorCampo}>{errores.evidencia}</small>}</div></div><p className={styles.ayudaCampo}>Las cantidades aceptadas quedarán pendientes de ubicación y todavía no estarán disponibles para venta.</p></fieldset>}
+        {['cerrar', 'cancelar'].includes(modo) && <fieldset disabled={guardando || !disponible}><legend>Justificación</legend><CampoMotivo motivo={motivo} error={errores.motivo} onChange={setMotivo} /></fieldset>}
+        <div className={styles.accionesFormulario}><p>La operación quedará registrada en auditoría.</p><div><button className={styles.botonNeutral} type="button" onClick={() => onNavegar(`${rutaBase}/${traslado.id}`)}><IconoAccion nombre="cancelar" />Volver</button><button className={modo === 'cancelar' || (modo === 'aprobar' && !aprobar) ? styles.botonPeligro : styles.botonPrimario} type="submit" disabled={guardando || !disponible}><IconoAccion nombre="guardar" />{guardando ? 'Procesando…' : tituloModo[modo]}</button></div></div>
+      </form>
+    </section>
+    <ModalEstado abierto={Boolean(guardado)} tipo="exito" titulo="Traslado actualizado" mensaje={guardado ? `El traslado ${guardado.numero} ahora está ${etiquetaCodigo(guardado.estado).toLowerCase()}.` : ''} textoAccionPrincipal="Ver traslado" onAccionPrincipal={() => onNavegar(`${rutaBase}/${trasladoId}`)} onCerrar={() => onNavegar(`${rutaBase}/${trasladoId}`)} />
+  </>
+}
+
+function CampoMotivo({ motivo, error, onChange }: { motivo: string; error?: string; onChange: (valor: string) => void }) {
+  return <div className={styles.campo}><label htmlFor="traslado-motivo">Motivo <span>*</span></label><textarea id="traslado-motivo" rows={4} maxLength={500} value={motivo} aria-invalid={Boolean(error)} onChange={(evento) => onChange(evento.target.value)} />{error && <small className={styles.errorCampo}>{error}</small>}</div>
 }

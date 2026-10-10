@@ -718,6 +718,86 @@
   margin-bottom: 1.25rem;
 }
 
+.resumenOperativo {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.tarjetaIndicador {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.9rem;
+  overflow: hidden;
+  padding: 1.15rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: linear-gradient(145deg, var(--color-surface), color-mix(in srgb, var(--color-surface) 94%, var(--color-primary)));
+  box-shadow: 0 0.45rem 1.25rem rgb(15 23 42 / 5%);
+}
+
+.tarjetaIndicador::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 4.5rem;
+  height: 0.22rem;
+  border-radius: 0 0 0 999px;
+  background: var(--color-primary);
+  content: '';
+  opacity: 0.8;
+}
+
+.tarjetaIndicador > div {
+  display: grid;
+  min-width: 0;
+}
+
+.tarjetaIndicador small,
+.tarjetaIndicador span {
+  color: var(--color-text-muted);
+}
+
+.tarjetaIndicador small {
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.tarjetaIndicador strong {
+  margin-block: 0.12rem;
+  overflow: hidden;
+  color: var(--color-text);
+  font-size: clamp(1.2rem, 2vw, 1.55rem);
+  line-height: 1.25;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tarjetaIndicador > div > span {
+  overflow: hidden;
+  font-size: 0.69rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.iconoCaja {
+  background: color-mix(in srgb, var(--color-primary) 12%, var(--color-surface));
+  color: var(--color-primary);
+}
+
+.iconoVentas {
+  background: color-mix(in srgb, var(--color-success) 13%, var(--color-surface));
+  color: var(--color-success);
+}
+
+.iconoTotal {
+  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface));
+  color: color-mix(in srgb, var(--color-accent) 70%, var(--color-text));
+}
+
 .tarjetaResumen {
   display: flex;
   min-width: 0;
@@ -794,6 +874,121 @@
   border-radius: var(--radius-medium);
   background: var(--color-surface);
   box-shadow: 0 0.35rem 1rem rgb(15 23 42 / 3%);
+}
+
+.grillaGraficasDashboard {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+.panelGraficaDashboard {
+  min-width: 0;
+  padding: 1.25rem 1.35rem 0.7rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: var(--color-surface);
+  box-shadow: 0 0.45rem 1.25rem rgb(15 23 42 / 4%);
+}
+
+.etiquetaPeriodo {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.32rem 0.68rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-primary) 9%, var(--color-surface));
+  color: var(--color-primary);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.estadoGraficaDashboard {
+  display: grid;
+  min-height: 15.6rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  place-items: center;
+  align-content: center;
+}
+
+.estadoGraficaDashboard svg {
+  width: 2.3rem;
+  margin-bottom: 0.7rem;
+  color: var(--color-primary);
+}
+
+.estadoGraficaDashboard strong {
+  color: var(--color-text);
+  font-size: 0.88rem;
+}
+
+.estadoGraficaDashboard span {
+  margin-top: 0.3rem;
+  font-size: 0.74rem;
+}
+
+.panelAccesosCompactos {
+  padding: 1rem 1.15rem;
+}
+
+.panelAccesosCompactos .cabeceraPanel {
+  margin-bottom: 0.75rem;
+}
+
+.listaAccesosCompacta {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.listaAccesosCompacta button {
+  display: grid;
+  min-width: 0;
+  min-height: 3.6rem;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.58rem 0.7rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-small);
+  background: color-mix(in srgb, var(--color-surface) 96%, var(--color-primary));
+  color: var(--color-text);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+}
+
+.listaAccesosCompacta button:hover {
+  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--color-border));
+  background: color-mix(in srgb, var(--color-primary) 5%, var(--color-surface));
+  transform: translateY(-1px);
+}
+
+.listaAccesosCompacta button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.listaAccesosCompacta .iconoAcceso {
+  width: 2rem;
+  height: 2rem;
+}
+
+.listaAccesosCompacta .iconoAcceso svg {
+  width: 1rem;
+}
+
+.listaAccesosCompacta strong {
+  overflow: hidden;
+  font-size: 0.74rem;
+  line-height: 1.25;
+  text-overflow: ellipsis;
+}
+
+.listaAccesosCompacta button > svg {
+  width: 0.9rem;
+  color: var(--color-text-muted);
 }
 
 .cabeceraPanel {
@@ -981,12 +1176,29 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .resumenOperativo {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .listaAccesosCompacta {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .columnasDashboard {
     grid-template-columns: 1fr;
   }
 }
 
 @media (max-width: 58rem) {
+  .grillaGraficasDashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .resumenOperativo,
+  .listaAccesosCompacta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .sidebar {
     width: min(19rem, 88vw);
     transform: translateX(-105%);
@@ -1073,8 +1285,14 @@
   }
 
   .resumen,
-  .listaAccesos {
+  .resumenOperativo,
+  .listaAccesos,
+  .listaAccesosCompacta {
     grid-template-columns: 1fr;
+  }
+
+  .panelGraficaDashboard {
+    padding-inline: 0.85rem;
   }
 
   .avisoContrasena {

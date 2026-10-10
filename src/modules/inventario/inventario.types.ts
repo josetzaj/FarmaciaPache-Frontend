@@ -12,6 +12,7 @@ export type EstadoExistenciaInventario =
   | 'RESERVADO'
   | 'COMPROMETIDO'
   | 'EN_TRANSITO'
+  | 'RECIBIDO_PENDIENTE_UBICACION'
   | 'BLOQUEADO'
   | 'CUARENTENA'
   | 'VENCIDO'
@@ -101,8 +102,18 @@ export type ExistenciaProducto = {
   posiciones: PosicionInventario[]
 }
 
-export type ExistenciasInventarioPaginadas = {
-  items: ExistenciaProducto[]
+export type ExistenciaLoteInventario = {
+  id: string
+  producto: ExistenciaProducto['producto']
+  ubicacion: { id: string; codigo: string; nombre: string }
+  lote: { id: string; numero: string; fechaVencimiento: string | null } | null
+  estado: EstadoExistenciaInventario
+  cantidad: number
+  costoUnitario: number | null
+  actualizadoEn: string
+}
+
+type BaseExistenciasInventarioPaginadas = {
   pagina: number
   tamanoPagina: number
   total: number
@@ -110,16 +121,25 @@ export type ExistenciasInventarioPaginadas = {
   consultadoEn: string
 }
 
-export type OrdenExistenciasInventario = 'producto' | 'codigo' | 'disponible' | 'actualizado'
+export type ExistenciasInventarioPaginadas =
+  | (BaseExistenciasInventarioPaginadas & { vista: 'CONSOLIDADA'; items: ExistenciaProducto[] })
+  | (BaseExistenciasInventarioPaginadas & { vista: 'LOTE'; items: ExistenciaLoteInventario[] })
+
+export type VistaExistenciasInventario = 'CONSOLIDADA' | 'LOTE'
+export type OrdenExistenciasInventario = 'producto' | 'codigo' | 'disponible' | 'actualizado' | 'lote' | 'vencimiento' | 'ubicacion' | 'estado'
 export type DireccionInventario = 'asc' | 'desc'
 
 export type ListarExistenciasInventarioParametros = {
   pagina: number
   tamanoPagina: number
+  vista: VistaExistenciasInventario
   busqueda?: string
   sucursalId?: string
   ubicacionId?: string
   estados?: EstadoExistenciaInventario[]
+  lote?: string
+  vencimientoDesde?: string
+  vencimientoHasta?: string
   soloConExistencia: boolean
   soloBajoMinimo: boolean
   orden: OrdenExistenciasInventario
@@ -160,7 +180,7 @@ export type AuditoriaInventarioPaginada = {
   totalPaginas: number
 }
 
-export type TipoEntidadAuditoriaInventario = 'ubicacion' | 'operacion' | 'conteo' | 'politica' | 'politicaMasiva'
+export type TipoEntidadAuditoriaInventario = 'ubicacion' | 'operacion' | 'costo' | 'conteo' | 'politica' | 'politicaMasiva'
 export type OrdenAuditoriaInventario = 'fecha' | 'operacion' | 'usuario' | 'sucursal' | 'resumen'
 
 export type ListarAuditoriaInventarioParametros = {
@@ -179,6 +199,7 @@ export type TipoOperacionInventario =
   | 'APERTURA'
   | 'AJUSTE_POSITIVO'
   | 'AJUSTE_NEGATIVO'
+  | 'REGULARIZACION_COSTO'
   | 'COMPRA_RECEPCION'
   | 'TRASLADO_DESPACHO'
   | 'TRASLADO_RECEPCION'
@@ -257,7 +278,49 @@ export type RegistrarAjusteInventarioRequest = {
   cantidad: number
   loteId: string | null
   lote: DatosLoteInventarioRequest | null
+  motivo: string
+  evidenciaReferencia: string
+}
+
+export type PosicionCostoInventario = {
+  saldoId: string
+  sucursal: { id: string; codigo: string; nombre: string }
+  producto: { id: string; codigo: string; nombre: string }
+  ubicacion: { id: string; codigo: string; nombre: string }
+  lote: { id: string; numero: string; fechaVencimiento: string | null } | null
+  estado: EstadoExistenciaInventario
+  cantidad: number
   costoUnitario: number | null
+  actualizadoEn: string
+  version: number
+}
+
+export type PosicionesCostoInventarioPaginadas = {
+  items: PosicionCostoInventario[]
+  pagina: number
+  tamanoPagina: number
+  total: number
+  totalPaginas: number
+}
+
+export type ListarPosicionesCostoInventarioParametros = {
+  pagina: number
+  tamanoPagina: number
+  busqueda?: string
+  sucursalIds?: string[]
+  orden: 'sucursal' | 'producto' | 'ubicacion' | 'actualizado'
+  direccion: DireccionInventario
+}
+
+export type OpcionesCostosInventario = {
+  sucursales: Array<{ id: string; codigo: string; nombre: string }>
+}
+
+export type RegistrarRegularizacionCostoInventarioRequest = {
+  saldoId: string
+  version: number
+  referencia: string
+  costoUnitario: number
   motivo: string
   evidenciaReferencia: string
 }

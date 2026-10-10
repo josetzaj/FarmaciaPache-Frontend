@@ -31,6 +31,8 @@ const etiquetasOperacion: Record<string, string> = {
   APERTURA: 'Apertura',
   AJUSTE_POSITIVO: 'Ajuste positivo',
   AJUSTE_NEGATIVO: 'Ajuste negativo',
+  REGULARIZACION_COSTO: 'Regularización de costo',
+  REGULARIZAR_COSTO: 'Regularización de costo',
   COMPRA_RECEPCION: 'Recepción de compra',
   TRASLADO_DESPACHO: 'Despacho de traslado',
   TRASLADO_RECEPCION: 'Recepción de traslado',

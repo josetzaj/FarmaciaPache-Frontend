@@ -1,0 +1,388 @@
+.contenedor {
+  position: relative;
+}
+
+.botonCampana {
+  position: relative;
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-medium);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+  place-items: center;
+}
+
+.botonCampana:hover,
+.botonCampanaActivo {
+  border-color: color-mix(in srgb, var(--color-primary) 55%, var(--color-border));
+  background: color-mix(in srgb, var(--color-primary) 8%, var(--color-surface));
+  color: var(--color-primary-hover);
+}
+
+.botonCampana:active {
+  transform: translateY(1px);
+}
+
+.botonCampana:focus-visible,
+.panel button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.botonCampana svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.contador {
+  position: absolute;
+  top: -0.38rem;
+  right: -0.38rem;
+  display: grid;
+  min-width: 1.35rem;
+  height: 1.35rem;
+  padding: 0 0.24rem;
+  border: 2px solid var(--color-surface);
+  border-radius: 999px;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-size: 0.62rem;
+  font-weight: 800;
+  line-height: 1;
+  place-items: center;
+}
+
+.indicadorCritico {
+  position: absolute;
+  right: 0.18rem;
+  bottom: 0.2rem;
+  width: 0.52rem;
+  height: 0.52rem;
+  border: 2px solid var(--color-surface);
+  border-radius: 50%;
+  background: var(--color-danger);
+}
+
+.panel {
+  position: absolute;
+  top: calc(100% + 0.75rem);
+  right: 0;
+  display: grid;
+  width: min(27rem, calc(100vw - 1.5rem));
+  max-height: min(42rem, calc(100dvh - 6.5rem));
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--color-primary) 20%, var(--color-border));
+  border-radius: var(--radius-large);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  color: var(--color-text);
+}
+
+.panel::before {
+  height: 0.23rem;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+  content: '';
+}
+
+.cabeceraPanel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.1rem 0.9rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.cabeceraPanel > div {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.sobretitulo {
+  color: var(--color-primary);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cabeceraPanel h2 {
+  margin: 0;
+  font-size: 1.08rem;
+}
+
+.marcarTodas,
+.error button,
+.piePanel button {
+  border: 0;
+  background: transparent;
+  color: var(--color-primary);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 750;
+}
+
+.marcarTodas:hover,
+.error button:hover,
+.piePanel button:hover {
+  color: var(--color-primary-hover);
+  text-decoration: underline;
+  text-underline-offset: 0.18rem;
+}
+
+.marcarTodas:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.resumenCritico {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 1rem;
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+  font-size: 0.72rem;
+}
+
+.resumenCritico > span {
+  display: grid;
+  width: 1.35rem;
+  height: 1.35rem;
+  flex: 0 0 auto;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-weight: 900;
+  place-items: center;
+}
+
+.resumenCritico p,
+.error p,
+.estadoPanel p {
+  margin: 0;
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.65rem 1rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-danger) 22%, var(--color-border));
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+  font-size: 0.72rem;
+}
+
+.error button {
+  color: var(--color-danger);
+}
+
+.lista {
+  min-height: 8rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.notificacion {
+  position: relative;
+  display: grid;
+  grid-template-columns: 0.22rem minmax(0, 1fr) auto;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  transition: background var(--transition-fast);
+}
+
+.notificacion:hover {
+  background: var(--color-surface-muted);
+}
+
+.noLeida {
+  background: color-mix(in srgb, var(--color-info-soft) 38%, var(--color-surface));
+}
+
+.marcaPrioridad {
+  width: 0.22rem;
+  height: 100%;
+}
+
+.prioridadINFORMATIVA {
+  background: var(--color-info);
+}
+
+.prioridadADVERTENCIA {
+  background: var(--color-warning);
+}
+
+.prioridadCRITICA {
+  background: var(--color-danger);
+}
+
+.contenidoNotificacion {
+  display: grid;
+  min-width: 0;
+  gap: 0.32rem;
+  padding: 0.85rem 0.75rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.contenidoNotificacion:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  color: var(--color-text-muted);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.meta time {
+  flex: 0 0 auto;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.contenidoNotificacion > strong {
+  overflow: hidden;
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mensaje {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.botonLeida {
+  align-self: center;
+  width: 2rem;
+  height: 2rem;
+  margin-right: 0.65rem;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--color-surface);
+  color: var(--color-primary);
+  cursor: pointer;
+}
+
+.botonLeida:hover {
+  border-color: var(--color-primary);
+  background: var(--color-success-soft);
+}
+
+.estadoPanel {
+  display: grid;
+  min-height: 13rem;
+  align-content: center;
+  justify-items: center;
+  gap: 0.45rem;
+  padding: 1.5rem;
+  color: var(--color-text-muted);
+  text-align: center;
+}
+
+.estadoPanel strong {
+  color: var(--color-text);
+}
+
+.estadoPanel p {
+  max-width: 18rem;
+  font-size: 0.75rem;
+}
+
+.estadoIcono {
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-primary) 12%, var(--color-surface));
+  color: var(--color-primary);
+  place-items: center;
+}
+
+.estadoIcono svg {
+  width: 1.35rem;
+  height: 1.35rem;
+}
+
+.cargador {
+  width: 1.7rem;
+  height: 1.7rem;
+  border: 0.18rem solid var(--color-border);
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: girar 720ms linear infinite;
+}
+
+.piePanel {
+  padding: 0.78rem 1rem;
+  background: var(--color-surface-muted);
+  text-align: center;
+}
+
+.piePanel button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+@keyframes girar {
+  to { transform: rotate(1turn); }
+}
+
+@media (max-width: 42rem) {
+  .panel {
+    position: fixed;
+    top: 4.9rem;
+    right: 0.75rem;
+    left: 0.75rem;
+    width: auto;
+    max-height: calc(100dvh - 5.7rem);
+  }
+
+  .cabeceraPanel {
+    align-items: flex-start;
+  }
+
+  .marcarTodas {
+    max-width: 9rem;
+    text-align: right;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .botonCampana,
+  .notificacion {
+    transition: none;
+  }
+
+  .cargador {
+    animation: none;
+    border-top-color: var(--color-border);
+    border-right-color: var(--color-primary);
+  }
+}

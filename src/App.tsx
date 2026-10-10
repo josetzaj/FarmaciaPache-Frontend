@@ -7,6 +7,18 @@ import { RestablecerContrasenaView } from './modules/autenticacion/components/re
 import { SolicitarRecuperacionView } from './modules/autenticacion/components/solicitar-recuperacion-view'
 import type { MotivoEnlaceRecuperacionNoValido } from './modules/autenticacion/recuperacion.types'
 import { DashboardView } from './modules/dashboard/components/dashboard-view'
+import { NotificacionesView } from './modules/notificaciones/components/notificaciones-view'
+import { ActivoDetalleView } from './modules/activos/components/activo-detalle-view'
+import { ActivoFormularioView } from './modules/activos/components/activo-formulario-view'
+import { ActivoListadoView } from './modules/activos/components/activo-listado-view'
+import { AsignacionDetalleView } from './modules/activos/components/asignacion-detalle-view'
+import { AsignacionFormularioView } from './modules/activos/components/asignacion-formulario-view'
+import { AsignacionListadoView } from './modules/activos/components/asignacion-listado-view'
+import { DevolucionActivosView } from './modules/activos/components/devolucion-activos-view'
+import { DevolucionDetalleView as DevolucionActivoDetalleView } from './modules/activos/components/devolucion-detalle-view'
+import { DevolucionListadoView as DevolucionActivoListadoView } from './modules/activos/components/devolucion-listado-view'
+import { DevolucionProcesoView } from './modules/activos/components/devolucion-proceso-view'
+import { TipoActivoCrearView, TipoActivoDetalleView, TipoActivoEditarView, TipoActivoListadoView } from './modules/activos/components/tipo-activo-views'
 import { DepartamentoOrganizacionalCrearView } from './modules/departamentos-organizacionales/components/departamento-organizacional-crear-view'
 import { DepartamentoOrganizacionalDetalleView } from './modules/departamentos-organizacionales/components/departamento-organizacional-detalle-view'
 import { DepartamentoOrganizacionalEditarView } from './modules/departamentos-organizacionales/components/departamento-organizacional-editar-view'
@@ -76,6 +88,8 @@ import { InventarioUbicacionesView } from './modules/inventario/components/inven
 import { InventarioKardexView } from './modules/inventario/components/inventario-kardex-view'
 import { InventarioAperturaView } from './modules/inventario/components/inventario-apertura-view'
 import { InventarioAjusteView } from './modules/inventario/components/inventario-ajuste-view'
+import { InventarioCostosListadoView } from './modules/inventario/components/inventario-costos-listado-view'
+import { InventarioCostoRegularizarView } from './modules/inventario/components/inventario-costo-regularizar-view'
 import { InventarioOperacionesListadoView } from './modules/inventario/components/inventario-operaciones-listado-view'
 import { InventarioOperacionDetalleView } from './modules/inventario/components/inventario-operacion-detalle-view'
 import { InventarioPoliticaCrearView } from './modules/inventario/components/inventario-politica-crear-view'
@@ -106,7 +120,11 @@ import { RecepcionDetalleView } from './modules/abastecimiento/components/recepc
 import { TrasladoAccionView } from './modules/abastecimiento/components/traslado-accion-view'
 import { TrasladoCrearView } from './modules/abastecimiento/components/traslado-crear-view'
 import { TrasladoDetalleView } from './modules/abastecimiento/components/traslado-detalle-view'
+import { TrasladoUbicacionView } from './modules/abastecimiento/components/traslado-ubicacion-view'
+import { TrasladoCuarentenaView } from './modules/abastecimiento/components/traslado-cuarentena-view'
+import { DevolucionInternaCrearView } from './modules/abastecimiento/components/devolucion-interna-crear-view'
 import { DevolucionAccionView } from './modules/abastecimiento/components/devolucion-accion-view'
+import type { ModoAccionDevolucion } from './modules/abastecimiento/components/devolucion-accion-view'
 import { DevolucionCrearView } from './modules/abastecimiento/components/devolucion-crear-view'
 import { DevolucionDetalleView } from './modules/abastecimiento/components/devolucion-detalle-view'
 import { ClienteDetalleView } from './modules/comercial/components/cliente-detalle-view'
@@ -124,7 +142,10 @@ import { VentaDetalleView } from './modules/comercial/components/venta-detalle-v
 import { VentaFormularioView } from './modules/comercial/components/venta-formulario-view'
 import { VentaListadoView } from './modules/comercial/components/venta-listado-view'
 import { MovimientoListadoView, TurnoListadoView } from './modules/caja/components/caja-listado-view'
+import { TurnosDiaListadoView } from './modules/caja/components/turnos-dia-listado-view'
 import { MovimientoDetalleView, TurnoDetalleView } from './modules/caja/components/caja-detalle-view'
+import { VentasPendientesListadoView } from './modules/caja/components/ventas-pendientes-listado-view'
+import { VentaPendienteCobroDetalleView } from './modules/caja/components/venta-pendiente-cobro-detalle-view'
 import { MovimientoCrearView } from './modules/caja/components/movimiento-crear-view'
 import { TurnoAperturaView } from './modules/caja/components/turno-apertura-view'
 import { ArqueoListadoView, CierreListadoView } from './modules/caja/components/control-caja-listado-view'
@@ -146,6 +167,15 @@ import { RendicionCrearView } from './modules/caja/components/rendicion-crear-vi
 import { ConciliacionCrearView } from './modules/caja/components/conciliacion-crear-view'
 import { ConsolidacionCrearView } from './modules/caja/components/consolidacion-crear-view'
 import type { EntidadIncidenciaCaja } from './modules/caja/caja.types'
+import { CajaChicaListadoView } from './modules/caja-chica/components/caja-chica-listado-view'
+import { LiquidacionListadoView } from './modules/caja-chica/components/liquidacion-listado-view'
+import { LiquidacionDetalleView } from './modules/caja-chica/components/liquidacion-detalle-view'
+import { ConfiguracionSalarialFormularioView } from './modules/planillas/components/configuracion-salarial-formulario-view'
+import { ConfiguracionSalarialListadoView } from './modules/planillas/components/configuracion-salarial-listado-view'
+import { PlanillaDetalleView } from './modules/planillas/components/planilla-detalle-view'
+import { PlanillaGenerarView } from './modules/planillas/components/planilla-generar-view'
+import { PlanillaListadoView } from './modules/planillas/components/planilla-listado-view'
+import { ReportesView } from './modules/reportes/components/reportes-view'
 import { ModalEstado } from './shared/components/modal-estado'
 import styles from './App.module.css'
 
@@ -405,6 +435,22 @@ function App() {
   const puedeVerEmpleados = permisos.includes('ORGANIZACION.EMPLEADOS.VER')
   const puedeCrearEmpleados = permisos.includes('ORGANIZACION.EMPLEADOS.CREAR')
   const puedeActualizarEmpleados = permisos.includes('ORGANIZACION.EMPLEADOS.ACTUALIZAR')
+  const puedeVerPlanillas = permisos.includes('PLANILLAS.PERIODOS.VER')
+  const puedeGenerarPlanillas = permisos.includes('PLANILLAS.PERIODOS.GENERAR')
+  const puedeGestionarPeriodosPlanilla = permisos.includes('PLANILLAS.PERIODOS.ACTUALIZAR') || permisos.includes('PLANILLAS.PERIODOS.CERRAR')
+  const puedeVerConfiguracionSalarial = permisos.includes('PLANILLAS.CONFIGURACION_SALARIAL.VER')
+  const puedeVerReportesComerciales = permisos.some((permiso) => [
+    'REPORTES.RESUMEN.VER',
+    'REPORTES.VENTAS.VER',
+    'REPORTES.CLIENTES.VER',
+  ].includes(permiso))
+  const puedeVerReportesInventario = permisos.some((permiso) => [
+    'REPORTES.INVENTARIO.VER',
+    'REPORTES.PROVEEDORES.VER',
+    'REPORTES.COSTOS.VER',
+  ].includes(permiso))
+  const puedeVerReportesFinanzas = permisos.includes('REPORTES.RESUMEN.VER') && permisos.includes('REPORTES.ALCANCE_GLOBAL')
+  const puedeVerReportes = puedeVerReportesComerciales || puedeVerReportesInventario || puedeVerReportesFinanzas
   const puedeVerRoles = permisos.includes('SEGURIDAD.ROLES.VER')
   const puedeCrearRoles = permisos.includes('SEGURIDAD.ROLES.CREAR')
     && permisos.includes('SEGURIDAD.PERMISOS.VER')
@@ -424,6 +470,20 @@ function App() {
   const puedeVerDepartamentos = permisos.includes('ORGANIZACION.DEPARTAMENTOS.VER')
   const puedeCrearDepartamentos = permisos.includes('ORGANIZACION.DEPARTAMENTOS.CREAR')
   const puedeActualizarDepartamentos = permisos.includes('ORGANIZACION.DEPARTAMENTOS.ACTUALIZAR')
+  const puedeVerActivos = permisos.includes('ACTIVOS.ACTIVOS.VER')
+  const puedeCrearActivos = permisos.includes('ACTIVOS.ACTIVOS.CREAR')
+  const puedeActualizarActivos = permisos.includes('ACTIVOS.ACTIVOS.ACTUALIZAR')
+  const puedeVerAsignacionesActivos = permisos.includes('ACTIVOS.ASIGNACIONES.VER')
+  const puedeCrearAsignacionesActivos = permisos.includes('ACTIVOS.ASIGNACIONES.CREAR')
+  const puedeVerAsignacionesPropias = permisos.includes('ACTIVOS.ASIGNACIONES.VER_PROPIAS')
+  const puedeConfirmarActivosRecibidos = permisos.includes('ACTIVOS.ASIGNACIONES.CONFIRMAR_RECEPCION')
+  const puedeSolicitarDevolucionActivos = permisos.includes('ACTIVOS.ASIGNACIONES.SOLICITAR_DEVOLUCION')
+  const puedeVerDevolucionesActivos = permisos.includes('ACTIVOS.ASIGNACIONES.VER_DEVOLUCIONES')
+  const puedeRecibirDevolucionesActivos = permisos.includes('ACTIVOS.ASIGNACIONES.RECIBIR_DEVOLUCION')
+  const puedeAprobarDevolucionesActivos = permisos.includes('ACTIVOS.ASIGNACIONES.APROBAR_DEVOLUCION')
+  const puedeVerTiposActivos = permisos.includes('ACTIVOS.TIPOS.VER')
+  const puedeCrearTiposActivos = permisos.includes('ACTIVOS.TIPOS.CREAR')
+  const puedeActualizarTiposActivos = permisos.includes('ACTIVOS.TIPOS.ACTUALIZAR')
   const puedeVerPuestos = permisos.includes('ORGANIZACION.PUESTOS.VER')
   const puedeCrearPuestos = permisos.includes('ORGANIZACION.PUESTOS.CREAR')
   const puedeActualizarPuestos = permisos.includes('ORGANIZACION.PUESTOS.ACTUALIZAR')
@@ -436,6 +496,8 @@ function App() {
   const puedeRegistrarApertura = permisos.includes('INVENTARIO.APERTURA.REGISTRAR')
   const puedeVerAjustes = permisos.includes('INVENTARIO.AJUSTES.VER')
   const puedeRegistrarAjustes = permisos.includes('INVENTARIO.AJUSTES.REGISTRAR')
+  const puedeVerCostosInventario = permisos.includes('INVENTARIO.COSTOS.VER')
+  const puedeRegularizarCostosInventario = permisos.includes('INVENTARIO.COSTOS.REGULARIZAR')
   const puedeVerUbicaciones = permisos.includes('INVENTARIO.UBICACIONES.VER')
   const puedeCrearUbicaciones = permisos.includes('INVENTARIO.UBICACIONES.CREAR')
   const puedeActualizarUbicaciones = permisos.includes('INVENTARIO.UBICACIONES.ACTUALIZAR')
@@ -445,6 +507,8 @@ function App() {
   const puedeVerPoliticasMasivas = puedeVerPoliticas || puedeCrearPoliticasMasivas || permisos.some((permiso) => ['INVENTARIO.POLITICAS.APROBAR_MASIVA', 'INVENTARIO.POLITICAS.VER_CORPORATIVO', 'INVENTARIO.POLITICAS.APROBAR_MASIVA_CORPORATIVA'].includes(permiso))
   const puedeVerConteos = permisos.includes('INVENTARIO.CONTEOS.VER')
   const puedeCrearConteos = permisos.includes('INVENTARIO.CONTEOS.CREAR')
+  const puedeRegistrarResultadosConteos = permisos.includes('INVENTARIO.CONTEOS.REGISTRAR_RESULTADOS')
+  const puedeAprobarConteos = permisos.includes('INVENTARIO.CONTEOS.APROBAR')
   const puedeVerVencimientos = permisos.includes('INVENTARIO.VENCIMIENTOS.VER')
   const puedeVerProveedores = permisos.includes('ABASTECIMIENTO.PROVEEDORES.VER')
   const puedeCrearProveedores = permisos.includes('ABASTECIMIENTO.PROVEEDORES.CREAR')
@@ -472,6 +536,7 @@ function App() {
   const puedePrepararTraslados = permisos.includes('ABASTECIMIENTO.TRASLADOS.PREPARAR')
   const puedeDespacharTraslados = permisos.includes('ABASTECIMIENTO.TRASLADOS.DESPACHAR')
   const puedeRecibirTraslados = permisos.includes('ABASTECIMIENTO.TRASLADOS.RECIBIR')
+  const puedeUbicarTraslados = permisos.includes('ABASTECIMIENTO.TRASLADOS.UBICAR')
   const puedeCerrarTraslados = permisos.includes('ABASTECIMIENTO.TRASLADOS.CERRAR')
   const puedeCancelarTraslados = permisos.includes('ABASTECIMIENTO.TRASLADOS.CANCELAR')
   const puedeVerDevoluciones = permisos.includes('ABASTECIMIENTO.DEVOLUCIONES.VER')
@@ -480,6 +545,8 @@ function App() {
   const puedeSegregarDevoluciones = permisos.includes('ABASTECIMIENTO.DEVOLUCIONES.SEGREGAR')
   const puedeDespacharDevoluciones = permisos.includes('ABASTECIMIENTO.DEVOLUCIONES.DESPACHAR')
   const puedeRecibirDevoluciones = permisos.includes('ABASTECIMIENTO.DEVOLUCIONES.RECIBIR_PROVEEDOR')
+  const puedeRegistrarRetornoDevoluciones = permisos.includes('ABASTECIMIENTO.DEVOLUCIONES.REGISTRAR_RETORNO')
+  const puedeEvaluarRetornoDevoluciones = permisos.includes('ABASTECIMIENTO.DEVOLUCIONES.EVALUAR_RETORNO')
   const puedeCompensarDevoluciones = permisos.includes('ABASTECIMIENTO.DEVOLUCIONES.COMPENSAR')
   const puedeCerrarDevoluciones = permisos.includes('ABASTECIMIENTO.DEVOLUCIONES.CERRAR')
   const puedeCancelarDevoluciones = permisos.includes('ABASTECIMIENTO.DEVOLUCIONES.CANCELAR')
@@ -489,12 +556,15 @@ function App() {
   const puedeVerPoliticasMargen = permisos.includes('COMERCIAL.MARGENES.VER')
   const puedeCrearMargenes = permisos.includes('COMERCIAL.MARGENES.CREAR')
   const puedeActualizarMargenes = permisos.includes('COMERCIAL.MARGENES.ACTUALIZAR')
-  const puedeVerPrecios = permisos.includes('COMERCIAL.PRECIOS.VER')
+  const puedeVerPreciosPublicos = permisos.includes('COMERCIAL.PRECIOS.VER_PUBLICO')
+  const puedeVerCostosPrecios = permisos.includes('COMERCIAL.PRECIOS.VER_COSTOS')
+  const puedeVerPrecios = puedeVerPreciosPublicos || puedeVerCostosPrecios
   const puedeProponerPrecios = permisos.includes('COMERCIAL.PRECIOS.PROPONER')
   const puedeVerVentas = permisos.includes('COMERCIAL.VENTAS.VER')
   const puedeCrearVentas = permisos.includes('COMERCIAL.VENTAS.CREAR')
   const puedeActualizarVentas = permisos.includes('COMERCIAL.VENTAS.ACTUALIZAR')
   const puedeVerRecetas = permisos.includes('COMERCIAL.RECETAS.VER')
+  const puedeCobrarVentasCaja = permisos.includes('CAJA.VENTAS.COBRAR')
   const puedeVerTurnosCaja = permisos.includes('CAJA.TURNOS.VER')
   const puedeVerMovimientosCaja = permisos.includes('CAJA.MOVIMIENTOS.VER')
   const puedeVerArqueosCaja = permisos.includes('CAJA.ARQUEOS.VER')
@@ -507,6 +577,7 @@ function App() {
   const puedeVerIncidenciasCaja = permisos.includes('CAJA.INCIDENCIAS.VER')
   const puedeVerCajas = permisos.includes('CAJA.CAJAS.VER')
   const puedeVerPoliticasCaja = permisos.includes('CAJA.POLITICAS.VER')
+  const puedeVerCuentasCaja = permisos.includes('CAJA.CUENTAS.VER')
   const puedeAbrirTurnosCaja = permisos.includes('CAJA.TURNOS.ABRIR')
   const puedeRegistrarMovimientosCaja = permisos.includes('CAJA.MOVIMIENTOS.REGISTRAR')
   const puedeRegistrarArqueosCaja = permisos.includes('CAJA.ARQUEOS.REGISTRAR')
@@ -515,12 +586,18 @@ function App() {
   const puedeCrearTransferenciasCaja = permisos.includes('CAJA.TRANSFERENCIAS.CREAR')
   const puedePrepararDepositosCaja = permisos.includes('CAJA.DEPOSITOS.PREPARAR')
   const puedeCrearIncidenciasCaja = permisos.includes('CAJA.INCIDENCIAS.CREAR')
-  const puedeGestionarConfiguracionCaja = puedeVerCajas || puedeVerPoliticasCaja
+  const puedeGestionarConfiguracionCaja = puedeVerCajas || puedeVerPoliticasCaja || puedeVerCuentasCaja
   const puedeVerDenominacionesCaja = permisos.includes('CAJA.DENOMINACIONES.VER')
   const puedeRegistrarRendicionesCaja = permisos.includes('CAJA.RENDICIONES.REGISTRAR')
   const puedeCrearConciliacionesCaja = permisos.includes('CAJA.CONCILIACIONES.CREAR')
   const puedeGenerarConsolidacionesCaja = permisos.includes('CAJA.CONSOLIDACIONES.GENERAR')
+  const puedeVerCajasChicas = permisos.includes('CAJA.CHICA.VER')
+  const puedeVerLiquidacionesCajaChica = permisos.includes('CAJA.LIQUIDACIONES.VER')
+  const coincidenciaLiquidacionCajaChica = urlActual.pathname.match(/^\/caja\/liquidaciones\/([^/]+)\/([^/]+)$/)
+  const coincidenciaVentaPendienteCaja = urlActual.pathname.match(/^\/caja\/ventas-pendientes\/([^/]+?)(\/cobrar)?$/)
   const coincidenciaTurnoCaja = urlActual.pathname.match(/^\/caja\/turnos\/([^/]+)$/)
+  const coincidenciaDiaTurnosCaja = urlActual.pathname.match(/^\/caja\/turnos\/dia\/(\d{4}-\d{2}-\d{2})$/)
+  const coincidenciaMovimientosTurnoCaja = urlActual.pathname.match(/^\/caja\/turnos\/([^/]+)\/movimientos$/)
   const coincidenciaMovimientoCaja = urlActual.pathname.match(/^\/caja\/movimientos\/([^/]+)$/)
   const coincidenciaArqueoCaja = urlActual.pathname.match(/^\/caja\/arqueos\/([^/]+)$/)
   const coincidenciaCierreCaja = urlActual.pathname.match(/^\/caja\/cierres\/([^/]+)$/)
@@ -536,6 +613,8 @@ function App() {
   const coincidenciaVenta = urlActual.pathname.match(/^\/ventas\/([^/]+?)(\/editar)?$/)
   const coincidenciaReceta = urlActual.pathname.match(/^\/ventas\/recetas\/([^/]+)$/)
   const coincidenciaEmpleado = urlActual.pathname.match(/^\/empleados\/([^/]+?)(\/editar)?$/)
+  const coincidenciaConfiguracionSalarial = urlActual.pathname.match(/^\/planillas\/configuracion-salarial\/([^/]+)$/)
+  const coincidenciaPeriodoPlanilla = urlActual.pathname.match(/^\/planillas\/([^/]+?)(\/editar)?$/)
   const coincidenciaRol = urlActual.pathname.match(/^\/seguridad\/roles\/([^/]+?)(\/editar)?$/)
   const coincidenciaUsuario = urlActual.pathname.match(/^\/seguridad\/usuarios\/([^/]+?)(\/editar)?$/)
   const coincidenciaEstado = urlActual.pathname.match(/^\/catalogos\/estados\/([^/]+?)(\/editar)?$/)
@@ -550,18 +629,25 @@ function App() {
   const coincidenciaDepartamento = urlActual.pathname.match(/^\/organizacion\/departamentos\/([^/]+?)(\/editar)?$/)
   const coincidenciaPuesto = urlActual.pathname.match(/^\/organizacion\/puestos\/([^/]+?)(\/editar)?$/)
   const coincidenciaSucursal = urlActual.pathname.match(/^\/organizacion\/sucursales\/([^/]+?)(\/editar)?$/)
-  const coincidenciaConteoInventario = urlActual.pathname.match(/^\/inventario\/conteos\/([^/]+)$/)
+  const coincidenciaConteoInventario = urlActual.pathname.match(/^\/inventario\/conteos\/([^/]+)(\/editar)?$/)
   const coincidenciaExistenciaInventario = urlActual.pathname.match(/^\/inventario\/existencias\/([^/]+)$/)
   const coincidenciaUbicacionInventario = urlActual.pathname.match(/^\/inventario\/ubicaciones\/([^/]+)\/editar$/)
   const coincidenciaAperturaInventario = urlActual.pathname.match(/^\/inventario\/apertura\/([^/]+)$/)
   const coincidenciaAjusteInventario = urlActual.pathname.match(/^\/inventario\/ajustes\/([^/]+)$/)
+  const coincidenciaActivo = urlActual.pathname.match(/^\/activos\/([^/]+?)(\/editar)?$/)
+  const coincidenciaAsignacionActivo = urlActual.pathname.match(/^\/activos\/asignaciones\/([^/]+)$/)
+  const coincidenciaMiAsignacionActivo = urlActual.pathname.match(/^\/activos\/mis-asignaciones\/([^/]+?)(\/(?:revisar|solicitar-devolucion))?$/)
+  const coincidenciaDevolucionActivo = urlActual.pathname.match(/^\/activos\/devoluciones\/([^/]+?)(\/(?:recibir|resolver))?$/)
+  const coincidenciaMiDevolucionActivo = urlActual.pathname.match(/^\/activos\/mis-devoluciones\/([^/]+)$/)
+  const coincidenciaTipoActivo = urlActual.pathname.match(/^\/activos\/tipos\/([^/]+?)(\/editar)?$/)
   const coincidenciaProveedor = urlActual.pathname.match(/^\/abastecimiento\/proveedores\/([^/]+?)(\/(?:editar|evaluar))?$/)
   const coincidenciaSolicitud = urlActual.pathname.match(/^\/abastecimiento\/solicitudes\/([^/]+?)(\/(?:resolver|cancelar))?$/)
   const coincidenciaCotizacion = urlActual.pathname.match(/^\/abastecimiento\/cotizaciones\/([^/]+?)(\/evaluar)?$/)
   const coincidenciaOrden = urlActual.pathname.match(/^\/abastecimiento\/ordenes\/([^/]+?)(\/(?:confirmar|cerrar|cancelar))?$/)
   const coincidenciaRecepcion = urlActual.pathname.match(/^\/abastecimiento\/recepciones\/([^/]+?)(\/regularizar|\/validar\/(?:documental|fisica|tecnica))?$/)
-  const coincidenciaTraslado = urlActual.pathname.match(/^\/abastecimiento\/traslados\/([^/]+?)(\/(?:aprobar|preparar|despachar|recibir|cerrar|cancelar))?$/)
-  const coincidenciaDevolucion = urlActual.pathname.match(/^\/abastecimiento\/devoluciones\/([^/]+?)(\/(?:autorizar|segregar|despachar|recibir|compensar|cerrar|cancelar))?$/)
+  const coincidenciaTraslado = urlActual.pathname.match(/^\/abastecimiento\/traslados\/([^/]+?)(\/(?:aprobar|preparar|despachar|recibir|ubicar|cerrar|cancelar))?$/)
+  const coincidenciaDevolucionInterna = urlActual.pathname.match(/^\/abastecimiento\/devoluciones-internas\/([^/]+?)(\/(?:aprobar|preparar|despachar|recibir|ubicar|evaluar-cuarentena|cerrar|cancelar))?$/)
+  const coincidenciaDevolucion = urlActual.pathname.match(/^\/abastecimiento\/devoluciones\/([^/]+?)(\/(?:autorizar|segregar|despachar|recibir|retorno|evaluar-retorno|compensar|cerrar|cancelar))?$/)
   const sinPermiso = (mensaje: string) => (
     <section className={styles.sinPermiso} aria-labelledby="titulo-sin-permiso">
       <span aria-hidden="true">!</span>
@@ -572,14 +658,81 @@ function App() {
   )
 
   let contenido
-  if (urlActual.pathname === '/caja/turnos') {
+  if (urlActual.pathname === '/notificaciones') {
+    contenido = <NotificacionesView onNavegar={navegar} />
+  } else if (urlActual.pathname === '/reportes') {
+    contenido = puedeVerReportes
+      ? <ReportesView key={puedeVerReportesComerciales ? 'comercial' : puedeVerReportesInventario ? 'inventario-abastecimiento' : 'finanzas-sucursales'} permisos={permisos} submodulo={puedeVerReportesComerciales ? 'comercial' : puedeVerReportesInventario ? 'inventario-abastecimiento' : 'finanzas-sucursales'} onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar reportes administrativos.')
+  } else if (urlActual.pathname === '/reportes/comercial') {
+    contenido = puedeVerReportesComerciales
+      ? <ReportesView key="comercial" permisos={permisos} submodulo="comercial" onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar reportes comerciales.')
+  } else if (urlActual.pathname === '/reportes/inventario-abastecimiento') {
+    contenido = puedeVerReportesInventario
+      ? <ReportesView key="inventario-abastecimiento" permisos={permisos} submodulo="inventario-abastecimiento" onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar reportes de inventario y abastecimiento.')
+  } else if (urlActual.pathname === '/reportes/finanzas-sucursales') {
+    contenido = puedeVerReportesFinanzas
+      ? <ReportesView key="finanzas-sucursales" permisos={permisos} submodulo="finanzas-sucursales" onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar reportes de finanzas y sucursales.')
+  } else if (urlActual.pathname === '/planillas') {
+    contenido = puedeVerPlanillas
+      ? <PlanillaListadoView permisos={permisos} onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar planillas.')
+  } else if (urlActual.pathname === '/planillas/nuevo') {
+    contenido = puedeGenerarPlanillas
+      ? <PlanillaGenerarView permisos={permisos} onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
+      : sinPermiso('Tu usuario no tiene permiso para generar planillas.')
+  } else if (urlActual.pathname === '/planillas/configuracion-salarial') {
+    contenido = puedeVerConfiguracionSalarial
+      ? <ConfiguracionSalarialListadoView permisos={permisos} onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar la configuración salarial.')
+  } else if (coincidenciaConfiguracionSalarial) {
+    contenido = puedeVerConfiguracionSalarial
+      ? <ConfiguracionSalarialFormularioView key={coincidenciaConfiguracionSalarial[1]!} empleadoId={coincidenciaConfiguracionSalarial[1]!} permisos={permisos} onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar la configuración salarial.')
+  } else if (coincidenciaPeriodoPlanilla) {
+    const modoEdicion = Boolean(coincidenciaPeriodoPlanilla[2])
+    contenido = puedeVerPlanillas && (!modoEdicion || puedeGestionarPeriodosPlanilla)
+      ? <PlanillaDetalleView key={`${coincidenciaPeriodoPlanilla[1]!}-${modoEdicion ? 'editar' : 'ver'}`} periodoId={coincidenciaPeriodoPlanilla[1]!} modoEdicion={modoEdicion} permisos={permisos} onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
+      : sinPermiso(modoEdicion ? 'Tu usuario no tiene permiso para modificar ni cerrar esta planilla.' : 'Tu usuario no tiene permiso para consultar esta planilla.')
+  } else if (urlActual.pathname === '/caja/chica') {
+    contenido = puedeVerCajasChicas
+      ? <CajaChicaListadoView permisos={permisos} onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar Caja Chica.')
+  } else if (urlActual.pathname === '/caja/liquidaciones') {
+    contenido = puedeVerLiquidacionesCajaChica
+      ? <LiquidacionListadoView permisos={permisos} onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar liquidaciones de Caja Chica.')
+  } else if (coincidenciaLiquidacionCajaChica) {
+    contenido = puedeVerLiquidacionesCajaChica
+      ? <LiquidacionDetalleView key={coincidenciaLiquidacionCajaChica[2]!} sucursalId={coincidenciaLiquidacionCajaChica[1]!} liquidacionId={coincidenciaLiquidacionCajaChica[2]!} permisos={permisos} onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar liquidaciones de Caja Chica.')
+  } else if (urlActual.pathname === '/caja/ventas-pendientes') {
+    contenido = puedeCobrarVentasCaja
+      ? <VentasPendientesListadoView onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar ni procesar cobros pendientes.')
+  } else if (coincidenciaVentaPendienteCaja) {
+    contenido = puedeCobrarVentasCaja
+      ? <VentaPendienteCobroDetalleView key={`${coincidenciaVentaPendienteCaja[1]!}-${coincidenciaVentaPendienteCaja[2] ?? 'ver'}`} ventaId={coincidenciaVentaPendienteCaja[1]!} modoCobro={Boolean(coincidenciaVentaPendienteCaja[2])} permisos={permisos} onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar ni procesar cobros pendientes.')
+  } else if (urlActual.pathname === '/caja/turnos') {
     contenido = puedeVerTurnosCaja
-      ? <TurnoListadoView permisos={permisos} onNavegar={navegar} />
+      ? <TurnosDiaListadoView permisos={permisos} onNavegar={navegar} />
       : sinPermiso('Tu usuario no tiene permiso para consultar turnos de caja.')
   } else if (urlActual.pathname === '/caja/turnos/nuevo') {
     contenido = puedeAbrirTurnosCaja
       ? <TurnoAperturaView onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
       : sinPermiso('Tu usuario no tiene permiso para abrir turnos de caja.')
+  } else if (coincidenciaDiaTurnosCaja) {
+    contenido = puedeVerTurnosCaja
+      ? <TurnoListadoView key={`${coincidenciaDiaTurnosCaja[1]}-${urlActual.searchParams.get('sucursalId') ?? ''}`} fechaNegocio={coincidenciaDiaTurnosCaja[1]!} sucursalId={urlActual.searchParams.get('sucursalId') ?? undefined} permisos={permisos} onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar turnos de caja.')
+  } else if (coincidenciaMovimientosTurnoCaja) {
+    contenido = puedeVerMovimientosCaja
+      ? <MovimientoListadoView key={coincidenciaMovimientosTurnoCaja[1]!} turnoId={coincidenciaMovimientosTurnoCaja[1]!} permisos={permisos} onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar movimientos de caja.')
   } else if (coincidenciaTurnoCaja) {
     contenido = puedeVerTurnosCaja
       ? <TurnoDetalleView key={coincidenciaTurnoCaja[1]!} turnoId={coincidenciaTurnoCaja[1]!} permisos={permisos} onNavegar={navegar} />
@@ -606,7 +759,7 @@ function App() {
       : sinPermiso('Tu usuario no tiene permiso para registrar arqueos de caja.')
   } else if (coincidenciaArqueoCaja) {
     contenido = puedeVerArqueosCaja || puedeAprobarArqueosCaja
-      ? <ArqueoDetalleView key={coincidenciaArqueoCaja[1]!} arqueoId={coincidenciaArqueoCaja[1]!} permisos={permisos} onNavegar={navegar} />
+      ? <ArqueoDetalleView key={coincidenciaArqueoCaja[1]!} arqueoId={coincidenciaArqueoCaja[1]!} accionInicial={urlActual.searchParams.get('accion') ?? undefined} permisos={permisos} onNavegar={navegar} />
       : sinPermiso('Tu usuario no tiene permiso para consultar arqueos de caja.')
   } else if (urlActual.pathname === '/caja/cierres') {
     contenido = puedeVerCierresCaja
@@ -614,7 +767,7 @@ function App() {
       : sinPermiso('Tu usuario no tiene permiso para consultar cierres de caja.')
   } else if (urlActual.pathname === '/caja/cierres/nuevo') {
     contenido = puedeCerrarTurnosCaja
-      ? <CierreCrearView onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
+      ? <CierreCrearView arqueoInicialId={urlActual.searchParams.get('arqueoId') ?? undefined} onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
       : sinPermiso('Tu usuario no tiene permiso para cerrar turnos de caja.')
   } else if (coincidenciaCierreCaja) {
     contenido = puedeVerCierresCaja
@@ -626,11 +779,11 @@ function App() {
       : sinPermiso('Tu usuario no tiene permiso para consultar transferencias de efectivo.')
   } else if (urlActual.pathname === '/caja/transferencias/nueva') {
     contenido = puedeCrearTransferenciasCaja
-      ? <TransferenciaCrearView onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
+      ? <TransferenciaCrearView turnoInicialId={urlActual.searchParams.get('turnoId') ?? undefined} arqueoInicialId={urlActual.searchParams.get('arqueoId') ?? undefined} montoInicial={urlActual.searchParams.get('monto') ?? undefined} onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
       : sinPermiso('Tu usuario no tiene permiso para registrar transferencias de efectivo.')
   } else if (coincidenciaTransferenciaCaja) {
     contenido = puedeVerTransferenciasCaja
-      ? <TransferenciaDetalleView key={coincidenciaTransferenciaCaja[1]!} transferenciaId={coincidenciaTransferenciaCaja[1]!} permisos={permisos} onNavegar={navegar} />
+      ? <TransferenciaDetalleView key={coincidenciaTransferenciaCaja[1]!} transferenciaId={coincidenciaTransferenciaCaja[1]!} accionInicial={urlActual.searchParams.get('accion') ?? undefined} permisos={permisos} onNavegar={navegar} />
       : sinPermiso('Tu usuario no tiene permiso para consultar transferencias de efectivo.')
   } else if (urlActual.pathname === '/caja/depositos') {
     contenido = puedeVerDepositosCaja
@@ -638,11 +791,11 @@ function App() {
       : sinPermiso('Tu usuario no tiene permiso para consultar depósitos bancarios.')
   } else if (urlActual.pathname === '/caja/depositos/nuevo') {
     contenido = puedePrepararDepositosCaja
-      ? <DepositoCrearView onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
+      ? <DepositoCrearView transferenciaInicialId={urlActual.searchParams.get('transferenciaId') ?? undefined} onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
       : sinPermiso('Tu usuario no tiene permiso para preparar depósitos bancarios.')
   } else if (coincidenciaDepositoCaja) {
     contenido = puedeVerDepositosCaja
-      ? <DepositoDetalleView key={coincidenciaDepositoCaja[1]!} depositoId={coincidenciaDepositoCaja[1]!} permisos={permisos} onNavegar={navegar} />
+      ? <DepositoDetalleView key={coincidenciaDepositoCaja[1]!} depositoId={coincidenciaDepositoCaja[1]!} accionInicial={urlActual.searchParams.get('accion') ?? undefined} permisos={permisos} onNavegar={navegar} />
       : sinPermiso('Tu usuario no tiene permiso para consultar depósitos bancarios.')
   } else if (urlActual.pathname === '/caja/rendiciones') {
     contenido = puedeVerRendicionesCaja
@@ -737,13 +890,13 @@ function App() {
       ? <PrecioListadoView permisos={permisos} onNavegar={navegar} />
       : sinPermiso('Tu usuario no tiene permiso para consultar precios.')
   } else if (urlActual.pathname === '/comercial/precios/nuevo') {
-    contenido = puedeProponerPrecios
-      ? <PrecioFormularioView onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
-      : sinPermiso('Tu usuario no tiene permiso para proponer precios.')
+    contenido = puedeVerCostosPrecios && puedeProponerPrecios
+      ? <PrecioFormularioView productoInicialId={urlActual.searchParams.get('productoId') ?? undefined} permisos={permisos} onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
+      : sinPermiso('Tu usuario necesita permisos para consultar costos y proponer precios.')
   } else if (coincidenciaPrecio) {
-    contenido = puedeVerPrecios
+    contenido = puedeVerCostosPrecios
       ? <PrecioDetalleView key={coincidenciaPrecio[1]!} precioId={coincidenciaPrecio[1]!} permisos={permisos} onNavegar={navegar} />
-      : sinPermiso('Tu usuario no tiene permiso para consultar precios.')
+      : sinPermiso('Tu usuario no tiene permiso para consultar costos y márgenes de precios.')
   } else if (urlActual.pathname === '/ventas/recetas') {
     contenido = puedeVerRecetas
       ? <RecetaListadoView permisos={permisos} onNavegar={navegar} />
@@ -754,14 +907,18 @@ function App() {
       : sinPermiso('Tu usuario no tiene permiso para validar recetas.')
   } else if (urlActual.pathname === '/ventas') {
     contenido = puedeVerVentas
-      ? <VentaListadoView permisos={permisos} onNavegar={navegar} />
+      ? <VentaListadoView modo="activas" permisos={permisos} onNavegar={navegar} />
       : sinPermiso('Tu usuario no tiene permiso para consultar ventas.')
+  } else if (urlActual.pathname === '/ventas/realizadas') {
+    contenido = puedeVerVentas
+      ? <VentaListadoView modo="realizadas" turnoIdInicial={urlActual.searchParams.get('turnoId') ?? undefined} permisos={permisos} onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar ventas realizadas.')
   } else if (urlActual.pathname === '/ventas/nueva') {
-    contenido = puedeActualizarVentas
+    contenido = puedeCrearVentas
       ? <VentaFormularioView permisos={permisos} onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
       : sinPermiso('Tu usuario no tiene permiso para registrar ventas.')
   } else if (coincidenciaVenta?.[2] === '/editar') {
-    contenido = puedeCrearVentas
+    contenido = puedeActualizarVentas
       ? <VentaFormularioView key={coincidenciaVenta[1]!} ventaId={coincidenciaVenta[1]!} permisos={permisos} onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
       : sinPermiso('Tu usuario no tiene permiso para editar ventas.')
   } else if (coincidenciaVenta) {
@@ -867,18 +1024,50 @@ function App() {
       : sinPermiso('Tu usuario no tiene permiso para consultar traslados internos.')
   } else if (urlActual.pathname === '/abastecimiento/traslados/nuevo') {
     contenido = puedeVerTraslados && puedeCrearTraslados
-      ? <TrasladoCrearView sucursalActualId={estado.sesion.sucursal.id} onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
+      ? <TrasladoCrearView sucursalActualId={estado.sesion.sucursal.id} consultaInicial={urlActual.search} onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
       : sinPermiso('Tu usuario necesita permisos para consultar y crear traslados internos.')
+  } else if (urlActual.pathname === '/abastecimiento/traslados/recepciones') {
+    contenido = puedeVerTraslados && puedeRecibirTraslados
+      ? <AbastecimientoListadoView key="recepciones-traslado" recurso="recepciones-traslado" permisos={permisos} sucursalActualId={estado.sesion.sucursal.id} onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para recibir traslados.')
+  } else if (urlActual.pathname === '/abastecimiento/traslados/ubicaciones') {
+    contenido = puedeVerTraslados && puedeUbicarTraslados
+      ? <AbastecimientoListadoView key="ubicaciones-traslado" recurso="ubicaciones-traslado" permisos={permisos} sucursalActualId={estado.sesion.sucursal.id} onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para ubicar productos recibidos.')
   } else if (coincidenciaTraslado?.[2]) {
-    const modo = coincidenciaTraslado[2].slice(1) as 'aprobar' | 'preparar' | 'despachar' | 'recibir' | 'cerrar' | 'cancelar'
-    const autorizado = modo === 'aprobar' ? puedeAprobarTraslados : modo === 'preparar' ? puedePrepararTraslados : modo === 'despachar' ? puedeDespacharTraslados : modo === 'recibir' ? puedeRecibirTraslados : modo === 'cerrar' ? puedeCerrarTraslados : puedeCancelarTraslados
+    const modo = coincidenciaTraslado[2].slice(1) as 'aprobar' | 'preparar' | 'despachar' | 'recibir' | 'ubicar' | 'cerrar' | 'cancelar'
+    const autorizado = modo === 'aprobar' ? puedeAprobarTraslados : modo === 'preparar' ? puedePrepararTraslados : modo === 'despachar' ? puedeDespacharTraslados : modo === 'recibir' ? puedeRecibirTraslados : modo === 'ubicar' ? puedeUbicarTraslados : modo === 'cerrar' ? puedeCerrarTraslados : puedeCancelarTraslados
     contenido = puedeVerTraslados && autorizado
-      ? <TrasladoAccionView key={`${coincidenciaTraslado[1]}-${modo}`} trasladoId={coincidenciaTraslado[1]!} modo={modo} onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
+      ? modo === 'ubicar'
+        ? <TrasladoUbicacionView key={`${coincidenciaTraslado[1]}-ubicar`} trasladoId={coincidenciaTraslado[1]!} onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
+        : <TrasladoAccionView key={`${coincidenciaTraslado[1]}-${modo}`} trasladoId={coincidenciaTraslado[1]!} modo={modo} onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
       : sinPermiso('Tu usuario no tiene el permiso requerido para esta etapa del traslado.')
   } else if (coincidenciaTraslado) {
     contenido = puedeVerTraslados
       ? <TrasladoDetalleView key={coincidenciaTraslado[1]!} trasladoId={coincidenciaTraslado[1]!} sucursalActualId={estado.sesion.sucursal.id} permisos={permisos} onNavegar={navegar} />
       : sinPermiso('Tu usuario no tiene permiso para consultar traslados internos.')
+  } else if (urlActual.pathname === '/abastecimiento/devoluciones-internas') {
+    contenido = puedeVerTraslados
+      ? <AbastecimientoListadoView key="listado-devoluciones-internas" recurso="devoluciones-internas" permisos={permisos} sucursalActualId={estado.sesion.sucursal.id} onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar devoluciones internas.')
+  } else if (urlActual.pathname === '/abastecimiento/devoluciones-internas/nuevo') {
+    contenido = puedeVerTraslados && puedeCrearTraslados
+      ? <DevolucionInternaCrearView sucursalActualId={estado.sesion.sucursal.id} onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
+      : sinPermiso('Tu usuario necesita permisos para consultar y crear devoluciones internas.')
+  } else if (coincidenciaDevolucionInterna?.[2]) {
+    const modo = coincidenciaDevolucionInterna[2].slice(1) as 'aprobar' | 'preparar' | 'despachar' | 'recibir' | 'ubicar' | 'evaluar-cuarentena' | 'cerrar' | 'cancelar'
+    const autorizado = modo === 'aprobar' ? puedeAprobarTraslados : modo === 'preparar' ? puedePrepararTraslados : modo === 'despachar' ? puedeDespacharTraslados : modo === 'recibir' ? puedeRecibirTraslados : ['ubicar', 'evaluar-cuarentena'].includes(modo) ? puedeUbicarTraslados : modo === 'cerrar' ? puedeCerrarTraslados : puedeCancelarTraslados
+    contenido = puedeVerTraslados && autorizado
+      ? modo === 'ubicar'
+        ? <TrasladoUbicacionView key={`${coincidenciaDevolucionInterna[1]}-ubicar`} trasladoId={coincidenciaDevolucionInterna[1]!} rutaBase="/abastecimiento/devoluciones-internas" onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
+        : modo === 'evaluar-cuarentena'
+          ? <TrasladoCuarentenaView key={`${coincidenciaDevolucionInterna[1]}-evaluar-cuarentena`} trasladoId={coincidenciaDevolucionInterna[1]!} onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
+          : <TrasladoAccionView key={`${coincidenciaDevolucionInterna[1]}-${modo}`} trasladoId={coincidenciaDevolucionInterna[1]!} modo={modo} rutaBase="/abastecimiento/devoluciones-internas" onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
+      : sinPermiso('Tu usuario no tiene el permiso requerido para esta etapa de la devolución interna.')
+  } else if (coincidenciaDevolucionInterna) {
+    contenido = puedeVerTraslados
+      ? <TrasladoDetalleView key={coincidenciaDevolucionInterna[1]!} trasladoId={coincidenciaDevolucionInterna[1]!} sucursalActualId={estado.sesion.sucursal.id} permisos={permisos} rutaBase="/abastecimiento/devoluciones-internas" onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar devoluciones internas.')
   } else if (urlActual.pathname === '/abastecimiento/devoluciones') {
     contenido = puedeVerDevoluciones
       ? <AbastecimientoListadoView key="listado-devoluciones" recurso="devoluciones" permisos={permisos} sucursalActualId={estado.sesion.sucursal.id} onNavegar={navegar} />
@@ -888,8 +1077,8 @@ function App() {
       ? <DevolucionCrearView sucursalActualId={estado.sesion.sucursal.id} onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
       : sinPermiso('Tu usuario necesita permisos para consultar y crear devoluciones a proveedores.')
   } else if (coincidenciaDevolucion?.[2]) {
-    const modo = coincidenciaDevolucion[2].slice(1) as 'autorizar' | 'segregar' | 'despachar' | 'recibir' | 'compensar' | 'cerrar' | 'cancelar'
-    const autorizado = modo === 'autorizar' ? puedeAutorizarDevoluciones : modo === 'segregar' ? puedeSegregarDevoluciones : modo === 'despachar' ? puedeDespacharDevoluciones : modo === 'recibir' ? puedeRecibirDevoluciones : modo === 'compensar' ? puedeCompensarDevoluciones : modo === 'cerrar' ? puedeCerrarDevoluciones : puedeCancelarDevoluciones
+    const modo = coincidenciaDevolucion[2].slice(1) as ModoAccionDevolucion
+    const autorizado = modo === 'autorizar' ? puedeAutorizarDevoluciones : modo === 'segregar' ? puedeSegregarDevoluciones : modo === 'despachar' ? puedeDespacharDevoluciones : modo === 'recibir' ? puedeRecibirDevoluciones : modo === 'retorno' ? puedeRegistrarRetornoDevoluciones : modo === 'evaluar-retorno' ? puedeEvaluarRetornoDevoluciones : modo === 'compensar' ? puedeCompensarDevoluciones : modo === 'cerrar' ? puedeCerrarDevoluciones : puedeCancelarDevoluciones
     contenido = puedeVerDevoluciones && autorizado
       ? <DevolucionAccionView key={`${coincidenciaDevolucion[1]}-${modo}`} devolucionId={coincidenciaDevolucion[1]!} modo={modo} onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
       : sinPermiso('Tu usuario no tiene el permiso requerido para esta etapa de la devolución.')
@@ -897,6 +1086,90 @@ function App() {
     contenido = puedeVerDevoluciones
       ? <DevolucionDetalleView key={coincidenciaDevolucion[1]!} devolucionId={coincidenciaDevolucion[1]!} permisos={permisos} onNavegar={navegar} />
       : sinPermiso('Tu usuario no tiene permiso para consultar devoluciones a proveedores.')
+  } else if (urlActual.pathname === '/activos') {
+    contenido = puedeVerActivos
+      ? <ActivoListadoView permisos={permisos} onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar activos administrativos.')
+  } else if (urlActual.pathname === '/activos/nuevo') {
+    contenido = puedeCrearActivos
+      ? <ActivoFormularioView onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
+      : sinPermiso('Tu usuario no tiene permiso para registrar activos administrativos.')
+  } else if (urlActual.pathname === '/activos/mis-asignaciones') {
+    contenido = puedeVerAsignacionesPropias
+      ? <AsignacionListadoView permisos={permisos} propias onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar sus activos asignados.')
+  } else if (coincidenciaMiAsignacionActivo?.[2] === '/revisar') {
+    contenido = puedeVerAsignacionesPropias && puedeConfirmarActivosRecibidos
+      ? <DevolucionActivosView key={`${coincidenciaMiAsignacionActivo[1]}-revision`} asignacionId={coincidenciaMiAsignacionActivo[1]!} modo="revision" onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
+      : sinPermiso('Tu usuario no tiene permiso para confirmar la revisión de los activos recibidos.')
+  } else if (coincidenciaMiAsignacionActivo?.[2] === '/solicitar-devolucion') {
+    contenido = puedeVerAsignacionesPropias && puedeSolicitarDevolucionActivos
+      ? <DevolucionActivosView key={`${coincidenciaMiAsignacionActivo[1]}-solicitud`} asignacionId={coincidenciaMiAsignacionActivo[1]!} modo="solicitud" onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
+      : sinPermiso('Tu usuario no tiene permiso para solicitar devoluciones de activos.')
+  } else if (coincidenciaMiAsignacionActivo) {
+    contenido = puedeVerAsignacionesPropias
+      ? <AsignacionDetalleView key={`propia-${coincidenciaMiAsignacionActivo[1]}`} asignacionId={coincidenciaMiAsignacionActivo[1]!} permisos={permisos} propia onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar sus activos asignados.')
+  } else if (urlActual.pathname === '/activos/mis-devoluciones') {
+    contenido = puedeVerAsignacionesPropias
+      ? <DevolucionActivoListadoView permisos={permisos} propias onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar sus devoluciones.')
+  } else if (coincidenciaMiDevolucionActivo) {
+    contenido = puedeVerAsignacionesPropias
+      ? <DevolucionActivoDetalleView key={`propia-${coincidenciaMiDevolucionActivo[1]}`} devolucionId={coincidenciaMiDevolucionActivo[1]!} permisos={permisos} propia onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar esta devolución.')
+  } else if (urlActual.pathname === '/activos/devoluciones') {
+    contenido = puedeVerDevolucionesActivos
+      ? <DevolucionActivoListadoView permisos={permisos} onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar devoluciones de activos.')
+  } else if (coincidenciaDevolucionActivo?.[2] === '/recibir') {
+    contenido = puedeVerDevolucionesActivos && puedeRecibirDevolucionesActivos
+      ? <DevolucionProcesoView key={`${coincidenciaDevolucionActivo[1]}-recepcion`} devolucionId={coincidenciaDevolucionActivo[1]!} modo="recepcion" onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
+      : sinPermiso('Tu usuario no tiene permiso para registrar la recepción de activos.')
+  } else if (coincidenciaDevolucionActivo?.[2] === '/resolver') {
+    contenido = puedeVerDevolucionesActivos && puedeAprobarDevolucionesActivos
+      ? <DevolucionProcesoView key={`${coincidenciaDevolucionActivo[1]}-resolucion`} devolucionId={coincidenciaDevolucionActivo[1]!} modo="resolucion" onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
+      : sinPermiso('Tu usuario no tiene permiso para resolver devoluciones de activos.')
+  } else if (coincidenciaDevolucionActivo) {
+    contenido = puedeVerDevolucionesActivos
+      ? <DevolucionActivoDetalleView key={coincidenciaDevolucionActivo[1]!} devolucionId={coincidenciaDevolucionActivo[1]!} permisos={permisos} onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar devoluciones de activos.')
+  } else if (urlActual.pathname === '/activos/asignaciones') {
+    contenido = puedeVerAsignacionesActivos
+      ? <AsignacionListadoView permisos={permisos} onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar asignaciones de activos.')
+  } else if (urlActual.pathname === '/activos/asignaciones/nueva') {
+    contenido = puedeCrearAsignacionesActivos
+      ? <AsignacionFormularioView onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
+      : sinPermiso('Tu usuario no tiene permiso para asignar activos a empleados.')
+  } else if (coincidenciaAsignacionActivo) {
+    contenido = puedeVerAsignacionesActivos
+      ? <AsignacionDetalleView key={coincidenciaAsignacionActivo[1]!} asignacionId={coincidenciaAsignacionActivo[1]!} permisos={permisos} onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar asignaciones de activos.')
+  } else if (urlActual.pathname === '/activos/tipos') {
+    contenido = puedeVerTiposActivos
+      ? <TipoActivoListadoView permisos={permisos} onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar tipos de activo.')
+  } else if (urlActual.pathname === '/activos/tipos/nuevo') {
+    contenido = puedeCrearTiposActivos
+      ? <TipoActivoCrearView onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
+      : sinPermiso('Tu usuario no tiene permiso para crear tipos de activo.')
+  } else if (coincidenciaTipoActivo?.[2] === '/editar') {
+    contenido = puedeActualizarTiposActivos
+      ? <TipoActivoEditarView key={coincidenciaTipoActivo[1]!} tipoActivoId={coincidenciaTipoActivo[1]!} onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
+      : sinPermiso('Tu usuario no tiene permiso para editar tipos de activo.')
+  } else if (coincidenciaTipoActivo) {
+    contenido = puedeVerTiposActivos
+      ? <TipoActivoDetalleView key={coincidenciaTipoActivo[1]!} tipoActivoId={coincidenciaTipoActivo[1]!} permisos={permisos} onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar tipos de activo.')
+  } else if (coincidenciaActivo?.[2] === '/editar') {
+    contenido = puedeActualizarActivos
+      ? <ActivoFormularioView key={coincidenciaActivo[1]!} activoId={coincidenciaActivo[1]!} onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
+      : sinPermiso('Tu usuario no tiene permiso para editar activos administrativos.')
+  } else if (coincidenciaActivo) {
+    contenido = puedeVerActivos
+      ? <ActivoDetalleView key={coincidenciaActivo[1]!} activoId={coincidenciaActivo[1]!} permisos={permisos} onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar activos administrativos.')
   } else if (urlActual.pathname === '/inventario/existencias') {
     contenido = puedeVerInventario
       ? <InventarioExistenciasView permisos={permisos} onNavegar={navegar} />
@@ -945,6 +1218,15 @@ function App() {
     contenido = puedeVerAjustes
       ? <InventarioOperacionDetalleView clase="AJUSTE" operacionId={coincidenciaAjusteInventario[1]!} permisos={permisos} onNavegar={navegar} />
       : sinPermiso('Tu usuario necesita permisos para consultar ajustes y existencias de inventario.')
+  } else if (urlActual.pathname === '/inventario/costos') {
+    contenido = puedeVerCostosInventario
+      ? <InventarioCostosListadoView permisos={permisos} onNavegar={navegar} />
+      : sinPermiso('Tu usuario no tiene permiso para consultar costos de inventario.')
+  } else if (urlActual.pathname === '/inventario/costos/regularizar') {
+    const saldoId = urlActual.searchParams.get('saldoId')
+    contenido = puedeVerCostosInventario && puedeRegularizarCostosInventario && saldoId
+      ? <InventarioCostoRegularizarView key={saldoId} saldoId={saldoId} permisos={permisos} onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
+      : sinPermiso(saldoId ? 'Tu usuario no tiene permiso para regularizar costos de inventario.' : 'Selecciona una posición de inventario para regularizar su costo.')
   } else if (urlActual.pathname === '/inventario/politicas') {
     contenido = puedeVerPoliticas
       ? <InventarioPoliticasView permisos={permisos} onNavegar={navegar} />
@@ -974,9 +1256,10 @@ function App() {
       ? <InventarioConteoCrearView onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
       : sinPermiso('Tu usuario necesita permisos para gestionar conteos y consultar existencias de inventario.')
   } else if (coincidenciaConteoInventario) {
-    contenido = puedeVerConteos
-      ? <InventarioConteoDetalleView conteoId={coincidenciaConteoInventario[1]!} permisos={permisos} onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
-      : sinPermiso('Tu usuario necesita permisos para gestionar conteos y consultar existencias de inventario.')
+    const modoEdicionConteo = coincidenciaConteoInventario[2] === '/editar'
+    contenido = puedeVerConteos && (!modoEdicionConteo || puedeRegistrarResultadosConteos || puedeAprobarConteos)
+      ? <InventarioConteoDetalleView conteoId={coincidenciaConteoInventario[1]!} permisos={permisos} modoEdicion={modoEdicionConteo} onNavegar={navegar} onCambiosPendientes={actualizarCambiosPendientes} />
+      : sinPermiso(modoEdicionConteo ? 'Tu usuario no tiene permiso para registrar o aprobar conteos.' : 'Tu usuario necesita permisos para gestionar conteos y consultar existencias de inventario.')
   } else if (urlActual.pathname === '/catalogos/laboratorios') {
     contenido = permisos.includes('CATALOGOS.LABORATORIOS.VER') ? <LaboratorioListadoView permisos={permisos} onNavegar={navegar} /> : sinPermiso('No tienes permiso para consultar laboratorios.')
   } else if (urlActual.pathname === '/catalogos/laboratorios/nuevo') {

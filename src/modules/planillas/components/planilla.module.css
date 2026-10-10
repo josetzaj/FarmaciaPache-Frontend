@@ -1,0 +1,91 @@
+.pagina { display: grid; gap: 1.25rem; }
+.breadcrumb { display: flex; flex-wrap: wrap; align-items: center; gap: .45rem; color: var(--color-text-muted); font-size: .9rem; }
+.breadcrumb button { border: 0; background: none; color: var(--color-primary); padding: .25rem; cursor: pointer; }
+.cabecera { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.cabecera h1 { margin: 0; color: var(--color-text); font-size: clamp(1.55rem, 3vw, 2rem); }
+.cabecera p { margin: .35rem 0 0; color: var(--color-text-muted); }
+.cabeceraPagina { display: grid; gap: .55rem; }
+.filaCabecera { display: flex; align-items: flex-start; gap: .75rem; }
+.tituloListado { flex: 1; min-width: min(100%, 22rem); }
+.tituloListado h1 { margin: 0; color: var(--color-text); font-size: clamp(1.65rem, 3vw, 2.1rem); }
+.tituloListado p { margin: .35rem 0 0; color: var(--color-text-muted); font-size: .86rem; }
+.acciones { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
+.botonPrimario, .botonSecundario, .botonPeligro, .botonTabla { min-height: 2.75rem; border-radius: var(--radius-small); padding: .65rem 1rem; font: inherit; font-weight: 700; cursor: pointer; transition: var(--transition-fast); }
+.botonPrimario { border: 1px solid var(--color-primary); background: var(--color-primary); color: var(--color-text-inverse); }
+.botonPrimario:hover { background: var(--color-primary-hover); }
+.botonSecundario, .botonTabla { border: 1px solid var(--color-border-strong); background: var(--color-surface); color: var(--color-text); }
+.botonAccent, .botonNuevoPeriodo { display: inline-flex; min-height: 2.75rem; align-items: center; justify-content: center; gap: .5rem; padding: .65rem 1rem; border-radius: var(--radius-small); cursor: pointer; font: inherit; font-weight: 700; white-space: nowrap; transition: var(--transition-fast); }
+.botonAccent { border: 1px solid var(--color-accent); background: var(--color-accent); color: var(--color-text-inverse); }
+.botonAccent:hover { border-color: color-mix(in srgb, var(--color-accent) 86%, black); background: color-mix(in srgb, var(--color-accent) 86%, black); }
+.botonNuevoPeriodo { border: 1px solid var(--color-primary); background: var(--color-surface); color: var(--color-primary); }
+.botonNuevoPeriodo:hover { background: var(--color-success-soft); }
+.botonNuevoPeriodo img { width: 1.6rem; height: 1.6rem; object-fit: contain; }
+.botonPeligro { border: 1px solid var(--color-danger); background: var(--color-danger); color: var(--color-text-inverse); }
+.botonPrimario:disabled, .botonSecundario:disabled, .botonAccent:disabled, .botonNuevoPeriodo:disabled, .botonPeligro:disabled { opacity: .55; cursor: not-allowed; }
+.panel { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-medium); padding: 1rem; box-shadow: 0 .5rem 1.5rem rgb(15 23 42 / 5%); }
+.panelListado { overflow: hidden; padding: 0; }
+.barraListado { display: flex; align-items: end; justify-content: space-between; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+.busqueda { display: grid; gap: .35rem; min-width: min(100%, 20rem); }
+.busqueda label, .campo label { font-weight: 700; color: var(--color-text); }
+.busqueda input, .campo input, .campo select, .campo textarea, .celdaEditable input, .celdaEditable textarea { width: 100%; min-height: 2.75rem; border: 1px solid var(--color-border-strong); border-radius: var(--radius-small); padding: .6rem .75rem; font: inherit; color: var(--color-text); background: var(--color-surface); box-sizing: border-box; }
+.busquedaGeneral { display: grid; flex: 0 1 30rem; width: min(30rem, 40vw); gap: .25rem; }
+.controlBusqueda { position: relative; display: flex; align-items: center; }
+.controlBusqueda > img { position: absolute; left: .7rem; width: 1.3rem; height: 1.3rem; object-fit: contain; pointer-events: none; }
+.controlBusqueda input { width: 100%; min-height: 2.75rem; padding: .65rem 2.5rem .65rem 2.35rem; border: 1px solid var(--color-border-strong); border-radius: var(--radius-small); background: var(--color-surface); color: var(--color-text); font: inherit; box-sizing: border-box; }
+.controlBusqueda button { position: absolute; right: .35rem; display: grid; width: 2rem; height: 2rem; padding: 0; place-items: center; border: 0; background: transparent; color: var(--color-text-muted); cursor: pointer; font-size: 1.2rem; }
+.busquedaGeneral small { color: var(--color-text-muted); font-size: .68rem; }
+.resumenTabla { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .9rem 1rem; border-bottom: 1px solid var(--color-border); }
+.resumenTabla strong { display: block; font-size: .86rem; }
+.resumenTabla small { display: block; margin-top: .2rem; color: var(--color-text-muted); font-size: .68rem; }
+.accionesResumen { display: flex; align-items: center; gap: .75rem; color: var(--color-text-muted); font-size: .72rem; }
+.accionesResumen button { border: 0; background: transparent; color: var(--color-secondary); cursor: pointer; font: inherit; font-weight: 650; }
+.busqueda input:focus-visible, .campo input:focus-visible, .campo select:focus-visible, .campo textarea:focus-visible, .celdaEditable input:focus-visible, .celdaEditable textarea:focus-visible, button:focus-visible { outline: 3px solid color-mix(in srgb, var(--color-focus) 35%, transparent); outline-offset: 2px; }
+.mensaje, .error, .aviso { border-radius: var(--radius-small); padding: .85rem 1rem; margin: 0; }
+.panelListado > .mensaje, .panelListado > .error { margin: 1rem; }
+.mensaje { background: var(--color-surface-muted); color: var(--color-text-muted); }
+.error { background: var(--color-danger-soft); color: var(--color-danger); }
+.aviso { background: var(--color-warning-soft); color: var(--color-warning); }
+.estado { display: inline-flex; align-items: center; border-radius: 999px; padding: .25rem .65rem; font-weight: 700; font-size: .82rem; }
+.borrador { background: var(--color-warning-soft); color: var(--color-warning); }
+.cerrada, .configurado { background: var(--color-success-soft); color: var(--color-success); }
+.sinConfigurar { background: var(--color-danger-soft); color: var(--color-danger); }
+.identidad { display: grid; gap: .15rem; }
+.identidad small, .datoSecundario { color: var(--color-text-muted); }
+.identidad strong { color: var(--color-text); }
+.identidad small { font-size: .68rem; }
+.accionesFila { display: flex; align-items: center; justify-content: flex-end; gap: .35rem; }
+.botonAccionIcono { display: grid; width: 2.45rem; height: 2.45rem; padding: .3rem; place-items: center; border: 1px solid var(--color-border-strong); border-radius: var(--radius-small); background: var(--color-surface); cursor: pointer; }
+.botonAccionIcono:hover { background: var(--color-surface-muted); }
+.botonAccionIcono:disabled { opacity: .55; cursor: wait; }
+.botonAccionIcono img { width: 1.5rem; height: 1.5rem; object-fit: contain; }
+.formulario { display: grid; gap: 1rem; }
+.formulario fieldset { border: 1px solid var(--color-border); border-radius: var(--radius-medium); padding: 1rem; display: grid; gap: 1rem; }
+.formulario legend { padding: 0 .35rem; font-weight: 800; color: var(--color-text); }
+.rejilla { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.campo { display: grid; gap: .4rem; }
+.campo small { color: var(--color-text-muted); }
+.campo textarea { min-height: 6rem; resize: vertical; }
+.resumenEmpleado { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; }
+.resumenEmpleado div { background: var(--color-surface-muted); border-radius: var(--radius-small); padding: .8rem; }
+.resumenEmpleado span { display: block; color: var(--color-text-muted); font-size: .82rem; }
+.resumenEmpleado strong { display: block; margin-top: .2rem; color: var(--color-text); }
+.historial { width: 100%; border-collapse: collapse; }
+.historial th, .historial td { padding: .75rem; border-bottom: 1px solid var(--color-border); text-align: left; }
+.tablaHoja { overflow-x: auto; border: 1px solid var(--color-border); border-radius: var(--radius-medium); }
+.tablaHoja table { width: 100%; min-width: 900px; border-collapse: collapse; }
+.tablaHoja th, .tablaHoja td { padding: .7rem; border-bottom: 1px solid var(--color-border); text-align: left; vertical-align: top; }
+.tablaHoja thead th { background: var(--color-surface-muted); color: var(--color-text); }
+.tablaHoja tbody tr:last-child td, .tablaHoja tbody tr:last-child th { border-bottom: 0; }
+.celdaEditable input { min-width: 9rem; text-align: right; }
+.celdaEditable textarea { min-width: 16rem; min-height: 3.2rem; resize: vertical; }
+.monto { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.totalPrincipal { display: flex; width: min(100%, 32rem); box-sizing: border-box; align-items: center; justify-self: end; justify-content: space-between; gap: 1rem; flex-wrap: wrap; padding: .75rem 1rem; border-radius: var(--radius-medium); background: var(--color-primary); color: var(--color-text-inverse); }
+.totalPrincipal span { font-size: .78rem; font-weight: 700; }
+.totalPrincipal strong { font-size: clamp(1.3rem, 3vw, 1.75rem); font-variant-numeric: tabular-nums; }
+.notaLimite { margin: 0; color: var(--color-text-muted); font-size: .9rem; }
+.soloLectores { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.panel h2 { margin-top: 0; color: var(--color-text); }
+.panel > .acciones { justify-content: flex-end; margin-top: 1rem; }
+@media (max-width: 64rem) { .filaCabecera { flex-wrap: wrap; } .tituloListado { flex-basis: 100%; } .busquedaGeneral { flex: 1 1 24rem; width: auto; } }
+@media (max-width: 720px) { .rejilla, .resumenEmpleado { grid-template-columns: 1fr; } .acciones { width: 100%; } .acciones > * { flex: 1 1 auto; } .filaCabecera, .resumenTabla { align-items: stretch; flex-direction: column; } .filaCabecera > .botonSecundario, .filaCabecera > .botonAccent, .busquedaGeneral { width: 100%; } .panel { padding: .8rem; } .panelListado { padding: 0; } .accionesResumen { justify-content: space-between; } }
+

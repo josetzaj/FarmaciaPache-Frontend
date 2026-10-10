@@ -39,7 +39,7 @@ export function InventarioOperacionDetalleView({ clase, operacionId, permisos, o
   const [revision, setRevision] = useState(0)
   const esApertura = clase === 'APERTURA'
   const listado = esApertura ? '/inventario/apertura' : '/inventario/ajustes'
-  const tituloListado = esApertura ? 'Aperturas controladas' : 'Ajustes de inventario'
+  const tituloListado = esApertura ? 'Aperturas controladas' : 'Ajustes de cantidad'
   const puedeVerAuditoria = permisos.includes('INVENTARIO.KARDEX.VER_AUDITORIA') && permisos.includes('INVENTARIO.KARDEX.VER')
 
   useEffect(() => {
@@ -51,7 +51,8 @@ export function InventarioOperacionDetalleView({ clase, operacionId, permisos, o
     return () => controlador.abort()
   }, [esApertura, operacionId, revision])
 
-  const columnas = useMemo<ColumnaTabla<MovimientoOperacionInventarioDetalle>[]>(() => [
+  const columnas = useMemo<ColumnaTabla<MovimientoOperacionInventarioDetalle>[]>(() => {
+    const columnasBase: ColumnaTabla<MovimientoOperacionInventarioDetalle>[] = [
     { id: 'fecha', titulo: 'Fecha', obtenerValor: (item) => item.ocurridoEn, celda: (item) => fechaHora(item.ocurridoEn) },
     { id: 'efecto', titulo: 'Movimiento', obtenerValor: (item) => item.efecto, celda: (item) => item.efecto === 'ENTRADA' ? 'Entrada' : 'Salida' },
     { id: 'producto', titulo: 'Medicamento', obtenerValor: (item) => `${item.producto.nombre} ${item.producto.codigo}`, celda: (item) => <span className={styles.identidad}><strong>{item.producto.nombre}</strong><small>{item.producto.codigo}</small></span> },
@@ -59,10 +60,12 @@ export function InventarioOperacionDetalleView({ clase, operacionId, permisos, o
     { id: 'lote', titulo: 'Lote', obtenerValor: (item) => item.lote?.numero ?? '', celda: (item) => item.lote ? <span className={styles.identidad}><strong>{item.lote.numero}</strong><small>{item.lote.fechaVencimiento ? `Vence ${new Date(item.lote.fechaVencimiento).toLocaleDateString('es-GT', { timeZone: 'UTC' })}` : 'Sin vencimiento'}</small></span> : <span className={styles.sinDato}>Sin lote</span> },
     { id: 'estado', titulo: 'Estado', obtenerValor: (item) => item.estado, celda: (item) => item.estado.replaceAll('_', ' ') },
     { id: 'cantidad', titulo: 'Cantidad', obtenerValor: (item) => item.cantidad, celda: (item) => numero(item.cantidad) },
-    { id: 'costo', titulo: 'Costo unitario', obtenerValor: (item) => item.costoUnitario ?? '', celda: (item) => item.costoUnitario === null ? <span className={styles.sinDato}>Sin costo</span> : moneda(item.costoUnitario) },
     { id: 'saldo', titulo: 'Saldo', obtenerValor: (item) => item.saldoPosterior, celda: (item) => `${numero(item.saldoAnterior)} → ${numero(item.saldoPosterior)}` },
     { id: 'seleccionLote', titulo: 'Selección de lote', obtenerValor: (item) => item.motivoSeleccionLote ?? '', celda: (item) => item.motivoSeleccionLote ?? <span className={styles.sinDato}>Automática o no aplica</span> },
-  ], [])
+    ]
+    if (esApertura) columnasBase.splice(7, 0, { id: 'costo', titulo: 'Costo unitario', obtenerValor: (item) => item.costoUnitario ?? '', celda: (item) => item.costoUnitario === null ? <span className={styles.sinDato}>Sin costo</span> : moneda(item.costoUnitario) })
+    return columnasBase
+  }, [esApertura])
 
   if (error) return <section className={styles.pagina}><InventarioBreadcrumb actual="Detalle de operación" onNavegar={onNavegar} /><div className={styles.alertaError} role="alert"><p>{error}</p><button type="button" onClick={() => setRevision((valor) => valor + 1)}>Reintentar</button><button type="button" onClick={() => onNavegar(listado)}>Volver al listado</button></div></section>
   if (!detalle) return <section className={styles.pagina} aria-busy="true"><InventarioBreadcrumb actual="Detalle de operación" onNavegar={onNavegar} /><div className={styles.estadoVacio}><h2>Cargando operación</h2><p>Consultando los datos y movimientos registrados…</p></div></section>

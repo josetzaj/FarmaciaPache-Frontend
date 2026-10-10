@@ -5,6 +5,9 @@ export type RecursoAbastecimiento =
   | 'ordenes'
   | 'recepciones'
   | 'traslados'
+  | 'devoluciones-internas'
+  | 'recepciones-traslado'
+  | 'ubicaciones-traslado'
   | 'devoluciones'
 
 export type OrdenAbastecimiento = 'numero' | 'descripcion' | 'nit' | 'autorizado' | 'calificacion' | 'total' | 'estado' | 'proveedor' | 'modalidad' | 'sucursal' | 'fecha'
@@ -56,9 +59,10 @@ export type LoteAbastecimiento = {
 export type OpcionesFiltrosAbastecimiento = {
   proveedores: Array<OpcionAbastecimiento & { autorizado: boolean }>
   sucursales: OpcionAbastecimiento[]
-  sucursalesTraslado: OpcionAbastecimiento[]
+  sucursalesTraslado: Array<OpcionAbastecimiento & { tipo: 'BODEGA' | 'FARMACIA' | 'STAND' }>
   sucursalContextoId: string
   alcanceGlobal: boolean
+  gestionGlobal: boolean
   modalidades: ModalidadCompra[]
   prioridadesUrgentes: string[]
   viasAtencionUrgente: string[]
@@ -315,17 +319,20 @@ export type TrasladoInterno = BaseRegistroAbastecimiento & {
   sucursalOrigen?: OpcionAbastecimiento
   sucursalDestinoId: string
   sucursalDestino?: OpcionAbastecimiento
-  ubicacionOrigenId: string
-  ubicacionOrigen?: UbicacionAbastecimiento
-  ubicacionDestinoId: string
-  ubicacionDestino?: UbicacionAbastecimiento
+  ubicacionOrigenId: string | null
+  ubicacionOrigen?: UbicacionAbastecimiento | null
+  ubicacionDestinoId: string | null
+  ubicacionDestino?: UbicacionAbastecimiento | null
   justificacion: string
   evidenciaReferencia: string | null
   ultimoTransportista: string | null
   ultimoTransporteReferencia: string | null
   ultimaEvidenciaDespacho: string | null
+  ultimaEvidenciaRecepcion: string | null
+  ultimoMotivoRecepcion: string | null
   ultimoCostoTransporte: number | null
   secuenciaDespacho: number
+  ubicadoEn: string | null
   detalles: DetalleProductoAbastecimiento[]
 }
 
@@ -357,6 +364,8 @@ export type RecepcionElegibleDevolucion = {
   estadoIngreso: EstadoIngresoRecepcion
   cantidadAceptada: number
   cantidadDevuelta: number
+  cantidadPendienteRecepcion: number
+  existenciaActualPosicion: number
   cantidadElegible: number
 }
 
@@ -365,12 +374,26 @@ export type CrearTrasladoInternoRequest = {
   prioridad: PrioridadTrasladoInterno
   requeridoEn: string
   sucursalOrigenId: string
-  sucursalDestinoId: string
-  ubicacionOrigenId: string
-  ubicacionDestinoId: string
+  sucursalDestinoId?: string
+  ubicacionOrigenId?: string
   justificacion: string
   evidenciaReferencia: string | null
-  detalles: Array<{ productoId: string; loteId: string | null; cantidadSolicitada: number; observaciones: string | null }>
+  detalles: Array<{ productoId: string; loteId?: string | null; cantidadSolicitada: number; observaciones: string | null }>
+}
+
+export type EvaluarCuarentenaTrasladoInternoRequest = {
+  version: number
+  motivo: string
+  detalles: Array<{ detalleId: string; cantidadLiberada: number; cantidadRestringida: number; ubicacionDisponibleId: string | null }>
+}
+
+export type UbicarTrasladoInternoRequest = {
+  version: number
+  motivo: string
+  detalles: Array<{
+    detalleId: string
+    asignaciones: Array<{ ubicacionId: string; cantidad: number }>
+  }>
 }
 
 export type CrearDevolucionProveedorRequest = {
@@ -379,6 +402,19 @@ export type CrearDevolucionProveedorRequest = {
   motivo: string
   evidenciaReferencia: string | null
   detalles: Array<{ recepcionDetalleId: string; productoId: string; loteId: string | null; cantidad: number; causa: string }>
+}
+
+export type RegistrarRetornoDevolucionProveedorRequest = {
+  version: number
+  motivo: string
+  evidenciaReferencia: string
+}
+
+export type EvaluarRetornoDevolucionProveedorRequest = {
+  version: number
+  motivo: string
+  evidenciaReferencia: string
+  detalles: Array<{ detalleId: string; cantidadLiberada: number; cantidadNoApta: number }>
 }
 
 export type RegistroAbastecimiento =

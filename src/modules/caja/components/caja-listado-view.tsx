@@ -12,7 +12,8 @@ import {
   type SortingState,
 } from '../../../shared/components/tabla-datos'
 import { ModalEstado } from '../../../shared/components/modal-estado'
-import { exportarCaja, listarCaja, obtenerOpcionesCaja } from '../caja-api'
+import { IconoAccion } from '../../../shared/components/icono-accion'
+import { exportarCaja, listarCaja, obtenerOpcionesCaja, obtenerResumenOperativoCaja } from '../caja-api'
 import {
   convertirQuetzalesACentavos,
   etiquetasEfecto,
@@ -20,6 +21,7 @@ import {
   etiquetasEstadoTurno,
   etiquetasTipoCaja,
   etiquetasTipoMovimiento,
+  fechaActualCaja,
   formatearCentavos,
   formatearFecha,
   formatearFechaHora,
@@ -32,12 +34,15 @@ import type {
   OpcionesFiltrosCaja,
   RecursoCaja,
   ResultadoPaginado,
+  ResumenOperativoCaja,
   TurnoCaja,
 } from '../caja.types'
 import { CajaBreadcrumb } from './caja-breadcrumb'
+import { ResumenOperativoCaja as TarjetasResumen, type IndicadorCaja } from './resumen-operativo-caja'
 import styles from './caja.module.css'
 
 type Props = { permisos: readonly string[]; onNavegar: (ruta: string) => void }
+type ContextoListado = { fechaNegocio?: string; sucursalId?: string; turnoId?: string }
 type RegistroCaja = TurnoCaja | MovimientoCaja
 
 const opcionesIniciales: OpcionesFiltrosCaja = {
@@ -73,22 +78,26 @@ function claseEstadoMovimiento(estado: EstadoMovimientoCaja): string {
   return styles.estadoNeutral
 }
 
-function CajaListadoView({ recurso, permisos, onNavegar }: Props & { recurso: RecursoCaja }) {
+function CajaListadoView({ recurso, permisos, onNavegar, fechaNegocio, sucursalId, turnoId }: Props & ContextoListado & { recurso: RecursoCaja }) {
   const esTurnos = recurso === 'turnos'
+  const fechaPredeterminada = fechaNegocio ?? (turnoId ? '' : fechaActualCaja())
   const [resultado, setResultado] = useState<ResultadoPaginado<RegistroCaja> | null>(null)
+  const [resumen, setResumen] = useState<ResumenOperativoCaja | null>(null)
   const [opciones, setOpciones] = useState<OpcionesFiltrosCaja>(opcionesIniciales)
   const [pagina, setPagina] = useState(1)
   const [tamanoPagina, setTamanoPagina] = useState(50)
   const [busquedaEntrada, setBusquedaEntrada] = useState('')
   const [busqueda, setBusqueda] = useState('')
-  const [desde, setDesde] = useState('')
-  const [hasta, setHasta] = useState('')
+  const [desde, setDesde] = useState(fechaPredeterminada)
+  const [hasta, setHasta] = useState(fechaPredeterminada)
   const [montoMinimo, setMontoMinimo] = useState('')
   const [montoMaximo, setMontoMaximo] = useState('')
   const [filtros, setFiltros] = useState<ColumnFiltersState>([])
   const [ordenamiento, setOrdenamiento] = useState<SortingState>([{ id: 'fecha', desc: true }])
   const [solicitudFinalizada, setSolicitudFinalizada] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [errorResumen, setErrorResumen] = useState<string | null>(null)
+  const [resumenSolicitudFinalizada, setResumenSolicitudFinalizada] = useState('')
   const [errorOpciones, setErrorOpciones] = useState<string | null>(null)
   const [errorExportacion, setErrorExportacion] = useState<string | null>(null)
   const [revision, setRevision] = useState(0)
@@ -105,8 +114,9 @@ function CajaListadoView({ recurso, permisos, onNavegar }: Props & { recurso: Re
     pagina,
     tamanoPagina,
     busqueda: busqueda || undefined,
-    sucursalIds: valoresFiltro(filtros, 'sucursal'),
+    sucursalIds: sucursalId ? [sucursalId] : valoresFiltro(filtros, 'sucursal'),
     cajaIds: cajaIdsFiltradas,
+    turnoIds: turnoId ? [turnoId] : undefined,
     estados: valoresFiltro(filtros, 'estado'),
     tipos: esTurnos ? undefined : valoresFiltro(filtros, 'tipo'),
     desde: desde || undefined,
@@ -115,9 +125,10 @@ function CajaListadoView({ recurso, permisos, onNavegar }: Props & { recurso: Re
     montoMaxCentavos: montoMaximo ? convertirQuetzalesACentavos(montoMaximo) ?? undefined : undefined,
     orden: ordenamiento[0]?.id ?? 'fecha',
     direccion: ordenamiento[0]?.desc ? 'desc' : 'asc',
-  }), [busqueda, cajaIdsFiltradas, desde, esTurnos, filtros, hasta, montoMaximo, montoMinimo, ordenamiento, pagina, tamanoPagina])
+  }), [busqueda, cajaIdsFiltradas, desde, esTurnos, filtros, hasta, montoMaximo, montoMinimo, ordenamiento, pagina, sucursalId, tamanoPagina, turnoId])
   const claveSolicitud = useMemo(() => JSON.stringify({ recurso, parametros, revision }), [parametros, recurso, revision])
   const cargando = solicitudFinalizada !== claveSolicitud
+  const resumenCargando = resumenSolicitudFinalizada !== claveSolicitud
 
   useEffect(() => {
     const controlador = new AbortController()
@@ -155,6 +166,15 @@ function CajaListadoView({ recurso, permisos, onNavegar }: Props & { recurso: Re
     return () => controlador.abort()
   }, [claveSolicitud, esTurnos, pagina, parametros, recurso])
 
+  useEffect(() => {
+    const controlador = new AbortController()
+    void obtenerResumenOperativoCaja(recurso as 'turnos' | 'movimientos', parametros, controlador.signal)
+      .then((respuesta) => { setResumen(respuesta); setErrorResumen(null) })
+      .catch((errorActual: unknown) => { if (!controlador.signal.aborted) setErrorResumen(errorActual instanceof ErrorApi ? errorActual.message : 'No fue posible cargar el resumen operativo.') })
+      .finally(() => { if (!controlador.signal.aborted) setResumenSolicitudFinalizada(claveSolicitud) })
+    return () => controlador.abort()
+  }, [claveSolicitud, parametros, recurso])
+
   const opcionesSucursales = opciones.sucursales.map((sucursal) => ({ valor: sucursal.id, etiqueta: sucursal.nombre, descripcion: sucursal.codigo }))
   const columnasTurnos = useMemo<ColumnaTabla<TurnoCaja>[]>(() => [
     { id: 'numero', titulo: 'Turno', obtenerValor: (turno) => turno.numero, ordenable: true, celda: (turno) => <div className={styles.identidad}><strong>{turno.numero}</strong><small>{formatearFecha(turno.fechaNegocio)}</small></div> },
@@ -165,7 +185,7 @@ function CajaListadoView({ recurso, permisos, onNavegar }: Props & { recurso: Re
     { id: 'saldo', titulo: 'Saldo confirmado', obtenerValor: (turno) => turno.saldoConfirmadoCentavos, ordenable: true, celda: (turno) => <strong>{formatearCentavos(turno.saldoConfirmadoCentavos)}</strong> },
     { id: 'estado', titulo: 'Estado', obtenerValor: (turno) => turno.estado, ordenable: true, filtro: { tipo: 'opciones', etiqueta: 'Seleccionar estados', multiple: true, buscable: false, opciones: opciones.turnos.estados.map((estado) => ({ valor: estado, etiqueta: etiquetasEstadoTurno[estado] })) }, celda: (turno) => <span className={`${styles.estado} ${claseEstadoTurno(turno.estado)}`}>{etiquetasEstadoTurno[turno.estado]}</span> },
     { id: 'fecha', titulo: 'Apertura', obtenerValor: (turno) => turno.abiertoEn, ordenable: true, celda: (turno) => formatearFechaHora(turno.abiertoEn) },
-    { id: 'acciones', titulo: 'Acciones', tituloSoloLectores: true, obtenerValor: (turno) => turno.id, celda: (turno) => <div className={styles.accionesFila}><button type="button" title="Ver detalle" aria-label={`Ver turno ${turno.numero}`} onClick={() => onNavegar(`/caja/turnos/${turno.id}`)}><img src={iconoVer} alt="" /></button></div> },
+    { id: 'acciones', titulo: 'Acciones', tituloSoloLectores: true, obtenerValor: (turno) => turno.id, celda: (turno) => <div className={styles.accionesFila}><button type="button" title="Ver detalle" aria-label={`Ver turno ${turno.numero}`} onClick={() => onNavegar(`/caja/turnos/${turno.id}`)}><img src={iconoVer} alt="" /></button><button type="button" title="Ver movimientos" aria-label={`Ver movimientos del turno ${turno.numero}`} onClick={() => onNavegar(`/caja/turnos/${turno.id}/movimientos`)}><IconoAccion nombre="estado" /></button><button type="button" title="Ver ventas realizadas" aria-label={`Ver ventas realizadas en el turno ${turno.numero}`} onClick={() => onNavegar(`/ventas/realizadas?turnoId=${encodeURIComponent(turno.id)}`)}><IconoAccion nombre="cobrar" /></button></div> },
   ], [onNavegar, opciones, opcionesSucursales])
 
   const columnasMovimientos = useMemo<ColumnaTabla<MovimientoCaja>[]>(() => [
@@ -181,9 +201,9 @@ function CajaListadoView({ recurso, permisos, onNavegar }: Props & { recurso: Re
     { id: 'acciones', titulo: 'Acciones', tituloSoloLectores: true, obtenerValor: (movimiento) => movimiento.id, celda: (movimiento) => <div className={styles.accionesFila}><button type="button" title="Ver detalle" aria-label={`Ver movimiento ${movimiento.numero}`} onClick={() => onNavegar(`/caja/movimientos/${movimiento.id}`)}><img src={iconoVer} alt="" /></button></div> },
   ], [onNavegar, opciones, opcionesSucursales])
 
-  const hayFiltros = Boolean(busqueda || desde || hasta || montoMinimo || montoMaximo || filtros.length)
+  const hayFiltros = Boolean(busqueda || desde !== fechaPredeterminada || hasta !== fechaPredeterminada || montoMinimo || montoMaximo || filtros.length)
   const limpiarFiltros = () => {
-    setBusquedaEntrada(''); setBusqueda(''); setDesde(''); setHasta(''); setMontoMinimo(''); setMontoMaximo(''); setFiltros([]); setPagina(1)
+    setBusquedaEntrada(''); setBusqueda(''); setDesde(fechaPredeterminada); setHasta(fechaPredeterminada); setMontoMinimo(''); setMontoMaximo(''); setFiltros([]); setPagina(1)
   }
   const exportar = async (formato: FormatoExportacion) => {
     setErrorExportacion(null)
@@ -196,25 +216,39 @@ function CajaListadoView({ recurso, permisos, onNavegar }: Props & { recurso: Re
   const puedeExportar = permisos.includes(esTurnos ? 'CAJA.TURNOS.EXPORTAR' : 'CAJA.MOVIMIENTOS.EXPORTAR')
   const rutaNueva = esTurnos ? '/caja/turnos/nuevo' : '/caja/movimientos/nuevo'
   const titulo = esTurnos ? 'Turnos de caja' : 'Movimientos de caja'
+  const indicadores = useMemo<IndicadorCaja[]>(() => {
+    if (resumen?.recurso === 'turnos') return [
+      { etiqueta: 'Saldo de caja', valor: formatearCentavos(resumen.saldoCentavos), detalle: `${resumen.turnosCantidad} turnos en el período seleccionado`, tono: 'informacion' },
+      { etiqueta: 'Ventas realizadas', valor: String(resumen.ventasCantidad), detalle: `${formatearCentavos(resumen.ventasCentavos)} cobrados`, tono: 'entrada' },
+    ]
+    if (resumen?.recurso === 'movimientos') return [
+      { etiqueta: 'Entradas confirmadas', valor: formatearCentavos(resumen.entradasCentavos), detalle: turnoId ? 'Movimientos del turno consultado' : 'Movimientos del período seleccionado', tono: 'entrada' },
+      { etiqueta: 'Salidas confirmadas', valor: formatearCentavos(resumen.salidasCentavos), detalle: turnoId ? 'Movimientos del turno consultado' : 'Movimientos del período seleccionado', tono: 'salida' },
+      { etiqueta: 'Saldo neto', valor: formatearCentavos(resumen.netoCentavos), detalle: `${resumen.movimientosCantidad} movimientos aplicados`, tono: 'informacion' },
+    ]
+    return []
+  }, [resumen, turnoId])
 
   return (
     <section className={styles.pagina} aria-labelledby="titulo-listado-caja">
       <header className={styles.cabeceraPagina}>
         <CajaBreadcrumb seccion={esTurnos ? 'Turnos de caja' : 'Movimientos'} onNavegar={onNavegar} />
         <div className={styles.filaCabecera}>
-          <div><h1 id="titulo-listado-caja">{titulo}</h1><p>{esTurnos ? 'Consulta aperturas, responsables, saldos y estado operativo.' : 'Consulta ingresos y salidas con su saldo, referencia y trazabilidad.'}</p></div>
+          <h1 id="titulo-listado-caja">{titulo}</h1>
           {puedeCrear && <button className={styles.botonNuevo} type="button" onClick={() => onNavegar(rutaNueva)}><img src={iconoAgregar} alt="" />{esTurnos ? 'Abrir turno' : 'Registrar movimiento'}</button>}
           {puedeExportar && <BotonExportar deshabilitado={cargando} onExportar={exportar} />}
-          <label className={styles.busquedaGeneral}><span>Búsqueda general</span><span className={styles.controlBusqueda}><img src={iconoBusqueda} alt="" /><input type="search" value={busquedaEntrada} maxLength={150} placeholder={esTurnos ? 'Número o responsable' : 'Número, referencia o motivo'} onChange={(evento) => setBusquedaEntrada(evento.target.value)} /></span></label>
+          <div className={styles.busquedaGeneral}><span className={styles.controlBusqueda}><img src={iconoBusqueda} alt="" /><input type="search" value={busquedaEntrada} maxLength={150} placeholder={esTurnos ? 'Número o responsable' : 'Número, referencia o motivo'} aria-label="Búsqueda general" onChange={(evento) => setBusquedaEntrada(evento.target.value)} /></span></div>
         </div>
       </header>
 
       <div className={styles.filtrosGenerales} aria-label="Filtros generales">
-        <label>Desde<input type="date" value={desde} max={hasta || undefined} onChange={(evento) => { setDesde(evento.target.value); setPagina(1) }} /></label>
-        <label>Hasta<input type="date" value={hasta} min={desde || undefined} onChange={(evento) => { setHasta(evento.target.value); setPagina(1) }} /></label>
+        {!fechaNegocio && <label>Desde<input type="date" value={desde} max={hasta || undefined} onChange={(evento) => { setDesde(evento.target.value); setPagina(1) }} /></label>}
+        {!fechaNegocio && <label>Hasta<input type="date" value={hasta} min={desde || undefined} onChange={(evento) => { setHasta(evento.target.value); setPagina(1) }} /></label>}
         <label>{esTurnos ? 'Saldo mínimo (Q)' : 'Monto mínimo (Q)'}<input type="number" min="0" step="0.01" inputMode="decimal" value={montoMinimo} placeholder="0.00" onChange={(evento) => { setMontoMinimo(evento.target.value); setPagina(1) }} /></label>
         <label>{esTurnos ? 'Saldo máximo (Q)' : 'Monto máximo (Q)'}<input type="number" min="0" step="0.01" inputMode="decimal" value={montoMaximo} placeholder="0.00" onChange={(evento) => { setMontoMaximo(evento.target.value); setPagina(1) }} /></label>
       </div>
+
+      <TarjetasResumen indicadores={indicadores} cargando={resumenCargando} error={errorResumen} onReintentar={() => setRevision((valor) => valor + 1)} />
 
       {errorOpciones && <div className={styles.alertaError} role="alert"><p>{errorOpciones}</p><button type="button" onClick={() => setRevision((valor) => valor + 1)}>Reintentar</button></div>}
       {error && <div className={styles.alertaError} role="alert"><p>{error}</p><button type="button" onClick={() => setRevision((valor) => valor + 1)}>Reintentar</button></div>}
@@ -230,5 +264,5 @@ function CajaListadoView({ recurso, permisos, onNavegar }: Props & { recurso: Re
   )
 }
 
-export function TurnoListadoView(props: Props) { return <CajaListadoView {...props} recurso="turnos" /> }
-export function MovimientoListadoView(props: Props) { return <CajaListadoView {...props} recurso="movimientos" /> }
+export function TurnoListadoView(props: Props & Pick<ContextoListado, 'fechaNegocio' | 'sucursalId'>) { return <CajaListadoView {...props} recurso="turnos" /> }
+export function MovimientoListadoView(props: Props & Pick<ContextoListado, 'turnoId'>) { return <CajaListadoView {...props} recurso="movimientos" /> }

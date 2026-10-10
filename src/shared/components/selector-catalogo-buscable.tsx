@@ -11,6 +11,7 @@ type PropiedadesBase = {
   id: string
   opciones: readonly OpcionSelectorCatalogo[]
   placeholder: string
+  apariencia?: 'selector' | 'busqueda'
   deshabilitado?: boolean
   invalido?: boolean
 }
@@ -41,7 +42,7 @@ export function SelectorCatalogoBuscable(props: SelectorCatalogoBuscableProps) {
   const contenedorRef = useRef<HTMLDivElement>(null)
   const busquedaRef = useRef<HTMLInputElement>(null)
   const seleccionados = props.multiple ? props.valor : props.valor ? [props.valor] : []
-  const usarBusqueda = props.opciones.length > LIMITE_SELECTOR_SIMPLE
+  const usarBusqueda = props.apariencia === 'busqueda' || props.opciones.length > LIMITE_SELECTOR_SIMPLE
 
   const opcionesFiltradas = useMemo(() => {
     const termino = normalizar(busqueda.trim())
@@ -125,7 +126,7 @@ export function SelectorCatalogoBuscable(props: SelectorCatalogoBuscableProps) {
     <div ref={contenedorRef} className={styles.contenedor}>
       <button
         id={props.id}
-        className={styles.activador}
+        className={`${styles.activador} ${props.apariencia === 'busqueda' ? styles.activadorBusqueda : ''}`}
         type="button"
         disabled={props.deshabilitado}
         aria-expanded={abierto}
@@ -137,7 +138,9 @@ export function SelectorCatalogoBuscable(props: SelectorCatalogoBuscableProps) {
         }}
       >
         <span className={seleccionados.length ? undefined : styles.placeholder}>{resumen}</span>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5" /></svg>
+        {props.apariencia === 'busqueda'
+          ? <span className={styles.iconoBusquedaActivador} aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="5.5" /><path d="m15 15 4 4" /></svg></span>
+          : <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m7 10 5 5 5-5" /></svg>}
       </button>
 
       {abierto && (

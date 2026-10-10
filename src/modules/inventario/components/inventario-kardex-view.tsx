@@ -15,7 +15,7 @@ import { SelectorProductoInventario } from './selector-producto-inventario'
 import styles from './inventario.module.css'
 
 const etiquetasOperacion: Record<string, string> = {
-  APERTURA: 'Apertura', AJUSTE_POSITIVO: 'Ajuste positivo', AJUSTE_NEGATIVO: 'Ajuste negativo',
+  APERTURA: 'Apertura', AJUSTE_POSITIVO: 'Ajuste positivo', AJUSTE_NEGATIVO: 'Ajuste negativo', REGULARIZACION_COSTO: 'Regularización de costo',
   COMPRA_RECEPCION: 'Recepción de compra', TRASLADO_DESPACHO: 'Despacho de traslado', TRASLADO_RECEPCION: 'Recepción de traslado',
   VENTA: 'Venta', DEVOLUCION_CLIENTE: 'Devolución de cliente', DEVOLUCION_PROVEEDOR: 'Devolución a proveedor',
   VENCIMIENTO: 'Vencimiento', DESTRUCCION: 'Destrucción', CONTEO: 'Conteo', COMPENSACION: 'Compensación',

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import iconoAgregar from '../../../assets/acciones/agregar.png'
 import iconoBusqueda from '../../../assets/acciones/busqueda.png'
+import iconoEditar from '../../../assets/acciones/editar.png'
 import iconoEliminar from '../../../assets/acciones/eliminar.png'
 import iconoVer from '../../../assets/acciones/ver.png'
 import { ErrorApi } from '../../../shared/api/cliente-api'
@@ -53,6 +54,8 @@ export function InventarioConteosView({ permisos, onNavegar }: { permisos: reado
   const [revision, setRevision] = useState(0)
   const [solicitudFinalizada, setSolicitudFinalizada] = useState('')
   const puedeGestionar = permisos.includes('INVENTARIO.CONTEOS.CREAR')
+  const puedeRegistrarResultados = permisos.includes('INVENTARIO.CONTEOS.REGISTRAR_RESULTADOS')
+  const puedeAprobar = permisos.includes('INVENTARIO.CONTEOS.APROBAR')
 
   useEffect(() => {
     const temporizador = window.setTimeout(() => { setBusqueda(entrada.trim()); setPagina(1) }, 400)
@@ -130,8 +133,8 @@ export function InventarioConteosView({ permisos, onNavegar }: { permisos: reado
     { id: 'posiciones', titulo: 'Posiciones', obtenerValor: (item) => item.totalPosiciones, celda: (item) => <span className={styles.cantidad}>{item.totalPosiciones}</span> },
     { id: 'diferencias', titulo: 'Diferencias', obtenerValor: (item) => item.posicionesConDiferencia, celda: (item) => <span className={styles.cantidad}>{item.posicionesConDiferencia}</span> },
     { id: 'iniciado', titulo: 'Iniciado', obtenerValor: (item) => item.iniciadoEn, ordenable: true, celda: (item) => fechaHora(item.iniciadoEn) },
-    { id: 'acciones', titulo: 'Acciones', tituloSoloLectores: true, obtenerValor: (item) => item.id, celda: (item) => <div className={styles.accionesFila}><button type="button" title="Ver conteo" aria-label={`Ver conteo ${item.referencia}`} onClick={() => onNavegar(`/inventario/conteos/${item.id}`)}><img src={iconoVer} alt="" /></button></div> },
-  ], [onNavegar, ubicaciones])
+    { id: 'acciones', titulo: 'Acciones', tituloSoloLectores: true, obtenerValor: (item) => item.id, celda: (item) => <div className={styles.accionesFila}><button type="button" title="Ver conteo" aria-label={`Ver conteo ${item.referencia}`} onClick={() => onNavegar(`/inventario/conteos/${item.id}`)}><img src={iconoVer} alt="" /></button>{((item.estado === 'ABIERTO' && puedeRegistrarResultados) || (item.estado === 'REGISTRADO' && puedeAprobar)) && <button type="button" title="Editar conteo" aria-label={`Editar conteo ${item.referencia}`} onClick={() => onNavegar(`/inventario/conteos/${item.id}/editar`)}><img src={iconoEditar} alt="" /></button>}</div> },
+  ], [onNavegar, puedeAprobar, puedeRegistrarResultados, ubicaciones])
 
   const ubicacionesDisponibles = ubicaciones.filter((item) => item.activa && !item.bloqueadaPorConteoId)
   const hayFiltros = Boolean(busqueda || filtros.length)

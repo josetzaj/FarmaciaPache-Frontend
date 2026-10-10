@@ -23,18 +23,23 @@ import type {
   ListarKardexInventarioParametros,
   ListarOperacionesInventarioParametros,
   ListarPoliticasStockParametros,
+  ListarPosicionesCostoInventarioParametros,
   ListarProductosPoliticaMasivaParametros,
   ListarSolicitudesPoliticaMasivaParametros,
   ListarUbicacionesInventarioParametros,
   OpcionesPoliticaMasiva,
+  OpcionesCostosInventario,
   OperacionInventario,
   OperacionInventarioDetalle,
   OperacionesInventarioPaginadas,
   PoliticaStockInventario,
   PoliticasStockPaginadas,
+  PosicionCostoInventario,
+  PosicionesCostoInventarioPaginadas,
   ProductosPoliticaMasivaPaginados,
   RegistrarAjusteInventarioRequest,
   RegistrarAperturaInventarioRequest,
+  RegistrarRegularizacionCostoInventarioRequest,
   RegistrarResultadosConteoRequest,
   ResolverSolicitudPoliticaMasivaRequest,
   SolicitudPoliticaMasiva,
@@ -126,6 +131,7 @@ export async function listarExistenciasInventario(
   const consulta = new URLSearchParams({
     pagina: String(parametros.pagina),
     tamanoPagina: String(parametros.tamanoPagina),
+    vista: parametros.vista,
     soloConExistencia: String(parametros.soloConExistencia),
     soloBajoMinimo: String(parametros.soloBajoMinimo),
     orden: parametros.orden,
@@ -135,6 +141,9 @@ export async function listarExistenciasInventario(
   if (parametros.sucursalId) consulta.set('sucursalId', parametros.sucursalId)
   if (parametros.ubicacionId) consulta.set('ubicacionId', parametros.ubicacionId)
   if (parametros.estados?.length) consulta.set('estados', parametros.estados.join(','))
+  if (parametros.lote) consulta.set('lote', parametros.lote)
+  if (parametros.vencimientoDesde) consulta.set('vencimientoDesde', parametros.vencimientoDesde)
+  if (parametros.vencimientoHasta) consulta.set('vencimientoHasta', parametros.vencimientoHasta)
   const respuesta = await solicitarApi<RespuestaApi<ExistenciasInventarioPaginadas>>(
     `/inventario/existencias?${consulta.toString()}`,
     { signal },
@@ -180,7 +189,7 @@ export async function listarAuditoriaInventario(
   if (parametros.usuario) consulta.set('usuario', parametros.usuario)
   if (parametros.sucursal) consulta.set('sucursal', parametros.sucursal)
   if (parametros.resumen) consulta.set('resumen', parametros.resumen)
-  const recurso = tipo === 'ubicacion' ? 'ubicaciones' : tipo === 'operacion' ? 'operaciones' : tipo === 'politica' ? 'politicas-stock' : tipo === 'politicaMasiva' ? 'politicas-stock/masivas/solicitudes' : 'conteos'
+  const recurso = tipo === 'ubicacion' ? 'ubicaciones' : tipo === 'operacion' ? 'operaciones' : tipo === 'costo' ? 'costos/regularizaciones' : tipo === 'politica' ? 'politicas-stock' : tipo === 'politicaMasiva' ? 'politicas-stock/masivas/solicitudes' : 'conteos'
   const respuesta = await solicitarApi<RespuestaApi<AuditoriaInventarioPaginada>>(
     `/inventario/${recurso}/${entidadId}/auditoria?${consulta.toString()}`,
     { signal },
@@ -226,6 +235,37 @@ export async function registrarAjusteInventario(
     method: 'POST',
     datos,
   })
+  return respuesta.data
+}
+
+export async function obtenerOpcionesCostosInventario(signal?: AbortSignal): Promise<OpcionesCostosInventario> {
+  const respuesta = await solicitarApi<RespuestaApi<OpcionesCostosInventario>>('/inventario/costos/opciones', { signal })
+  return respuesta.data
+}
+
+export async function listarPosicionesCostoInventario(
+  parametros: ListarPosicionesCostoInventarioParametros,
+  signal?: AbortSignal,
+): Promise<PosicionesCostoInventarioPaginadas> {
+  const consulta = new URLSearchParams({
+    pagina: String(parametros.pagina),
+    tamanoPagina: String(parametros.tamanoPagina),
+    orden: parametros.orden,
+    direccion: parametros.direccion,
+  })
+  if (parametros.busqueda) consulta.set('busqueda', parametros.busqueda)
+  if (parametros.sucursalIds?.length) consulta.set('sucursalIds', parametros.sucursalIds.join(','))
+  const respuesta = await solicitarApi<RespuestaApi<PosicionesCostoInventarioPaginadas>>(`/inventario/costos/posiciones?${consulta.toString()}`, { signal })
+  return respuesta.data
+}
+
+export async function obtenerPosicionCostoInventario(saldoId: string, signal?: AbortSignal): Promise<PosicionCostoInventario> {
+  const respuesta = await solicitarApi<RespuestaApi<PosicionCostoInventario>>(`/inventario/costos/posiciones/${saldoId}`, { signal })
+  return respuesta.data
+}
+
+export async function registrarRegularizacionCostoInventario(datos: RegistrarRegularizacionCostoInventarioRequest): Promise<OperacionInventario> {
+  const respuesta = await solicitarApi<RespuestaApi<OperacionInventario>>('/inventario/costos/regularizaciones', { method: 'POST', datos })
   return respuesta.data
 }
 

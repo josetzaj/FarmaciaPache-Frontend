@@ -12,19 +12,20 @@ import { ComercialBreadcrumb } from './comercial-breadcrumb'
 import styles from './comercial.module.css'
 
 const etiquetasVenta: Record<EstadoVenta, string> = { BORRADOR: 'Borrador', PENDIENTE_RECETA: 'Pendiente de receta', LISTA_PARA_COBRO: 'Lista para cobro', CONFIRMADA: 'Confirmada', ANULADA: 'Anulada' }
-const opcionesBase: OpcionesComercial = { sucursales: [], productos: [], clientes: { tipos: ['PERSONA', 'EMPRESA'], estados: ['ACTIVO', 'INACTIVO'] }, margenes: { alcances: ['GENERAL', 'PRODUCTO'], estados: ['ACTIVO', 'INACTIVO'] }, precios: { estados: ['BORRADOR', 'VIGENTE', 'INACTIVO'] }, ventas: { estados: ['BORRADOR', 'PENDIENTE_RECETA', 'LISTA_PARA_COBRO', 'CONFIRMADA', 'ANULADA'], estadosPago: ['PENDIENTE', 'PAGADO', 'REVERTIDO'], estadosDispensacion: ['PENDIENTE', 'DISPENSADA', 'REVERTIDA'], estadosFiscales: ['PENDIENTE', 'EMITIDA', 'ANULADA', 'ERROR'] } }
+const opcionesBase: OpcionesComercial = { sucursalContextoId: null, sucursales: [], productos: [], clientes: { tipos: ['PERSONA', 'EMPRESA'], estados: ['ACTIVO', 'INACTIVO'] }, margenes: { alcances: ['GENERAL', 'PRODUCTO'], estados: ['ACTIVO', 'INACTIVO'] }, precios: { estados: ['BORRADOR', 'VIGENTE', 'INACTIVO'] }, ventas: { estados: ['BORRADOR', 'PENDIENTE_RECETA', 'LISTA_PARA_COBRO', 'CONFIRMADA', 'ANULADA'], estadosPago: ['PENDIENTE', 'PAGADO', 'REVERTIDO'], estadosDispensacion: ['PENDIENTE', 'DISPENSADA', 'REVERTIDA'], estadosFiscales: ['PENDIENTE', 'EMITIDA', 'ANULADA', 'ERROR'] } }
 const valores = (f: ColumnFiltersState, id: string) => { const x = f.find((i) => i.id === id)?.value; return Array.isArray(x) ? x.filter((v): v is string => typeof v === 'string') : undefined }
 const numero = (v: string) => v.trim() && Number.isFinite(Number(v)) ? Number(v) : undefined
 const moneda = (v: number) => new Intl.NumberFormat('es-GT', { style: 'currency', currency: 'GTQ' }).format(v)
 const fecha = (v: string) => new Intl.DateTimeFormat('es-GT', { dateStyle: 'medium', timeStyle: 'short', timeZone: 'America/Guatemala' }).format(new Date(v))
 const claseEstado = (estado: EstadoVenta) => estado === 'CONFIRMADA' ? styles.estadoActivo : estado === 'ANULADA' ? styles.estadoPeligro : ['PENDIENTE_RECETA', 'LISTA_PARA_COBRO'].includes(estado) ? styles.estadoAdvertencia : styles.estadoInactivo
 
-export function VentaListadoView({ permisos, onNavegar }: { permisos: readonly string[]; onNavegar: (ruta: string) => void }) {
+export function VentaListadoView({ permisos, onNavegar, modo = 'activas', turnoIdInicial }: { permisos: readonly string[]; onNavegar: (ruta: string) => void; modo?: 'activas' | 'realizadas'; turnoIdInicial?: string }) {
+  const realizadas = modo === 'realizadas'
   const [resultado, setResultado] = useState<Awaited<ReturnType<typeof listarVentas>> | null>(null); const [opciones, setOpciones] = useState(opcionesBase)
   const [pagina, setPagina] = useState(1); const [tamanoPagina, setTamanoPagina] = useState(50); const [busquedaEntrada, setBusquedaEntrada] = useState(''); const [busqueda, setBusqueda] = useState('')
   const [desde, setDesde] = useState(''); const [hasta, setHasta] = useState(''); const [totalMin, setTotalMin] = useState(''); const [totalMax, setTotalMax] = useState('')
   const [filtros, setFiltros] = useState<ColumnFiltersState>([]); const [ordenamiento, setOrdenamiento] = useState<SortingState>([{ id: 'fecha', desc: true }]); const [error, setError] = useState<string | null>(null); const [errorExportacion, setErrorExportacion] = useState<string | null>(null); const [revision, setRevision] = useState(0)
-  const parametros = useMemo<ConsultaComercial>(() => ({ pagina, tamanoPagina, busqueda: busqueda || undefined, estados: valores(filtros, 'estado'), estadosPago: valores(filtros, 'pago'), sucursalIds: valores(filtros, 'sucursal'), desde: desde || undefined, hasta: hasta || undefined, totalMin: numero(totalMin), totalMax: numero(totalMax), orden: ordenamiento[0]?.id ?? 'fecha', direccion: ordenamiento[0]?.desc ? 'desc' : 'asc' }), [busqueda, desde, filtros, hasta, ordenamiento, pagina, tamanoPagina, totalMax, totalMin])
+  const parametros = useMemo<ConsultaComercial>(() => ({ pagina, tamanoPagina, busqueda: busqueda || undefined, estados: realizadas ? ['CONFIRMADA', 'ANULADA'] : undefined, soloTurnosNoCerrados: realizadas ? undefined : true, estadosPago: valores(filtros, 'pago'), sucursalIds: valores(filtros, 'sucursal'), turnoIds: turnoIdInicial ? [turnoIdInicial] : undefined, desde: desde || undefined, hasta: hasta || undefined, totalMin: numero(totalMin), totalMax: numero(totalMax), orden: ordenamiento[0]?.id ?? 'fecha', direccion: ordenamiento[0]?.desc ? 'desc' : 'asc' }), [busqueda, desde, filtros, hasta, ordenamiento, pagina, realizadas, tamanoPagina, totalMax, totalMin, turnoIdInicial])
   useEffect(() => { const c = new AbortController(); void obtenerOpcionesComercial(c.signal).then(setOpciones).catch(() => undefined); return () => c.abort() }, [])
   useEffect(() => { const t = window.setTimeout(() => { const x = busquedaEntrada.trim().replace(/\s+/g, ' '); setBusqueda(x); setPagina(1) }, 400); return () => clearTimeout(t) }, [busquedaEntrada])
   useEffect(() => { const c = new AbortController(); void listarVentas(parametros, c.signal).then((r) => { if (r.totalPaginas > 0 && pagina > r.totalPaginas) { setPagina(r.totalPaginas); return }; setResultado(r); setError(null) }).catch((e: unknown) => { if (!c.signal.aborted) setError(e instanceof ErrorApi ? e.message : 'No fue posible cargar las ventas.') }); return () => c.abort() }, [pagina, parametros, revision])
@@ -34,19 +35,20 @@ export function VentaListadoView({ permisos, onNavegar }: { permisos: readonly s
     { id: 'sucursal', titulo: 'Sucursal', obtenerValor: (x) => x.sucursal?.nombre ?? '', ordenable: true, filtro: { tipo: 'opciones', etiqueta: 'Sucursal', multiple: true, opciones: opciones.sucursales.map((s) => ({ valor: s.id, etiqueta: s.nombre, descripcion: s.codigo })) }, celda: (x) => x.sucursal?.nombre ?? 'No disponible' },
     { id: 'total', titulo: 'Total', obtenerValor: (x) => x.total, ordenable: true, celda: (x) => <strong>{moneda(x.total)}</strong> },
     { id: 'pago', titulo: 'Pago', obtenerValor: (x) => x.estadoPago, filtro: { tipo: 'opciones', etiqueta: 'Estado de pago', multiple: true, buscable: false, opciones: opciones.ventas.estadosPago.map((x) => ({ valor: x, etiqueta: x === 'PAGADO' ? 'Pagado' : x === 'REVERTIDO' ? 'Revertido' : 'Pendiente' })) }, celda: (x) => x.estadoPago === 'PAGADO' ? 'Pagado' : x.estadoPago === 'REVERTIDO' ? 'Revertido' : 'Pendiente' },
-    { id: 'estado', titulo: 'Estado', obtenerValor: (x) => x.estado, filtro: { tipo: 'opciones', etiqueta: 'Estado de venta', multiple: true, buscable: false, opciones: opciones.ventas.estados.map((x) => ({ valor: x, etiqueta: etiquetasVenta[x] })) }, celda: (x) => <span className={`${styles.estado} ${claseEstado(x.estado)}`}>{etiquetasVenta[x.estado]}</span> },
+    ...(realizadas ? [{ id: 'turno', titulo: 'Turno / caja', obtenerValor: (x: VentaComercial) => x.turnoNumero ?? '', celda: (x: VentaComercial) => <div className={styles.identidad}><strong>{x.turnoNumero ?? 'Sin cobro en caja'}</strong><small>{x.cajaNombre ?? 'No disponible'}</small></div> }] : []),
+    { id: 'estado', titulo: 'Estado', obtenerValor: (x) => x.estado, celda: (x) => <span className={`${styles.estado} ${claseEstado(x.estado)}`}>{etiquetasVenta[x.estado]}</span> },
     { id: 'fecha', titulo: 'Registro', obtenerValor: (x) => x.creadoEn, ordenable: true, celda: (x) => fecha(x.creadoEn) },
     { id: 'acciones', titulo: 'Acciones', tituloSoloLectores: true, obtenerValor: () => '', celda: (x) => <div className={styles.accionesFila}><button type="button" title="Ver detalle" aria-label={`Ver venta ${x.numero}`} onClick={() => onNavegar(`/ventas/${x.id}`)}><img src={iconoVer} alt="" /></button>{permisos.includes('COMERCIAL.VENTAS.ACTUALIZAR') && ['BORRADOR', 'PENDIENTE_RECETA'].includes(x.estado) && <button type="button" title="Editar" aria-label={`Editar venta ${x.numero}`} onClick={() => onNavegar(`/ventas/${x.id}/editar`)}><img src={iconoEditar} alt="" /></button>}</div> },
-  ], [onNavegar, opciones, permisos])
+  ], [onNavegar, opciones, permisos, realizadas])
   const limpiar = () => { setBusquedaEntrada(''); setBusqueda(''); setDesde(''); setHasta(''); setTotalMin(''); setTotalMax(''); setFiltros([]); setPagina(1) }; const hayFiltros = Boolean(busqueda || desde || hasta || totalMin || totalMax || filtros.length)
   const exportar = async (formato: FormatoExportacion) => { setErrorExportacion(null); const { pagina: _p, tamanoPagina: _t, ...f } = parametros; try { await exportarComercial('ventas', formato, f) } catch (e) { setErrorExportacion(e instanceof ErrorApi ? e.message : 'No fue posible exportar las ventas.') } }
   return (
     <section className={styles.pagina} aria-labelledby="titulo-ventas">
       <header className={styles.cabeceraPagina}>
-        <ComercialBreadcrumb seccion="Ventas" rutaListado="/ventas" onNavegar={onNavegar} />
+        <ComercialBreadcrumb seccion={realizadas ? 'Ventas realizadas' : 'Ventas'} rutaListado={realizadas ? '/ventas/realizadas' : '/ventas'} onNavegar={onNavegar} />
         <div className={`${styles.filaCabecera} ${styles.filaCabeceraConFiltros}`}>
-          <h1 id="titulo-ventas">Ventas</h1>
-          {permisos.includes('COMERCIAL.VENTAS.CREAR') && (
+          <h1 id="titulo-ventas">{realizadas ? 'Ventas realizadas' : 'Ventas'}</h1>
+          {!realizadas && permisos.includes('COMERCIAL.VENTAS.CREAR') && (
             <button className={styles.botonNuevo} type="button" onClick={() => onNavegar('/ventas/nueva')}>
               <img src={iconoAgregar} alt="" />
               Nueva venta
@@ -88,7 +90,7 @@ export function VentaListadoView({ permisos, onNavegar }: { permisos: readonly s
       {errorExportacion && <div className={styles.alertaError} role="alert">{errorExportacion}</div>}
       <article className={styles.panelTabla}>
         <div className={styles.resumenTabla}>
-          <div><strong>Ventas registradas</strong><small>Los filtros de cada columna se procesan en el servidor.</small></div>
+          <div><strong>{realizadas ? 'Historial de ventas realizadas' : 'Ventas del turno activo'}</strong><small>{turnoIdInicial ? 'Resultado limitado al turno seleccionado.' : 'Las ventas cobradas permanecen aquí hasta que su turno se cierre.'}</small></div>
           <div className={styles.accionesResumen}><span>{resultado?.total ?? 0} ventas</span>{hayFiltros && <button type="button" onClick={limpiar}>Restablecer filtros</button>}</div>
         </div>
         {error ? (
@@ -99,7 +101,7 @@ export function VentaListadoView({ permisos, onNavegar }: { permisos: readonly s
             <PaginacionTabla pagina={resultado.pagina} tamanoPagina={resultado.tamanoPagina} total={resultado.total} totalPaginas={resultado.totalPaginas} unidadSingular="venta" unidadPlural="ventas" onPaginaChange={setPagina} onTamanoPaginaChange={(x) => { setTamanoPagina(x); setPagina(1) }} />
           </>
         ) : resultado ? (
-          <div className={styles.estadoVacio}><h2>Sin ventas para mostrar</h2><p>{hayFiltros ? 'No hay coincidencias con los filtros actuales.' : 'Registra la primera venta.'}</p></div>
+          <div className={styles.estadoVacio}><h2>Sin ventas para mostrar</h2><p>{hayFiltros ? 'No hay coincidencias con los filtros actuales.' : realizadas ? 'Todavía no hay ventas cobradas o anuladas en este alcance.' : 'Registra la primera venta.'}</p></div>
         ) : (
           <div className={styles.estadoVacio} aria-busy="true"><h2>Cargando ventas</h2></div>
         )}

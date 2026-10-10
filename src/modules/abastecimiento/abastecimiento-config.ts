@@ -19,7 +19,10 @@ export const configuracionesAbastecimiento: Record<RecursoAbastecimiento, Config
   cotizaciones: { singular: 'cotización', plural: 'Cotizaciones', ruta: '/abastecimiento/cotizaciones', permisoVer: 'ABASTECIMIENTO.COTIZACIONES.VER', permisoCrear: 'ABASTECIMIENTO.COTIZACIONES.CREAR', permisoExportar: 'ABASTECIMIENTO.COTIZACIONES.EXPORTAR', claveEstados: 'cotizaciones', permiteProveedor: true, permiteModalidad: true, permiteSucursal: true },
   ordenes: { singular: 'orden', plural: 'Órdenes de compra', ruta: '/abastecimiento/ordenes', permisoVer: 'ABASTECIMIENTO.ORDENES.VER', permisoCrear: 'ABASTECIMIENTO.ORDENES.EMITIR', permisoExportar: 'ABASTECIMIENTO.ORDENES.EXPORTAR', claveEstados: 'ordenes', permiteProveedor: true, permiteModalidad: true, permiteSucursal: true },
   recepciones: { singular: 'recepción', plural: 'Recepciones', ruta: '/abastecimiento/recepciones', permisoVer: 'ABASTECIMIENTO.RECEPCIONES.VER', permisoCrear: 'ABASTECIMIENTO.RECEPCIONES.REGISTRAR', permisoExportar: 'ABASTECIMIENTO.RECEPCIONES.EXPORTAR', claveEstados: 'recepciones', permiteProveedor: true, permiteModalidad: true, permiteSucursal: true },
-  traslados: { singular: 'traslado', plural: 'Traslados internos', ruta: '/abastecimiento/traslados', permisoVer: 'ABASTECIMIENTO.TRASLADOS.VER', permisoCrear: 'ABASTECIMIENTO.TRASLADOS.CREAR', permisoExportar: 'ABASTECIMIENTO.TRASLADOS.EXPORTAR', claveEstados: 'traslados', permiteSucursal: true },
+  traslados: { singular: 'solicitud de traslado', plural: 'Solicitudes de traslado', ruta: '/abastecimiento/traslados', permisoVer: 'ABASTECIMIENTO.TRASLADOS.VER', permisoCrear: 'ABASTECIMIENTO.TRASLADOS.CREAR', permisoExportar: 'ABASTECIMIENTO.TRASLADOS.EXPORTAR', claveEstados: 'traslados', permiteSucursal: true },
+  'devoluciones-internas': { singular: 'devolución interna', plural: 'Devoluciones internas', ruta: '/abastecimiento/devoluciones-internas', permisoVer: 'ABASTECIMIENTO.TRASLADOS.VER', permisoCrear: 'ABASTECIMIENTO.TRASLADOS.CREAR', claveEstados: 'traslados', permiteSucursal: true },
+  'recepciones-traslado': { singular: 'traslado por recibir', plural: 'Recepción de traslados', ruta: '/abastecimiento/traslados/recepciones', permisoVer: 'ABASTECIMIENTO.TRASLADOS.RECIBIR' },
+  'ubicaciones-traslado': { singular: 'traslado pendiente de ubicación', plural: 'Productos pendientes de ubicación', ruta: '/abastecimiento/traslados/ubicaciones', permisoVer: 'ABASTECIMIENTO.TRASLADOS.UBICAR' },
   devoluciones: { singular: 'devolución', plural: 'Devoluciones a proveedores', ruta: '/abastecimiento/devoluciones', permisoVer: 'ABASTECIMIENTO.DEVOLUCIONES.VER', permisoCrear: 'ABASTECIMIENTO.DEVOLUCIONES.CREAR', permisoExportar: 'ABASTECIMIENTO.DEVOLUCIONES.EXPORTAR', claveEstados: 'devoluciones', permiteProveedor: true, permiteSucursal: true },
 }
 
@@ -28,8 +31,8 @@ export const etiquetasEstado: Record<string, string> = {
   REGISTRADA: 'Registrada', EVALUADA: 'Evaluada', SELECCIONADA: 'Seleccionada', DESCARTADA: 'Descartada',
   EMITIDA: 'Emitida', CONFIRMADA_PROVEEDOR: 'Confirmada por proveedor', RECEPCION_PARCIAL: 'Recepción parcial', RECIBIDA: 'Recibida', CERRADA: 'Cerrada',
   DOCUMENTAL_CONFORME: 'Documental conforme', FISICA_CONFORME: 'Física conforme', TECNICA_CONFORME: 'Técnica conforme',
-  SOLICITADO: 'Solicitado', APROBADO: 'Aprobado', PREPARADO: 'Preparado', EN_TRANSITO: 'En tránsito', RECIBIDO: 'Recibido', CERRADO: 'Cerrado', CANCELADO: 'Cancelado',
-  APROBACION_INTERNA: 'Aprobación interna', AUTORIZADA_PROVEEDOR: 'Autorizada por proveedor', SEGREGADA: 'Segregada', DESPACHADA: 'Despachada', RECIBIDA_PROVEEDOR: 'Recibida por proveedor', COMPENSADA: 'Compensada',
+  SOLICITADO: 'Solicitado', APROBADO: 'Aprobado', PREPARADO: 'Preparado', EN_TRANSITO: 'En tránsito', PENDIENTE_UBICACION: 'Pendiente de ubicación', RECIBIDO: 'Recibido', CERRADO: 'Cerrado', CANCELADO: 'Cancelado',
+  APROBACION_INTERNA: 'Aprobación interna', AUTORIZADA_PROVEEDOR: 'Autorizada por proveedor', SEGREGADA: 'Segregada', DESPACHADA: 'Despachada', RETORNO_PENDIENTE: 'Retorno pendiente', RETORNO_CUARENTENA: 'Retorno en cuarentena', RECIBIDA_PROVEEDOR: 'Recibida por proveedor', COMPENSADA: 'Compensada',
   ACTIVO: 'Activo', INACTIVO: 'Inactivo', ORDINARIA: 'Ordinaria', URGENTE: 'Urgente',
   DISPONIBLE: 'Disponible', CUARENTENA: 'Cuarentena', BLOQUEADO: 'Bloqueado', SUCURSAL: 'Sucursal', CLIENTE: 'Cliente',
 }

@@ -42,6 +42,9 @@ const rutas: Record<RecursoAbastecimiento, string> = {
   ordenes: '/compras/ordenes',
   recepciones: '/compras/recepciones',
   traslados: '/traslados-internos',
+  'devoluciones-internas': '/traslados-internos',
+  'recepciones-traslado': '/traslados-internos/recepciones-pendientes',
+  'ubicaciones-traslado': '/traslados-internos/ubicaciones-pendientes',
   devoluciones: '/devoluciones-proveedor',
 }
 
@@ -66,7 +69,8 @@ export async function obtenerOpcionesAbastecimiento(signal?: AbortSignal) {
 }
 
 export async function listarRegistrosAbastecimiento<T extends RegistroAbastecimiento>(recurso: RecursoAbastecimiento, parametros: ConsultaAbastecimiento, signal?: AbortSignal) {
-  const respuesta = await solicitarApi<RespuestaApi<PaginacionAbastecimiento<T>>>(`${rutas[recurso]}${consultaUrl(parametros)}`, { signal })
+  const rutaListado = recurso === 'devoluciones-internas' ? '/traslados-internos/devoluciones-internas' : rutas[recurso]
+  const respuesta = await solicitarApi<RespuestaApi<PaginacionAbastecimiento<T>>>(`${rutaListado}${consultaUrl(parametros)}`, { signal })
   return {
     ...respuesta.data,
     pagina: enteroRespuesta(respuesta.data.pagina, parametros.pagina, 1),
@@ -230,4 +234,16 @@ export async function abrirPdfCotizacionCompra(id: string) {
 
 export async function abrirPdfOrdenCompra(id: string) {
   await abrirPdfApi(`/compras/ordenes/${id}/documento-pdf`, { method: 'GET', nombreArchivoAlternativo: `orden_compra_${id}.pdf` })
+}
+
+export async function abrirPdfSolicitudTraslado(id: string) {
+  await abrirPdfApi(`/traslados-internos/${id}/solicitud-pdf`, { method: 'GET', nombreArchivoAlternativo: `solicitud_traslado_${id}.pdf` })
+}
+
+export async function abrirPdfDespachoTraslado(id: string) {
+  await abrirPdfApi(`/traslados-internos/${id}/despacho-pdf`, { method: 'GET', nombreArchivoAlternativo: `despacho_traslado_${id}.pdf` })
+}
+
+export async function abrirPdfRecepcionTraslado(id: string) {
+  await abrirPdfApi(`/traslados-internos/${id}/recepcion-pdf`, { method: 'GET', nombreArchivoAlternativo: `recepcion_traslado_${id}.pdf` })
 }

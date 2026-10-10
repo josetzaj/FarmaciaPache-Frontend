@@ -4,6 +4,9 @@ import isotipo from '../../../assets/marca/isotipo.png'
 import { construirUrlApi } from '../../../shared/api/cliente-api'
 import { EVENTO_FOTO_EMPLEADO_ACTUALIZADA } from '../../../shared/eventos/eventos-aplicacion'
 import type { SesionUsuario } from '../../autenticacion/autenticacion.types'
+import { CampanaNotificaciones } from '../../notificaciones/components/campana-notificaciones'
+import { DashboardInicio } from './dashboard-inicio'
+import type { AccesoInicio } from './dashboard-inicio'
 import { Icono } from './icono'
 import styles from './dashboard-view.module.css'
 
@@ -34,27 +37,24 @@ type SubmoduloNavegacion = {
   rutaCreacion: string
   permisoVer: string | readonly string[]
   permisoCrear: string | readonly string[]
+  permisosRequeridos?: readonly string[]
 }
 
 function tieneAlgunPermiso(permisos: ReadonlySet<string>, requisito: string | readonly string[]): boolean {
   return typeof requisito === 'string' ? permisos.has(requisito) : requisito.some((permiso) => permisos.has(permiso))
 }
 
-type AccesoRapido = {
-  id: string
-  titulo: string
-  descripcion: string
-  permiso: string
-  permisoExacto?: string
-  icono: Parameters<typeof Icono>[0]['nombre']
-}
+type AccesoRapido = AccesoInicio
 
 const obtenerSeccionPorRuta = (ruta: string) => {
   if (ruta === '/') return 'inicio'
   if (ruta.startsWith('/clientes') || ruta.startsWith('/comercial/') || ruta.startsWith('/ventas')) return 'ventas'
   if (ruta.startsWith('/inventario/')) return 'inventario'
+  if (ruta.startsWith('/activos')) return 'activos'
   if (ruta.startsWith('/abastecimiento/')) return 'compras'
   if (ruta.startsWith('/caja/')) return 'caja'
+  if (ruta.startsWith('/planillas')) return 'planillas'
+  if (ruta.startsWith('/reportes')) return 'reportes'
   if (ruta.startsWith('/catalogos/')) return 'catalogos'
   if (ruta === '/empleados' || ruta.startsWith('/empleados/')) return 'organizacion'
   if (ruta.startsWith('/organizacion/')) return 'organizacion'
@@ -94,7 +94,7 @@ const secciones: SeccionNavegacion[] = [
         icono: 'reportes',
         rutaListado: '/comercial/precios',
         rutaCreacion: '/comercial/precios/nuevo',
-        permisoVer: 'COMERCIAL.PRECIOS.VER',
+        permisoVer: ['COMERCIAL.PRECIOS.VER_PUBLICO', 'COMERCIAL.PRECIOS.VER_COSTOS'],
         permisoCrear: 'COMERCIAL.PRECIOS.PROPONER',
       },
       {
@@ -105,6 +105,15 @@ const secciones: SeccionNavegacion[] = [
         rutaCreacion: '/ventas/nueva',
         permisoVer: 'COMERCIAL.VENTAS.VER',
         permisoCrear: 'COMERCIAL.VENTAS.CREAR',
+      },
+      {
+        id: 'ventas-realizadas-comercial',
+        etiqueta: 'Ventas realizadas',
+        icono: 'reportes',
+        rutaListado: '/ventas/realizadas',
+        rutaCreacion: '/ventas/realizadas',
+        permisoVer: 'COMERCIAL.VENTAS.VER',
+        permisoCrear: 'COMERCIAL.VENTAS.REALIZADAS.CREAR',
       },
       {
         id: 'recetas-comercial',
@@ -161,12 +170,21 @@ const secciones: SeccionNavegacion[] = [
       },
       {
         id: 'ajustes-inventario',
-        etiqueta: 'Ajustes',
+        etiqueta: 'Ajustes de cantidad',
         icono: 'inventario',
         rutaListado: '/inventario/ajustes',
         rutaCreacion: '/inventario/ajustes/nuevo',
         permisoVer: 'INVENTARIO.AJUSTES.VER',
         permisoCrear: 'INVENTARIO.AJUSTES.REGISTRAR',
+      },
+      {
+        id: 'costos-inventario',
+        etiqueta: 'Regularización de costos',
+        icono: 'reportes',
+        rutaListado: '/inventario/costos',
+        rutaCreacion: '/inventario/costos',
+        permisoVer: 'INVENTARIO.COSTOS.VER',
+        permisoCrear: 'INVENTARIO.COSTOS.REGULARIZAR',
       },
       {
         id: 'politicas-inventario',
@@ -259,7 +277,7 @@ const secciones: SeccionNavegacion[] = [
       },
       {
         id: 'traslados-abastecimiento',
-        etiqueta: 'Traslados',
+        etiqueta: 'Solicitudes de traslado',
         icono: 'inventario',
         rutaListado: '/abastecimiento/traslados',
         rutaCreacion: '/abastecimiento/traslados/nuevo',
@@ -267,8 +285,35 @@ const secciones: SeccionNavegacion[] = [
         permisoCrear: 'ABASTECIMIENTO.TRASLADOS.CREAR',
       },
       {
+        id: 'recepciones-traslado-abastecimiento',
+        etiqueta: 'Recepción de traslados',
+        icono: 'inventario',
+        rutaListado: '/abastecimiento/traslados/recepciones',
+        rutaCreacion: '/abastecimiento/traslados/recepciones',
+        permisoVer: 'ABASTECIMIENTO.TRASLADOS.RECIBIR',
+        permisoCrear: 'ABASTECIMIENTO.TRASLADOS.RECIBIR',
+      },
+      {
+        id: 'devoluciones-internas-abastecimiento',
+        etiqueta: 'Devoluciones internas',
+        icono: 'inventario',
+        rutaListado: '/abastecimiento/devoluciones-internas',
+        rutaCreacion: '/abastecimiento/devoluciones-internas/nueva',
+        permisoVer: 'ABASTECIMIENTO.TRASLADOS.VER',
+        permisoCrear: 'ABASTECIMIENTO.TRASLADOS.CREAR',
+      },
+      {
+        id: 'ubicaciones-traslado-abastecimiento',
+        etiqueta: 'Productos pendientes de ubicación',
+        icono: 'inventario',
+        rutaListado: '/abastecimiento/traslados/ubicaciones',
+        rutaCreacion: '/abastecimiento/traslados/ubicaciones',
+        permisoVer: 'ABASTECIMIENTO.TRASLADOS.UBICAR',
+        permisoCrear: 'ABASTECIMIENTO.TRASLADOS.UBICAR',
+      },
+      {
         id: 'devoluciones-abastecimiento',
-        etiqueta: 'Devoluciones',
+        etiqueta: 'Devoluciones a proveedores',
         icono: 'inventario',
         rutaListado: '/abastecimiento/devoluciones',
         rutaCreacion: '/abastecimiento/devoluciones/nuevo',
@@ -283,6 +328,33 @@ const secciones: SeccionNavegacion[] = [
     icono: 'ventas',
     prefijosPermiso: ['CAJA.'],
     submodulos: [
+      {
+        id: 'caja-chica',
+        etiqueta: 'Caja Chica',
+        icono: 'ventas',
+        rutaListado: '/caja/chica',
+        rutaCreacion: '/caja/chica',
+        permisoVer: 'CAJA.CHICA.VER',
+        permisoCrear: 'CAJA.CHICA.CREAR',
+      },
+      {
+        id: 'liquidaciones-caja-chica',
+        etiqueta: 'Liquidaciones',
+        icono: 'reportes',
+        rutaListado: '/caja/liquidaciones',
+        rutaCreacion: '/caja/liquidaciones',
+        permisoVer: 'CAJA.LIQUIDACIONES.VER',
+        permisoCrear: 'CAJA.LIQUIDACIONES.SOLICITAR',
+      },
+      {
+        id: 'ventas-pendientes-caja',
+        etiqueta: 'Cobros pendientes',
+        icono: 'ventas',
+        rutaListado: '/caja/ventas-pendientes',
+        rutaCreacion: '/caja/ventas-pendientes',
+        permisoVer: 'CAJA.VENTAS.COBRAR',
+        permisoCrear: 'CAJA.VENTAS.COBRAR',
+      },
       {
         id: 'turnos-caja',
         etiqueta: 'Turnos de caja',
@@ -394,6 +466,46 @@ const secciones: SeccionNavegacion[] = [
     ],
   },
   {
+    id: 'planillas',
+    etiqueta: 'Planillas',
+    icono: 'reportes',
+    prefijosPermiso: ['PLANILLAS.'],
+    submodulos: [
+      {
+        id: 'periodos-planilla',
+        etiqueta: 'Periodos de planilla',
+        icono: 'reportes',
+        rutaListado: '/planillas',
+        rutaCreacion: '/planillas/nuevo',
+        permisoVer: 'PLANILLAS.PERIODOS.VER',
+        permisoCrear: 'PLANILLAS.PERIODOS.GENERAR',
+      },
+      {
+        id: 'configuracion-salarial',
+        etiqueta: 'Configuración salarial',
+        icono: 'usuarios',
+        rutaListado: '/planillas/configuracion-salarial',
+        rutaCreacion: '/planillas/configuracion-salarial',
+        permisoVer: 'PLANILLAS.CONFIGURACION_SALARIAL.VER',
+        permisoCrear: 'PLANILLAS.CONFIGURACION_SALARIAL.ACTUALIZAR',
+      },
+    ],
+  },
+  {
+    id: 'activos',
+    etiqueta: 'Activos administrativos',
+    icono: 'inventario',
+    prefijosPermiso: ['ACTIVOS.'],
+    submodulos: [
+      { id: 'activos-registro', etiqueta: 'Activos', icono: 'inventario', rutaListado: '/activos', rutaCreacion: '/activos/nuevo', permisoVer: 'ACTIVOS.ACTIVOS.VER', permisoCrear: 'ACTIVOS.ACTIVOS.CREAR' },
+      { id: 'activos-asignaciones', etiqueta: 'Asignaciones', icono: 'usuarios', rutaListado: '/activos/asignaciones', rutaCreacion: '/activos/asignaciones/nueva', permisoVer: 'ACTIVOS.ASIGNACIONES.VER', permisoCrear: 'ACTIVOS.ASIGNACIONES.CREAR' },
+      { id: 'activos-devoluciones', etiqueta: 'Devoluciones', icono: 'estado', rutaListado: '/activos/devoluciones', rutaCreacion: '/activos/devoluciones', permisoVer: 'ACTIVOS.ASIGNACIONES.VER_DEVOLUCIONES', permisoCrear: 'ACTIVOS.ASIGNACIONES.VER_DEVOLUCIONES' },
+      { id: 'activos-propios', etiqueta: 'Mis activos', icono: 'usuarios', rutaListado: '/activos/mis-asignaciones', rutaCreacion: '/activos/mis-asignaciones', permisoVer: 'ACTIVOS.ASIGNACIONES.VER_PROPIAS', permisoCrear: 'ACTIVOS.ASIGNACIONES.VER_PROPIAS' },
+      { id: 'activos-devoluciones-propias', etiqueta: 'Mis devoluciones', icono: 'estado', rutaListado: '/activos/mis-devoluciones', rutaCreacion: '/activos/mis-devoluciones', permisoVer: 'ACTIVOS.ASIGNACIONES.VER_PROPIAS', permisoCrear: 'ACTIVOS.ASIGNACIONES.VER_PROPIAS' },
+      { id: 'activos-tipos', etiqueta: 'Tipos de activo', icono: 'estado', rutaListado: '/activos/tipos', rutaCreacion: '/activos/tipos/nuevo', permisoVer: 'ACTIVOS.TIPOS.VER', permisoCrear: 'ACTIVOS.TIPOS.CREAR' },
+    ],
+  },
+  {
     id: 'catalogos',
     etiqueta: 'Catálogos',
     icono: 'inventario',
@@ -496,10 +608,52 @@ const secciones: SeccionNavegacion[] = [
       },
     ],
   },
-  { id: 'reportes', etiqueta: 'Reportes', icono: 'reportes', prefijosPermiso: ['REPORTES.'], proximamente: true },
+  {
+    id: 'reportes',
+    etiqueta: 'Reportes',
+    icono: 'reportes',
+    prefijosPermiso: ['REPORTES.'],
+    submodulos: [
+      {
+        id: 'reportes-comerciales',
+        etiqueta: 'Comercial',
+        icono: 'reportes',
+        rutaListado: '/reportes/comercial',
+        rutaCreacion: '/reportes/comercial',
+        permisoVer: ['REPORTES.RESUMEN.VER', 'REPORTES.VENTAS.VER', 'REPORTES.CLIENTES.VER'],
+        permisoCrear: ['REPORTES.RESUMEN.VER', 'REPORTES.VENTAS.VER', 'REPORTES.CLIENTES.VER'],
+      },
+      {
+        id: 'reportes-inventario-abastecimiento',
+        etiqueta: 'Inventario y abastecimiento',
+        icono: 'inventario',
+        rutaListado: '/reportes/inventario-abastecimiento',
+        rutaCreacion: '/reportes/inventario-abastecimiento',
+        permisoVer: ['REPORTES.INVENTARIO.VER', 'REPORTES.PROVEEDORES.VER', 'REPORTES.COSTOS.VER'],
+        permisoCrear: ['REPORTES.INVENTARIO.VER', 'REPORTES.PROVEEDORES.VER', 'REPORTES.COSTOS.VER'],
+      },
+      {
+        id: 'reportes-finanzas-sucursales',
+        etiqueta: 'Finanzas y sucursales',
+        icono: 'reportes',
+        rutaListado: '/reportes/finanzas-sucursales',
+        rutaCreacion: '/reportes/finanzas-sucursales',
+        permisoVer: 'REPORTES.RESUMEN.VER',
+        permisoCrear: 'REPORTES.RESUMEN.VER',
+        permisosRequeridos: ['REPORTES.ALCANCE_GLOBAL'],
+      },
+    ],
+  },
 ]
 
 const accesos: AccesoRapido[] = [
+  {
+    id: 'activos',
+    titulo: 'Activos administrativos',
+    descripcion: 'Registra bienes, custodios y devoluciones de la sucursal.',
+    permiso: 'ACTIVOS.',
+    icono: 'inventario' as const,
+  },
   {
     id: 'inventario',
     titulo: 'Existencias de inventario',
@@ -573,34 +727,6 @@ function obtenerIniciales(nombre: string): string {
     .slice(0, 2)
     .map((parte) => parte[0]?.toUpperCase())
     .join('')
-}
-
-function obtenerSaludo(): string {
-  const hora = new Date().getHours()
-  if (hora < 12) return 'Buenos días'
-  if (hora < 19) return 'Buenas tardes'
-  return 'Buenas noches'
-}
-
-function formatearFecha(): string {
-  const texto = new Intl.DateTimeFormat('es-GT', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  }).format(new Date())
-
-  return texto.charAt(0).toUpperCase() + texto.slice(1)
-}
-
-function formatearExpiracion(fecha: string): string {
-  const valor = new Date(fecha)
-  if (Number.isNaN(valor.getTime())) return 'Activa'
-
-  return new Intl.DateTimeFormat('es-GT', {
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(valor)
 }
 
 function AvatarSesion({ sesion }: { sesion: SesionUsuario }) {
@@ -700,16 +826,48 @@ export function DashboardView({
   const esVistaUsuarios = rutaActual.startsWith('/seguridad/usuarios')
   const esVistaEstados = rutaActual.startsWith('/catalogos/estados')
   const esVistaProductos = rutaActual.startsWith('/catalogos/productos')
-  const tituloPagina = rutaActual.startsWith('/clientes')
-    ? 'Clientes'
+  const tituloPagina = rutaActual === '/notificaciones'
+    ? 'Notificaciones'
+    : rutaActual.startsWith('/reportes/inventario-abastecimiento')
+      ? 'Reportes de inventario y abastecimiento'
+    : rutaActual.startsWith('/reportes/finanzas-sucursales')
+      ? 'Reportes de finanzas y sucursales'
+    : rutaActual.startsWith('/reportes')
+      ? 'Reportes comerciales'
+    : rutaActual.startsWith('/planillas/configuracion-salarial')
+      ? 'Configuración salarial'
+    : rutaActual.startsWith('/planillas')
+      ? 'Planillas'
+    : rutaActual.startsWith('/activos/mis-asignaciones')
+      ? 'Mis activos asignados'
+    : rutaActual.startsWith('/activos/mis-devoluciones')
+      ? 'Mis devoluciones de activos'
+    : rutaActual.startsWith('/activos/devoluciones')
+      ? 'Devoluciones de activos'
+    : rutaActual.startsWith('/activos/asignaciones')
+      ? 'Asignaciones de activos'
+    : rutaActual.startsWith('/activos/tipos')
+      ? 'Tipos de activo'
+    : rutaActual.startsWith('/activos')
+      ? 'Activos administrativos'
+    : rutaActual.startsWith('/clientes')
+      ? 'Clientes'
     : rutaActual.startsWith('/comercial/politicas-margen')
       ? 'Políticas de margen'
       : rutaActual.startsWith('/comercial/precios')
         ? 'Precios'
       : rutaActual.startsWith('/ventas/recetas')
         ? 'Validación de recetas'
+      : rutaActual.startsWith('/ventas/realizadas')
+        ? 'Ventas realizadas'
       : rutaActual.startsWith('/ventas')
         ? 'Ventas'
+      : rutaActual.startsWith('/caja/chica')
+        ? 'Caja Chica'
+      : rutaActual.startsWith('/caja/liquidaciones')
+        ? 'Liquidaciones de Caja Chica'
+      : rutaActual.startsWith('/caja/ventas-pendientes')
+        ? 'Cobros pendientes'
       : rutaActual.startsWith('/abastecimiento/proveedores')
         ? 'Proveedores'
     : rutaActual.startsWith('/abastecimiento/solicitudes')
@@ -720,8 +878,14 @@ export function DashboardView({
         ? 'Órdenes de compra'
       : rutaActual.startsWith('/abastecimiento/recepciones')
         ? 'Recepciones'
+      : rutaActual.startsWith('/abastecimiento/devoluciones-internas')
+        ? 'Devoluciones internas'
+      : rutaActual.startsWith('/abastecimiento/traslados/recepciones')
+        ? 'Recepción de traslados'
+      : rutaActual.startsWith('/abastecimiento/traslados/ubicaciones')
+        ? 'Productos pendientes de ubicación'
       : rutaActual.startsWith('/abastecimiento/traslados')
-        ? 'Traslados internos'
+        ? 'Solicitudes de traslado'
       : rutaActual.startsWith('/abastecimiento/devoluciones')
         ? 'Devoluciones a proveedores'
         : rutaActual === '/inventario/existencias'
@@ -741,11 +905,15 @@ export function DashboardView({
             : rutaActual.startsWith('/inventario/apertura/')
               ? 'Detalle de apertura controlada'
             : rutaActual === '/inventario/ajustes/nuevo'
-              ? 'Nuevo ajuste de inventario'
+              ? 'Nuevo ajuste de cantidad'
               : rutaActual === '/inventario/ajustes'
-                ? 'Ajustes de inventario'
+                ? 'Ajustes de cantidad'
                 : rutaActual.startsWith('/inventario/ajustes/')
-                  ? 'Detalle de ajuste de inventario'
+                  ? 'Detalle de ajuste de cantidad'
+                  : rutaActual === '/inventario/costos/regularizar'
+                    ? 'Regularizar costo unitario'
+                    : rutaActual === '/inventario/costos'
+                      ? 'Regularización de costos'
             : rutaActual === '/inventario/politicas/masivas/nueva'
               ? 'Nueva aplicación masiva de políticas'
               : rutaActual === '/inventario/politicas/masivas'
@@ -839,9 +1007,6 @@ export function DashboardView({
                         : esVistaEstados
                           ? 'Detalle del estado'
                           : 'Panel principal'
-  const rolesTexto = sesion.roles.length > 0
-    ? sesion.roles.map((rol) => rol.nombre).join(', ')
-    : 'Sin rol asignado'
   const sidebarVisible = esPantallaMovil ? menuMovilAbierto : !sidebarOculto
   const seccionSeleccionadaId = seleccionManual?.ruta === rutaActual
     ? seleccionManual.seccionId
@@ -942,8 +1107,9 @@ export function DashboardView({
     (seccion.submodulos ?? []).filter(
       (submodulo) => {
         const permitido = tieneAlgunPermiso(permisos, submodulo.permisoVer) || tieneAlgunPermiso(permisos, submodulo.permisoCrear)
-        const requiereConsultaInventario = seccion.id === 'inventario' && !['existencias-inventario', 'politicas-inventario', 'politicas-masivas-inventario'].includes(submodulo.id)
-        return permitido && (!requiereConsultaInventario || permisos.has('INVENTARIO.EXISTENCIAS.VER'))
+        const cumpleAdicionales = (submodulo.permisosRequeridos ?? []).every((permiso) => permisos.has(permiso))
+        const requiereConsultaInventario = seccion.id === 'inventario' && !['existencias-inventario', 'costos-inventario', 'politicas-inventario', 'politicas-masivas-inventario'].includes(submodulo.id)
+        return permitido && cumpleAdicionales && (!requiereConsultaInventario || permisos.has('INVENTARIO.EXISTENCIAS.VER'))
       },
     )
 
@@ -956,6 +1122,20 @@ export function DashboardView({
         ? submodulo.rutaListado
         : submodulo.rutaCreacion,
     )
+  }
+
+  const abrirAccesoRapido = (acceso: AccesoRapido) => {
+    if (acceso.id === 'inventario') onNavegar('/inventario/existencias')
+    else if (acceso.id === 'activos') onNavegar(permisos.has('ACTIVOS.ACTIVOS.VER') ? '/activos' : permisos.has('ACTIVOS.ASIGNACIONES.VER') ? '/activos/asignaciones' : permisos.has('ACTIVOS.ASIGNACIONES.VER_DEVOLUCIONES') ? '/activos/devoluciones' : permisos.has('ACTIVOS.ASIGNACIONES.VER_PROPIAS') ? '/activos/mis-asignaciones' : '/activos/tipos')
+    else if (acceso.id === 'productos') onNavegar(permisos.has('CATALOGOS.PRODUCTOS.VER') ? '/catalogos/productos' : '/catalogos/productos/nuevo')
+    else if (acceso.id === 'empleados') onNavegar(permisos.has('ORGANIZACION.EMPLEADOS.VER') ? '/empleados' : '/empleados/nuevo')
+    else if (acceso.id === 'departamentos') onNavegar(permisos.has('ORGANIZACION.DEPARTAMENTOS.VER') ? '/organizacion/departamentos' : '/organizacion/departamentos/nuevo')
+    else if (acceso.id === 'puestos') onNavegar(permisos.has('ORGANIZACION.PUESTOS.VER') ? '/organizacion/puestos' : '/organizacion/puestos/nuevo')
+    else if (acceso.id === 'sucursales') onNavegar(permisos.has('ORGANIZACION.SUCURSALES.VER') ? '/organizacion/sucursales' : '/organizacion/sucursales/nuevo')
+    else if (acceso.id === 'estados') onNavegar(permisos.has('CATALOGOS.ESTADOS.VER') ? '/catalogos/estados' : '/catalogos/estados/nuevo')
+    else if (acceso.id === 'roles') onNavegar(permisos.has('SEGURIDAD.ROLES.VER') ? '/seguridad/roles' : '/seguridad/roles/nuevo')
+    else if (acceso.id === 'usuarios') onNavegar(permisos.has('SEGURIDAD.USUARIOS.VER') ? '/seguridad/usuarios' : '/seguridad/usuarios/nuevo')
+    else anunciarModulo(acceso.titulo)
   }
 
   const submoduloActivo = (submodulo: SubmoduloNavegacion) => {
@@ -975,7 +1155,10 @@ export function DashboardView({
     (seccion.id === 'ventas' && (rutaActual.startsWith('/clientes') || rutaActual.startsWith('/comercial/') || rutaActual.startsWith('/ventas'))) ||
     (seccion.id === 'compras' && rutaActual.startsWith('/abastecimiento/')) ||
     (seccion.id === 'inventario' && rutaActual.startsWith('/inventario/')) ||
+    (seccion.id === 'activos' && rutaActual.startsWith('/activos')) ||
     (seccion.id === 'caja' && rutaActual.startsWith('/caja/')) ||
+    (seccion.id === 'planillas' && rutaActual.startsWith('/planillas')) ||
+    (seccion.id === 'reportes' && rutaActual.startsWith('/reportes')) ||
     (seccion.id === 'catalogos' && rutaActual.startsWith('/catalogos/')) ||
     (seccion.id === 'organizacion' && (esVistaEmpleados || esVistaDepartamentos || esVistaPuestos || esVistaSucursales)) ||
     (seccion.id === 'seguridad' && (esVistaRoles || esVistaUsuarios))
@@ -1112,14 +1295,7 @@ export function DashboardView({
           </div>
 
           <div className={styles.accionesHeader}>
-            <button
-              className={styles.botonIcono}
-              type="button"
-              aria-label="Notificaciones, ninguna pendiente"
-              onClick={() => setAvisoModulo('No tienes notificaciones pendientes.')}
-            >
-              <Icono nombre="campana" />
-            </button>
+            <CampanaNotificaciones onNavegar={onNavegar} />
 
             <div className={styles.perfil} ref={perfilRef}>
               <button
@@ -1187,101 +1363,14 @@ export function DashboardView({
             </section>
           )}
 
-          {contenido ?? <><section className={styles.bienvenida} aria-labelledby="titulo-dashboard">
-            <div>
-              <p className={styles.fecha}>{formatearFecha()}</p>
-              <h1 id="titulo-dashboard">{obtenerSaludo()}, {sesion.empleadoNombre.split(' ')[0]}</h1>
-              <p>Aquí tienes una vista general de tu acceso y entorno de trabajo.</p>
-            </div>
-            <div className={styles.estadoSucursal}>
-              <span aria-hidden="true"><Icono nombre="check" /></span>
-              <div>
-                <small>Operando en</small>
-                <strong>{sesion.sucursal.nombre}</strong>
-              </div>
-            </div>
-          </section>
-
-          <section className={styles.resumen} aria-label="Resumen de la sesión">
-            <article className={styles.tarjetaResumen}>
-              <span className={styles.iconoResumen}><Icono nombre="sucursal" /></span>
-              <div><small>Sucursal</small><strong>{sesion.sucursal.codigo}</strong><span>{sesion.sucursal.nombre}</span></div>
-            </article>
-            <article className={styles.tarjetaResumen}>
-              <span className={styles.iconoResumen}><Icono nombre="escudo" /></span>
-              <div><small>{sesion.roles.length === 1 ? 'Rol asignado' : 'Roles asignados'}</small><strong>{sesion.roles.length}</strong><span>{rolesTexto}</span></div>
-            </article>
-            <article className={styles.tarjetaResumen}>
-              <span className={styles.iconoResumen}><Icono nombre="llave" /></span>
-              <div><small>Permisos habilitados</small><strong>{sesion.permisos.length}</strong><span>Según tus responsabilidades</span></div>
-            </article>
-            <article className={styles.tarjetaResumen}>
-              <span className={styles.iconoResumen}><Icono nombre="reloj" /></span>
-              <div><small>Sesión activa hasta</small><strong>{formatearExpiracion(sesion.expiraEn)}</strong><span>Se cerrará de forma segura</span></div>
-            </article>
-          </section>
-
-          <div className={styles.columnasDashboard}>
-            <section className={styles.panel} aria-labelledby="titulo-accesos">
-              <header className={styles.cabeceraPanel}>
-                <div><h2 id="titulo-accesos">Accesos rápidos</h2><p>Funciones disponibles según tus permisos.</p></div>
-              </header>
-
-              {accesosVisibles.length > 0 ? (
-                <div className={styles.listaAccesos}>
-                  {accesosVisibles.map((acceso) => (
-                    <button
-                      key={acceso.id}
-                      type="button"
-                      onClick={() => acceso.id === 'inventario'
-                        ? onNavegar('/inventario/existencias')
-                        : acceso.id === 'productos'
-                        ? onNavegar(permisos.has('CATALOGOS.PRODUCTOS.VER') ? '/catalogos/productos' : '/catalogos/productos/nuevo')
-                        : acceso.id === 'empleados'
-                        ? onNavegar(permisos.has('ORGANIZACION.EMPLEADOS.VER') ? '/empleados' : '/empleados/nuevo')
-                        : acceso.id === 'departamentos'
-                          ? onNavegar(permisos.has('ORGANIZACION.DEPARTAMENTOS.VER') ? '/organizacion/departamentos' : '/organizacion/departamentos/nuevo')
-                        : acceso.id === 'puestos'
-                          ? onNavegar(permisos.has('ORGANIZACION.PUESTOS.VER') ? '/organizacion/puestos' : '/organizacion/puestos/nuevo')
-                        : acceso.id === 'sucursales'
-                          ? onNavegar(permisos.has('ORGANIZACION.SUCURSALES.VER') ? '/organizacion/sucursales' : '/organizacion/sucursales/nuevo')
-                        : acceso.id === 'estados'
-                          ? onNavegar(permisos.has('CATALOGOS.ESTADOS.VER') ? '/catalogos/estados' : '/catalogos/estados/nuevo')
-                        : acceso.id === 'roles'
-                          ? onNavegar(permisos.has('SEGURIDAD.ROLES.VER') ? '/seguridad/roles' : '/seguridad/roles/nuevo')
-                        : acceso.id === 'usuarios'
-                          ? onNavegar(permisos.has('SEGURIDAD.USUARIOS.VER') ? '/seguridad/usuarios' : '/seguridad/usuarios/nuevo')
-                        : anunciarModulo(acceso.titulo)}
-                    >
-                      <span className={styles.iconoAcceso}><Icono nombre={acceso.icono} /></span>
-                      <span><strong>{acceso.titulo}</strong><small>{acceso.descripcion}</small></span>
-                      <Icono nombre="flecha" />
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <div className={styles.estadoVacio}>
-                  <span><Icono nombre="llave" /></span>
-                  <strong>Sin accesos administrativos</strong>
-                  <p>Tu sesión está activa, pero no tiene módulos de administración asignados.</p>
-                </div>
-              )}
-            </section>
-
-            <section className={styles.panel} aria-labelledby="titulo-perfil-operativo">
-              <header className={styles.cabeceraPanel}>
-                <div><h2 id="titulo-perfil-operativo">Perfil operativo</h2><p>Contexto activo de tu cuenta.</p></div>
-                <span className={styles.estadoActivo}><span /> Activo</span>
-              </header>
-
-              <dl className={styles.detallePerfil}>
-                <div><dt>Código de empleado</dt><dd>{sesion.empleadoCodigo}</dd></div>
-                <div><dt>Usuario</dt><dd>{sesion.nombreUsuario}</dd></div>
-                <div><dt>Sucursal</dt><dd>{sesion.sucursal.nombre}</dd></div>
-                <div><dt>{sesion.roles.length === 1 ? 'Rol' : 'Roles'}</dt><dd>{rolesTexto}</dd></div>
-              </dl>
-            </section>
-          </div></>}
+          {contenido ?? (
+            <DashboardInicio
+              sesion={sesion}
+              permisos={permisos}
+              accesos={accesosVisibles}
+              onAbrirAcceso={abrirAccesoRapido}
+            />
+          )}
         </main>
 
         <footer className={styles.footer}>

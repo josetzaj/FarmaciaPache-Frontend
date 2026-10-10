@@ -14,8 +14,10 @@ import type {
   Paginado,
   PoliticaMargen,
   PrecioProducto,
+  PrecioPublico,
   CrearPrecioRequest,
   GuardarVentaRequest,
+  DisponibilidadSucursalVenta,
   RecetaVenta,
   RecetaValidacion,
   ResultadoValidacionReceta,
@@ -45,6 +47,8 @@ function consultaListado(parametros: ConsultaComercial): string {
   if (parametros.estadosPago?.length) consulta.set('estadosPago', parametros.estadosPago.join(','))
   if (parametros.estadosDispensacion?.length) consulta.set('estadosDispensacion', parametros.estadosDispensacion.join(','))
   if (parametros.estadosFiscales?.length) consulta.set('estadosFiscales', parametros.estadosFiscales.join(','))
+  if (parametros.turnoIds?.length) consulta.set('turnoIds', parametros.turnoIds.join(','))
+  if (parametros.soloTurnosNoCerrados !== undefined) consulta.set('soloTurnosNoCerrados', String(parametros.soloTurnosNoCerrados))
   if (parametros.desde) consulta.set('desde', parametros.desde)
   if (parametros.hasta) consulta.set('hasta', parametros.hasta)
   if (parametros.totalMin !== undefined) consulta.set('totalMin', String(parametros.totalMin))
@@ -114,6 +118,11 @@ export async function listarPrecios(parametros: ConsultaComercial, signal?: Abor
   return respuesta.data
 }
 
+export async function listarPreciosPublicos(parametros: ConsultaComercial, signal?: AbortSignal): Promise<Paginado<PrecioPublico>> {
+  const respuesta = await solicitarApi<RespuestaApi<Paginado<PrecioPublico>>>(`/comercial/precios-publicos?${consultaListado(parametros)}`, { signal })
+  return respuesta.data
+}
+
 export async function obtenerPrecio(id: string, signal?: AbortSignal): Promise<PrecioProducto> {
   const respuesta = await solicitarApi<RespuestaApi<PrecioProducto>>(`/comercial/precios/${id}`, { signal })
   return respuesta.data
@@ -151,6 +160,12 @@ export async function obtenerVenta(id: string, signal?: AbortSignal): Promise<Ve
 
 export async function crearVenta(datos: GuardarVentaRequest): Promise<VentaComercial> {
   const respuesta = await solicitarApi<RespuestaApi<VentaComercial>>('/ventas', { method: 'POST', datos })
+  return respuesta.data
+}
+
+export async function buscarDisponibilidadSucursales(busqueda: string, signal?: AbortSignal): Promise<DisponibilidadSucursalVenta[]> {
+  const consulta = new URLSearchParams({ busqueda })
+  const respuesta = await solicitarApi<RespuestaApi<DisponibilidadSucursalVenta[]>>(`/ventas/disponibilidad-sucursales?${consulta}`, { signal, mostrarCargaGlobal: false })
   return respuesta.data
 }
 

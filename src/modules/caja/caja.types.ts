@@ -8,7 +8,7 @@ export type EstadoArqueoCaja = 'REGISTRADO' | 'PENDIENTE_APROBACION' | 'APROBADO
 export type TipoArqueoCaja = 'ORDINARIO' | 'CIEGO' | 'SORPRESIVO' | 'INCIDENCIA' | 'CIERRE'
 export type EstadoCierreCaja = 'SIN_DIFERENCIA' | 'FALTANTE' | 'SOBRANTE' | 'INVESTIGACION' | 'APROBADO' | 'REABIERTO'
 export type EstadoCustodiaEfectivo = 'CAJA' | 'RETIRADO' | 'CAJA_FUERTE' | 'REPARTIDOR' | 'TRANSITO' | 'RECIBIDO' | 'PENDIENTE_DEPOSITO' | 'DEPOSITADO'
-export type EstadoTransferenciaEfectivo = 'PREPARADA' | 'ENTREGADA' | 'RECIBIDA' | 'RECHAZADA' | 'CANCELADA'
+export type EstadoTransferenciaEfectivo = 'PREPARADA' | 'ENTREGADA' | 'RECIBIDA' | 'DEPOSITADA' | 'RECHAZADA' | 'CANCELADA'
 export type EstadoDepositoEfectivo = 'PREPARADO' | 'EN_CUSTODIA' | 'REGISTRADO' | 'CONFIRMADO' | 'DIFERENCIA' | 'CANCELADO'
 export type EstadoIncidenciaCaja = 'ABIERTA' | 'EN_INVESTIGACION' | 'RESUELTA' | 'CERRADA'
 export type SeveridadIncidenciaCaja = 'BAJA' | 'MEDIA' | 'ALTA' | 'CRITICA'
@@ -33,11 +33,14 @@ export type TipoMovimientoCaja =
 
 export type DireccionOrdenCaja = 'asc' | 'desc'
 export type RecursoCaja = 'cajas' | 'politicas' | 'denominaciones' | 'turnos' | 'movimientos' | 'arqueos' | 'cierres' | 'transferencias' | 'cuentas' | 'depositos' | 'incidencias' | 'rendiciones' | 'conciliaciones' | 'consolidaciones'
+export type RecursoResumenCaja = Extract<RecursoCaja, 'turnos' | 'movimientos' | 'arqueos' | 'cierres' | 'transferencias' | 'depositos' | 'rendiciones' | 'conciliaciones'>
 
 export type ReferenciaCaja = { id: string; codigo: string; nombre: string }
 export type CajaOpcion = ReferenciaCaja & {
   estado: EstadoCaja
   tipo: TipoCaja
+  fondoBaseAperturaCentavos: number | null
+  umbralRetiroCentavos: number | null
   sucursal: ReferenciaCaja | null
 }
 
@@ -47,6 +50,8 @@ export type CajaConfiguracion = ReferenciaCaja & {
   tipo: TipoCaja
   moneda: 'GTQ'
   estado: EstadoCaja
+  fondoBaseAperturaCentavos: number | null
+  umbralRetiroCentavos: number | null
   creadoEn: string
   actualizadoEn: string | null
   version: number
@@ -60,6 +65,7 @@ export type PoliticaCaja = {
   horaFinDia: string
   fondoMaximoCentavos: number | null
   saldoMaximoCentavos: number | null
+  umbralDepositoBancarioCentavos: number | null
   reintegroMaximoCentavos: number | null
   movimientoExtraordinarioMaximoCentavos: number | null
   umbralDiferenciaCentavos: number | null
@@ -91,7 +97,7 @@ export type TurnoCaja = {
   id: string
   numero: string
   cajaId: string
-  caja: (ReferenciaCaja & { tipo?: TipoCaja }) | null
+  caja: (ReferenciaCaja & { tipo?: TipoCaja; fondoBaseAperturaCentavos?: number | null; umbralRetiroCentavos?: number | null }) | null
   sucursalId: string
   responsableId: string
   responsableNombre: string
@@ -102,17 +108,48 @@ export type TurnoCaja = {
   abiertoEn: string
   cerradoEn: string | null
   versionCierre: number
+  turnoFondoOrigenId: string | null
+  turnoFondoOrigenNumero: string | null
+  requiereRetiro: boolean
+  montoRetiroSugeridoCentavos: number
   fondoDenominaciones?: FondoDenominacionTurno[]
   creadoEn: string
   actualizadoEn: string | null
   version: number
 }
 
+export type DiaTurnosCaja = {
+  id: string
+  fechaNegocio: string
+  sucursalId: string
+  sucursalCodigo: string
+  sucursalNombre: string
+  totalTurnos: number
+  turnosAbiertos: number
+  turnosCerrados: number
+  fondoInicialCentavos: number
+  saldoConfirmadoCentavos: number
+  estadoConsolidacion: EstadoConsolidacionCaja | null
+}
+
+export type ResumenOperativoCaja =
+  | { recurso: 'turnos'; saldoCentavos: number; ventasCantidad: number; ventasCentavos: number; turnosCantidad: number }
+  | { recurso: 'movimientos'; entradasCentavos: number; salidasCentavos: number; netoCentavos: number; movimientosCantidad: number }
+  | { recurso: 'arqueos'; esperadoCentavos: number; declaradoCentavos: number; diferenciaCentavos: number; arqueosCantidad: number }
+  | { recurso: 'cierres'; saldoFinalCentavos: number; diferenciaCentavos: number; cierresCantidad: number }
+  | { recurso: 'transferencias'; custodiaActualCentavos: number; enTransitoCentavos: number; transferenciasCantidad: number }
+  | { recurso: 'depositos'; pendienteCentavos: number; depositadoCentavos: number; diferenciaCentavos: number; depositosCantidad: number }
+  | { recurso: 'rendiciones'; esperadoCentavos: number; entregadoCentavos: number; faltanteCentavos: number; rendicionesCantidad: number }
+  | { recurso: 'conciliaciones'; depositadoCentavos: number; conciliadoCentavos: number; diferenciaCentavos: number; conciliacionesCantidad: number }
+
+export type ResumenCobrosPendientesCaja = { ventasCantidad: number; montoPendienteCentavos: number }
+
 export type MovimientoCaja = {
   id: string
   numero: string
   turnoId: string
   turnoNumero: string | null
+  turnoEstado: EstadoTurnoCaja | null
   caja: (ReferenciaCaja & { tipo: TipoCaja }) | null
   sucursalId: string
   tipo: TipoMovimientoCaja
@@ -157,6 +194,11 @@ export type ArqueoCaja = {
   esperadoCentavos: number
   declaradoCentavos: number
   diferenciaCentavos: number
+  fondoBaseCentavos: number | null
+  montoTrasladoCierreCentavos: number
+  requiereReposicionFaltante: boolean
+  requiereTrasladoCierre: boolean
+  puedeCerrarTurno: boolean
   explicacion: string | null
   declaradoPorId: string
   aprobadoPorId: string | null
@@ -199,6 +241,8 @@ export type TransferenciaEfectivo = {
   sucursalId: string
   turnoOrigenId: string | null
   turnoOrigenNumero: string | null
+  arqueoCierreId: string | null
+  arqueoCierreNumero: string | null
   cajaDestinoId: string | null
   cajaDestino: ReferenciaCaja | null
   custodiaOrigen: EstadoCustodiaEfectivo
@@ -217,6 +261,9 @@ export type TransferenciaEfectivo = {
   entregadoEn: string | null
   recibidoPorId: string | null
   recibidoEn: string | null
+  totalCustodiaPendienteDepositoCentavos?: number
+  umbralDepositoBancarioCentavos?: number | null
+  requiereDepositoBancario?: boolean
   creadoEn: string
   actualizadoEn: string | null
   version: number
@@ -224,6 +271,8 @@ export type TransferenciaEfectivo = {
 
 export type CuentaBancariaCaja = {
   id: string
+  sucursalId: string | null
+  sucursal: { id: string; codigo: string; nombre: string } | null
   banco: string
   alias: string
   ultimosCuatro: string
@@ -472,6 +521,8 @@ export type ResultadoOperacionVentaCaja<TVenta> = {
   movimiento: MovimientoCaja
   venta?: TVenta
   ventaId?: string
+  requiereRetiro?: boolean
+  montoRetiroSugeridoCentavos?: number
 }
 
 export type AccionConMotivoRequest = { version: number; motivo: string }
@@ -486,6 +537,7 @@ export type RegistrarArqueoRequest = {
 export type CerrarTurnoRequest = { arqueoId: string; arqueoVersion: number; motivo: string }
 export type CrearTransferenciaRequest = {
   turnoOrigenId: string
+  arqueoCierreId?: string | null
   cajaDestinoId?: string | null
   custodiaDestino: EstadoCustodiaEfectivo
   montoCentavos: number
@@ -496,11 +548,13 @@ export type CrearTransferenciaRequest = {
   claveIdempotencia: string
 }
 export type RecibirTransferenciaRequest = { turnoDestinoId?: string | null; version: number; motivo: string }
-export type CrearCuentaBancariaCajaRequest = { banco: string; alias: string; ultimosCuatro: string; titular: string }
-export type PrepararDepositoRequest = { cuentaBancariaId: string; transferenciaId?: string | null; montoPreparadoCentavos: number; bolsa: string; sello: string; transporte?: string | null }
+export type ReponerFaltanteArqueoRequest = { version: number; motivo: string; claveIdempotencia: string }
+export type CrearCuentaBancariaCajaRequest = { sucursalId: string; banco: string; alias: string; ultimosCuatro: string; titular: string }
+export type ActualizarCuentaBancariaCajaRequest = CrearCuentaBancariaCajaRequest & { activa: boolean; motivo: string; version: number }
+export type PrepararDepositoRequest = { cuentaBancariaId: string; transferenciaId: string; montoPreparadoCentavos: number; bolsa: string; sello: string; transporte?: string | null }
 export type RegistrarDepositoRequest = { version: number; montoDepositadoCentavos: number; referenciaBancaria: string; observacionDiferencia?: string | null }
-export type CrearCajaRequest = { codigo: string; nombre: string; tipo: TipoCaja }
-export type ActualizarCajaRequest = CrearCajaRequest & { estado: EstadoCaja; motivo: string; version: number }
+export type CrearCajaRequest = { sucursalId: string; codigo: string; nombre: string; tipo: TipoCaja; fondoBaseAperturaCentavos: number; umbralRetiroCentavos: number }
+export type ActualizarCajaRequest = { codigo: string; nombre: string; tipo: TipoCaja; estado: EstadoCaja; fondoBaseAperturaCentavos: number; umbralRetiroCentavos: number; motivo: string; version: number }
 export type ConfigurarPoliticaCajaRequest = Omit<PoliticaCaja, 'id' | 'sucursalId' | 'sucursal' | 'creadoEn' | 'actualizadoEn' | 'version'> & { motivo: string; version?: number }
 export type CrearDenominacionCajaRequest = { nombre: string; valorCentavos: number; orden: number }
 export type ActualizarDenominacionCajaRequest = CrearDenominacionCajaRequest & { activa: boolean; motivo: string; version: number }

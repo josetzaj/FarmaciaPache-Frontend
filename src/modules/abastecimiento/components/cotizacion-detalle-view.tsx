@@ -60,7 +60,7 @@ export function CotizacionDetalleView({ cotizacionId, permisos, onNavegar }: { c
       <AbastecimientoBreadcrumb recurso="cotizaciones" actual="Detalle de cotización" onNavegar={onNavegar} />
       <header className={styles.cabeceraDetalle}>
         <div><p className={styles.sobretitulo}>Oferta del proveedor</p><h1 id="titulo-detalle-cotizacion">Cotización {cotizacion.numeroProveedor}</h1><div className={styles.estadosDetalle}><span className={`${styles.estado} ${claseEstado(cotizacion.estado)}`}>{etiquetaCodigo(cotizacion.estado)}</span>{cotizacion.solicitud && <span className={`${styles.estado} ${styles.estadoInfo}`}>{etiquetaCodigo(cotizacion.solicitud.modalidad)}</span>}</div></div>
-        {puedeEvaluar && cotizacion.estado === 'REGISTRADA' && <div className={styles.accionesCabecera}><button className={styles.botonPrimario} type="button" onClick={() => onNavegar(`/abastecimiento/cotizaciones/${cotizacion.id}/evaluar`)}><IconoAccion nombre="estado" />Evaluar cotización</button></div>}
+        {puedeEvaluar && ['REGISTRADA', 'EVALUADA'].includes(cotizacion.estado) && <div className={styles.accionesCabecera}><button className={styles.botonPrimario} type="button" onClick={() => onNavegar(`/abastecimiento/cotizaciones/${cotizacion.id}/evaluar`)}><IconoAccion nombre="estado" />{cotizacion.estado === 'EVALUADA' ? 'Adjudicar cotización' : 'Evaluar cotización'}</button></div>}
       </header>
 
       <div className={styles.grillaDetalle}>

@@ -60,6 +60,8 @@ export type ConsultaComercial = {
   estadosPago?: string[]
   estadosDispensacion?: string[]
   estadosFiscales?: string[]
+  turnoIds?: string[]
+  soloTurnosNoCerrados?: boolean
   desde?: string
   hasta?: string
   totalMin?: number
@@ -75,6 +77,7 @@ export type ConsultaComercial = {
 export type FiltrosExportacionComercial = Omit<ConsultaComercial, 'pagina' | 'tamanoPagina'>
 
 export type OpcionesComercial = {
+  sucursalContextoId: string | null
   sucursales: ReferenciaCatalogo[]
   productos: ProductoComercialCatalogo[]
   clientes: { tipos: TipoCliente[]; estados: EstadoActivo[] }
@@ -92,6 +95,20 @@ export type ProductoComercialCatalogo = ReferenciaCatalogo & {
   requiereReceta?: boolean
   esControlado?: boolean
   precioVigente?: number | null
+  imagenUrl?: string | null
+  version?: number
+  cantidadDisponible?: number
+}
+
+export type DisponibilidadSucursalVenta = {
+  producto: ReferenciaCatalogo & {
+    imagenUrl: string | null
+    version: number
+  }
+  sucursal: ReferenciaCatalogo & {
+    tipo: 'FARMACIA' | 'STAND' | 'BODEGA'
+  }
+  cantidadDisponible: number
 }
 
 export type EstadoPrecio = 'BORRADOR' | 'VIGENTE' | 'INACTIVO'
@@ -118,7 +135,21 @@ export type PrecioProducto = {
   vigenteDesde: string | null
   vigenteHasta: string | null
   motivo: string
+  requiereRevision: boolean
+  motivosRevision: string[]
+  costoBaseActual: number | null
+  precioSugeridoActual: number | null
   version: number
+}
+
+export type PrecioPublico = {
+  id: string
+  productoId: string
+  codigo: string
+  producto: string
+  precioVenta: number
+  estado: 'VIGENTE'
+  vigenteDesde: string | null
 }
 
 export type CrearPrecioRequest = {
@@ -211,6 +242,9 @@ export type VentaComercial = {
   operacionInventarioId?: string | null
   creadoEn: string
   confirmadaEn: string | null
+  turnoId?: string | null
+  turnoNumero?: string | null
+  cajaNombre?: string | null
   anuladaEn?: string | null
   motivoAnulacion?: string | null
   detalles?: VentaDetalleLinea[]

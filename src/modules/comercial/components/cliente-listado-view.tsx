@@ -13,7 +13,7 @@ import { ComercialBreadcrumb } from './comercial-breadcrumb'
 import styles from './comercial.module.css'
 
 const opcionesIniciales: OpcionesComercial = {
-  sucursales: [], productos: [],
+  sucursalContextoId: null, sucursales: [], productos: [],
   clientes: { tipos: ['PERSONA', 'EMPRESA'], estados: ['ACTIVO', 'INACTIVO'] },
   margenes: { alcances: ['GENERAL', 'PRODUCTO'], estados: ['ACTIVO', 'INACTIVO'] },
   precios: { estados: ['BORRADOR', 'VIGENTE', 'INACTIVO'] },

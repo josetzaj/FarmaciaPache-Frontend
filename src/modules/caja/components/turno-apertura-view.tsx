@@ -55,6 +55,7 @@ export function TurnoAperturaView({ onNavegar, onCambiosPendientes }: Props) {
   useEffect(() => { onCambiosPendientes(hayCambios); return () => onCambiosPendientes(false) }, [hayCambios, onCambiosPendientes])
 
   const cajasDisponibles = opciones.cajas.opciones.filter((caja) => caja.estado === 'DISPONIBLE')
+  const cajaSeleccionada = cajasDisponibles.find((caja) => caja.id === cajaId) ?? null
   const enviar = async (evento: FormEvent) => {
     evento.preventDefault()
     setErrorCaja(cajaId ? null : 'Selecciona la caja que se abrirá.')
@@ -64,6 +65,10 @@ export function TurnoAperturaView({ onNavegar, onCambiosPendientes }: Props) {
       ? 'Las cantidades deben ser números enteros iguales o mayores que cero.'
       : fondoInicialCentavos <= 0 || !conteoValido.length
         ? 'Registra al menos una denominación para calcular un fondo inicial mayor que cero.'
+        : cajaSeleccionada?.fondoBaseAperturaCentavos == null
+          ? 'La caja no tiene fondo base configurado. Solicita al administrador que complete su configuración.'
+          : fondoInicialCentavos !== cajaSeleccionada.fondoBaseAperturaCentavos
+            ? `El conteo debe sumar exactamente ${formatearCentavos(cajaSeleccionada.fondoBaseAperturaCentavos)}.`
         : null
     setErrorConteo(mensajeConteo)
     if (!cajaId || mensajeConteo) {
@@ -112,7 +117,7 @@ export function TurnoAperturaView({ onNavegar, onCambiosPendientes }: Props) {
             <div className={styles.campo}>
               <label>Fondo inicial calculado</label>
               <input value={formatearCentavos(fondoInicialCentavos)} readOnly aria-readonly="true" />
-              <small className={styles.ayudaCampo}>El total se calcula automáticamente con el conteo.</small>
+              <small className={styles.ayudaCampo}>{cajaSeleccionada?.fondoBaseAperturaCentavos != null ? `Fondo base requerido: ${formatearCentavos(cajaSeleccionada.fondoBaseAperturaCentavos)}.` : 'Selecciona una caja para consultar el fondo base requerido.'}</small>
             </div>
           </div>
         </fieldset>

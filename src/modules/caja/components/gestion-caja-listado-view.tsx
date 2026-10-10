@@ -6,14 +6,16 @@ import { ErrorApi } from '../../../shared/api/cliente-api'
 import { BotonExportar, type FormatoExportacion } from '../../../shared/components/boton-exportar'
 import { ModalEstado } from '../../../shared/components/modal-estado'
 import { PaginacionTabla, TablaDatos, type ColumnaTabla, type ColumnFiltersState, type SortingState } from '../../../shared/components/tabla-datos'
-import { exportarCaja, listarCaja, obtenerOpcionesCaja } from '../caja-api'
+import { exportarCaja, listarCaja, obtenerOpcionesCaja, obtenerResumenOperativoCaja } from '../caja-api'
 import { convertirDiferenciaACentavos, convertirQuetzalesACentavos, etiquetasEstadoConciliacion, etiquetasEstadoConsolidacion, etiquetasEstadoRendicion, etiquetasTipoConciliacion, formatearCentavos, formatearFecha } from '../caja-formatos'
-import type { ConciliacionCaja, ConsolidacionDiariaCaja, ConsultaCaja, OpcionesFiltrosCaja, RendicionRepartidor, ResultadoPaginado } from '../caja.types'
+import type { ConciliacionCaja, ConsolidacionDiariaCaja, ConsultaCaja, OpcionesFiltrosCaja, RendicionRepartidor, ResultadoPaginado, ResumenOperativoCaja } from '../caja.types'
 import { CajaBreadcrumb } from './caja-breadcrumb'
+import { ResumenOperativoCaja as TarjetasResumenCaja } from './resumen-operativo-caja'
 import styles from './caja.module.css'
 
 type RecursoGestion = 'rendiciones' | 'conciliaciones' | 'consolidaciones'
 type RegistroGestion = RendicionRepartidor | ConciliacionCaja | ConsolidacionDiariaCaja
+type ResumenGestion = Extract<ResumenOperativoCaja, { recurso: 'rendiciones' | 'conciliaciones' }>
 type Props = { permisos: readonly string[]; onNavegar: (ruta: string) => void; recurso: RecursoGestion }
 
 function valoresFiltro(filtros: ColumnFiltersState, id: string): string[] | undefined {
@@ -49,6 +51,9 @@ export function GestionCajaListadoView({ permisos, onNavegar, recurso }: Props) 
   const [error, setError] = useState<string | null>(null)
   const [errorOpciones, setErrorOpciones] = useState<string | null>(null)
   const [errorExportacion, setErrorExportacion] = useState<string | null>(null)
+  const [resumen, setResumen] = useState<ResumenGestion | null>(null)
+  const [solicitudResumenFinalizada, setSolicitudResumenFinalizada] = useState('')
+  const [errorResumen, setErrorResumen] = useState<string | null>(null)
   const [revision, setRevision] = useState(0)
 
   const parametros = useMemo<ConsultaCaja>(() => ({
@@ -66,6 +71,7 @@ export function GestionCajaListadoView({ permisos, onNavegar, recurso }: Props) 
   }), [busqueda, desde, diferenciaMaxima, diferenciaMinima, filtros, hasta, montoMaximo, montoMinimo, ordenamiento, pagina, recurso, tamanoPagina])
   const claveSolicitud = useMemo(() => JSON.stringify({ parametros, recurso, revision }), [parametros, recurso, revision])
   const cargando = solicitudFinalizada !== claveSolicitud
+  const cargandoResumen = recurso !== 'consolidaciones' && solicitudResumenFinalizada !== claveSolicitud
 
   useEffect(() => { const controlador = new AbortController(); void obtenerOpcionesCaja(controlador.signal).then((dato) => { setOpciones(dato); setErrorOpciones(null) }).catch((errorActual: unknown) => { if (!controlador.signal.aborted) setErrorOpciones(errorActual instanceof ErrorApi ? errorActual.message : 'No fue posible cargar las opciones de filtros.') }); return () => controlador.abort() }, [revision])
   useEffect(() => { const temporizador = window.setTimeout(() => { setBusqueda(busquedaEntrada.trim().replace(/\s+/g, ' ')); setPagina(1) }, 400); return () => window.clearTimeout(temporizador) }, [busquedaEntrada])
@@ -74,6 +80,15 @@ export function GestionCajaListadoView({ permisos, onNavegar, recurso }: Props) 
     void listarCaja<RegistroGestion>(recurso, parametros, controlador.signal).then((dato) => { if (dato.totalPaginas > 0 && pagina > dato.totalPaginas) { setPagina(dato.totalPaginas); return } setResultado(dato); setError(null) }).catch((errorActual: unknown) => { if (!controlador.signal.aborted) setError(errorActual instanceof ErrorApi ? errorActual.message : 'No fue posible cargar la información.') }).finally(() => { if (!controlador.signal.aborted) setSolicitudFinalizada(claveSolicitud) })
     return () => controlador.abort()
   }, [claveSolicitud, pagina, parametros, recurso])
+  useEffect(() => {
+    if (recurso === 'consolidaciones') return
+    const controlador = new AbortController()
+    void obtenerResumenOperativoCaja<ResumenGestion>(recurso, parametros, controlador.signal)
+      .then((dato) => { setResumen(dato); setErrorResumen(null) })
+      .catch((errorActual: unknown) => { if (!controlador.signal.aborted) setErrorResumen(errorActual instanceof ErrorApi ? errorActual.message : 'No fue posible cargar el resumen monetario.') })
+      .finally(() => { if (!controlador.signal.aborted) setSolicitudResumenFinalizada(claveSolicitud) })
+    return () => controlador.abort()
+  }, [claveSolicitud, parametros, recurso])
 
   const sucursales = useMemo(() => (opciones?.sucursales ?? []).map((item) => ({ valor: item.id, etiqueta: item.nombre, descripcion: item.codigo })), [opciones])
   const columnaSucursal = useMemo(() => sucursales.length ? [{ id: 'sucursal', titulo: 'Sucursal', obtenerValor: (item: RegistroGestion) => opciones?.sucursales.find((sucursal) => sucursal.id === item.sucursalId)?.nombre ?? item.sucursalId, filtro: { tipo: 'opciones' as const, etiqueta: 'Seleccionar sucursales', multiple: true, opciones: sucursales }, celda: (item: RegistroGestion) => opciones?.sucursales.find((sucursal) => sucursal.id === item.sucursalId)?.nombre ?? ('sucursal' in item ? item.sucursal?.nombre : null) ?? 'Sucursal activa' }] : [], [opciones, sucursales])
@@ -86,8 +101,8 @@ export function GestionCajaListadoView({ permisos, onNavegar, recurso }: Props) 
     { id: 'diferencia', titulo: 'Diferencia', obtenerValor: (item) => item.diferenciaCentavos, ordenable: true, celda: (item) => <strong className={item.diferenciaCentavos === 0 ? undefined : styles.montoSalida}>{formatearCentavos(item.diferenciaCentavos)}</strong> },
     { id: 'estado', titulo: 'Estado', obtenerValor: (item) => item.estado, ordenable: true, filtro: { tipo: 'opciones', etiqueta: 'Seleccionar estados', multiple: true, opciones: (opciones?.rendiciones?.estados ?? []).map((estado) => ({ valor: estado, etiqueta: etiquetasEstadoRendicion[estado] })) }, celda: (item) => <span className={`${styles.estado} ${claseEstado(item.estado)}`}>{etiquetasEstadoRendicion[item.estado]}</span> },
     { id: 'fecha', titulo: 'Fecha', obtenerValor: (item) => item.fechaNegocio, ordenable: true, celda: (item) => formatearFecha(item.fechaNegocio) },
-    { id: 'acciones', titulo: 'Acciones', tituloSoloLectores: true, obtenerValor: (item) => item.id, celda: (item) => <div className={styles.accionesFila}><button type="button" title="Ver detalle" aria-label={`Ver rendición ${item.numero}`} onClick={() => onNavegar(`/caja/rendiciones/${item.id}`)}><img src={iconoVer} alt="" /></button></div> },
-  ], [columnaSucursal, onNavegar, opciones])
+    { id: 'acciones', titulo: 'Acciones', tituloSoloLectores: true, obtenerValor: (item) => item.id, celda: (item) => <div className={styles.accionesFila}><button type="button" title="Ver detalle" aria-label={`Ver rendición ${item.numero}`} onClick={() => onNavegar(`/caja/rendiciones/${item.id}`)}><img src={iconoVer} alt="" /></button>{permisos.includes('CAJA.RENDICIONES.APROBAR') && ['PENDIENTE_APROBACION', 'INVESTIGACION'].includes(item.estado) && <button className={styles.accionTexto} type="button" onClick={() => onNavegar(`/caja/rendiciones/${item.id}`)}>Autorizar</button>}</div> },
+  ], [columnaSucursal, onNavegar, opciones, permisos])
 
   const columnasConciliacion = useMemo<ColumnaTabla<ConciliacionCaja>[]>(() => [
     { id: 'numero', titulo: 'Conciliación', obtenerValor: (item) => item.numero, ordenable: true, celda: (item) => <strong>{item.numero}</strong> },
@@ -96,8 +111,8 @@ export function GestionCajaListadoView({ permisos, onNavegar, recurso }: Props) 
     { id: 'diferencia', titulo: 'Diferencia', obtenerValor: (item) => item.diferenciaCentavos, ordenable: true, celda: (item) => <strong className={!item.diferenciaCentavos ? undefined : styles.montoSalida}>{formatearCentavos(item.diferenciaCentavos)}</strong> },
     { id: 'estado', titulo: 'Estado', obtenerValor: (item) => item.estado, ordenable: true, filtro: { tipo: 'opciones', etiqueta: 'Seleccionar estados', multiple: true, opciones: (opciones?.conciliaciones?.estados ?? []).map((estado) => ({ valor: estado, etiqueta: etiquetasEstadoConciliacion[estado] })) }, celda: (item) => <span className={`${styles.estado} ${claseEstado(item.estado)}`}>{etiquetasEstadoConciliacion[item.estado]}</span> },
     { id: 'fecha', titulo: 'Fecha', obtenerValor: (item) => item.fechaNegocio, ordenable: true, celda: (item) => formatearFecha(item.fechaNegocio) },
-    { id: 'acciones', titulo: 'Acciones', tituloSoloLectores: true, obtenerValor: (item) => item.id, celda: (item) => <div className={styles.accionesFila}><button type="button" title="Ver detalle" aria-label={`Ver conciliación ${item.numero}`} onClick={() => onNavegar(`/caja/conciliaciones/${item.id}`)}><img src={iconoVer} alt="" /></button></div> },
-  ], [columnaSucursal, onNavegar, opciones])
+    { id: 'acciones', titulo: 'Acciones', tituloSoloLectores: true, obtenerValor: (item) => item.id, celda: (item) => <div className={styles.accionesFila}><button type="button" title="Ver detalle" aria-label={`Ver conciliación ${item.numero}`} onClick={() => onNavegar(`/caja/conciliaciones/${item.id}`)}><img src={iconoVer} alt="" /></button>{permisos.includes('CAJA.CONCILIACIONES.CONFIRMAR') && ['PENDIENTE', 'PARCIAL', 'REABIERTA'].includes(item.estado) && <button className={styles.accionTexto} type="button" onClick={() => onNavegar(`/caja/conciliaciones/${item.id}`)}>Confirmar</button>}</div> },
+  ], [columnaSucursal, onNavegar, opciones, permisos])
 
   const columnasConsolidacion = useMemo<ColumnaTabla<ConsolidacionDiariaCaja>[]>(() => [
     { id: 'numero', titulo: 'Consolidación', obtenerValor: (item) => item.numero, ordenable: true, celda: (item) => <div className={styles.identidad}><strong>{item.numero}</strong><small>Versión {item.versionConsolidacion}</small></div> },
@@ -106,8 +121,8 @@ export function GestionCajaListadoView({ permisos, onNavegar, recurso }: Props) 
     { id: 'diferencia', titulo: 'Diferencia', obtenerValor: (item) => item.diferenciaCierresCentavos, ordenable: true, celda: (item) => <strong className={item.diferenciaCierresCentavos === 0 ? undefined : styles.montoSalida}>{formatearCentavos(item.diferenciaCierresCentavos)}</strong> },
     { id: 'estado', titulo: 'Estado', obtenerValor: (item) => item.estado, ordenable: true, filtro: { tipo: 'opciones', etiqueta: 'Seleccionar estados', multiple: true, opciones: (opciones?.consolidaciones?.estados ?? []).map((estado) => ({ valor: estado, etiqueta: etiquetasEstadoConsolidacion[estado] })) }, celda: (item) => <span className={`${styles.estado} ${claseEstado(item.estado)}`}>{etiquetasEstadoConsolidacion[item.estado]}</span> },
     { id: 'fecha', titulo: 'Fecha', obtenerValor: (item) => item.fechaNegocio, ordenable: true, celda: (item) => formatearFecha(item.fechaNegocio) },
-    { id: 'acciones', titulo: 'Acciones', tituloSoloLectores: true, obtenerValor: (item) => item.id, celda: (item) => <div className={styles.accionesFila}><button type="button" title="Ver detalle" aria-label={`Ver consolidación ${item.numero}`} onClick={() => onNavegar(`/caja/consolidaciones/${item.id}`)}><img src={iconoVer} alt="" /></button></div> },
-  ], [columnaSucursal, onNavegar, opciones])
+    { id: 'acciones', titulo: 'Acciones', tituloSoloLectores: true, obtenerValor: (item) => item.id, celda: (item) => <div className={styles.accionesFila}><button type="button" title="Ver detalle" aria-label={`Ver consolidación ${item.numero}`} onClick={() => onNavegar(`/caja/consolidaciones/${item.id}`)}><img src={iconoVer} alt="" /></button>{permisos.includes('CAJA.CONSOLIDACIONES.APROBAR') && ['PENDIENTE_APROBACION', 'INVESTIGACION'].includes(item.estado) && <button className={styles.accionTexto} type="button" onClick={() => onNavegar(`/caja/consolidaciones/${item.id}`)}>Autorizar</button>}</div> },
+  ], [columnaSucursal, onNavegar, opciones, permisos])
 
   const configuracion = recurso === 'rendiciones'
     ? { seccion: 'Rendiciones' as const, titulo: 'Rendiciones de repartidores', descripcion: 'Recibe, investiga y aprueba el efectivo cobrado por repartidores.', rutaNueva: '/caja/rendiciones/nueva', permisoCrear: 'CAJA.RENDICIONES.REGISTRAR', singular: 'rendición', plural: 'rendiciones', columnas: columnasRendicion as ColumnaTabla<RegistroGestion>[] }
@@ -120,9 +135,23 @@ export function GestionCajaListadoView({ permisos, onNavegar, recurso }: Props) 
   const limpiarFiltros = () => { setBusquedaEntrada(''); setBusqueda(''); setDesde(''); setHasta(''); setMontoMinimo(''); setMontoMaximo(''); setDiferenciaMinima(''); setDiferenciaMaxima(''); setFiltros([]); setPagina(1) }
   const exportar = async (formato: FormatoExportacion) => { const { pagina: _pagina, tamanoPagina: _tamanoPagina, ...filtrosExportacion } = parametros; try { await exportarCaja(recurso, formato, filtrosExportacion) } catch (errorActual: unknown) { setErrorExportacion(errorActual instanceof ErrorApi ? errorActual.message : 'No fue posible generar la exportación.') } }
 
-  return <section className={styles.pagina} aria-labelledby="titulo-listado-gestion-caja"><header className={styles.cabeceraPagina}><CajaBreadcrumb seccion={configuracion.seccion} onNavegar={onNavegar} /><div className={styles.filaCabecera}><div><h1 id="titulo-listado-gestion-caja">{configuracion.titulo}</h1><p>{configuracion.descripcion}</p></div>{puedeCrear && <button className={styles.botonNuevo} type="button" onClick={() => onNavegar(configuracion.rutaNueva)}><img src={iconoAgregar} alt="" />{recurso === 'rendiciones' ? 'Registrar rendición' : recurso === 'conciliaciones' ? 'Crear conciliación' : 'Generar consolidación'}</button>}{puedeExportar && <BotonExportar deshabilitado={cargando} onExportar={exportar} />}<label className={styles.busquedaGeneral}><span>Búsqueda general</span><span className={styles.controlBusqueda}><img src={iconoBusqueda} alt="" /><input type="search" value={busquedaEntrada} maxLength={150} placeholder={recurso === 'rendiciones' ? 'Número, repartidor o referencia' : 'Número o referencia'} onChange={(evento) => setBusquedaEntrada(evento.target.value)} /></span></label></div></header>
+  return <section className={styles.pagina} aria-labelledby="titulo-listado-gestion-caja"><header className={styles.cabeceraPagina}><CajaBreadcrumb seccion={configuracion.seccion} onNavegar={onNavegar} /><div className={styles.filaCabecera}><h1 id="titulo-listado-gestion-caja">{configuracion.titulo}</h1>{puedeCrear && <button className={styles.botonNuevo} type="button" onClick={() => onNavegar(configuracion.rutaNueva)}><img src={iconoAgregar} alt="" />{recurso === 'rendiciones' ? 'Registrar rendición' : recurso === 'conciliaciones' ? 'Crear conciliación' : 'Generar consolidación'}</button>}{puedeExportar && <BotonExportar deshabilitado={cargando} onExportar={exportar} />}<div className={styles.busquedaGeneral}><span className={styles.controlBusqueda}><img src={iconoBusqueda} alt="" /><input type="search" value={busquedaEntrada} maxLength={150} placeholder={recurso === 'rendiciones' ? 'Número, repartidor o referencia' : 'Número o referencia'} aria-label="Búsqueda general" onChange={(evento) => setBusquedaEntrada(evento.target.value)} /></span></div></div></header>
     <div className={`${styles.filtrosGenerales} ${styles.filtrosSeis}`} aria-label="Filtros generales"><label>Desde<input type="date" value={desde} max={hasta || undefined} onChange={(evento) => { setDesde(evento.target.value); setPagina(1) }} /></label><label>Hasta<input type="date" value={hasta} min={desde || undefined} onChange={(evento) => { setHasta(evento.target.value); setPagina(1) }} /></label><label>Monto mínimo (Q)<input type="number" min="0" step="0.01" value={montoMinimo} onChange={(evento) => { setMontoMinimo(evento.target.value); setPagina(1) }} /></label><label>Monto máximo (Q)<input type="number" min="0" step="0.01" value={montoMaximo} onChange={(evento) => { setMontoMaximo(evento.target.value); setPagina(1) }} /></label><label>Diferencia mínima (Q)<input type="number" step="0.01" value={diferenciaMinima} onChange={(evento) => { setDiferenciaMinima(evento.target.value); setPagina(1) }} /></label><label>Diferencia máxima (Q)<input type="number" step="0.01" value={diferenciaMaxima} onChange={(evento) => { setDiferenciaMaxima(evento.target.value); setPagina(1) }} /></label></div>
     {errorOpciones && <div className={styles.alertaError} role="alert"><p>{errorOpciones}</p><button type="button" onClick={() => setRevision((valor) => valor + 1)}>Reintentar</button></div>}{error && <div className={styles.alertaError} role="alert"><p>{error}</p><button type="button" onClick={() => setRevision((valor) => valor + 1)}>Reintentar</button></div>}
+    {recurso !== 'consolidaciones' && <TarjetasResumenCaja
+      cargando={cargandoResumen}
+      error={cargandoResumen ? null : errorResumen}
+      onReintentar={() => setRevision((valor) => valor + 1)}
+      indicadores={recurso === 'rendiciones' ? [
+        { etiqueta: 'Esperado', valor: formatearCentavos(resumen?.recurso === 'rendiciones' ? resumen.esperadoCentavos : 0), detalle: `${resumen?.recurso === 'rendiciones' ? resumen.rendicionesCantidad : 0} rendiciones filtradas`, tono: 'informacion' },
+        { etiqueta: 'Entregado', valor: formatearCentavos(resumen?.recurso === 'rendiciones' ? resumen.entregadoCentavos : 0), detalle: 'Efectivo entregado por repartidores', tono: 'entrada' },
+        { etiqueta: 'Faltante', valor: formatearCentavos(resumen?.recurso === 'rendiciones' ? resumen.faltanteCentavos : 0), detalle: 'Suma de faltantes sin compensar sobrantes', tono: 'salida' },
+      ] : [
+        { etiqueta: 'Depositado', valor: formatearCentavos(resumen?.recurso === 'conciliaciones' ? resumen.depositadoCentavos : 0), detalle: `Monto esperado de ${resumen?.recurso === 'conciliaciones' ? resumen.conciliacionesCantidad : 0} referencias filtradas`, tono: 'informacion' },
+        { etiqueta: 'Conciliado', valor: formatearCentavos(resumen?.recurso === 'conciliaciones' ? resumen.conciliadoCentavos : 0), detalle: 'Monto registrado al conciliar', tono: 'entrada' },
+        { etiqueta: 'Diferencia', valor: formatearCentavos(resumen?.recurso === 'conciliaciones' ? resumen.diferenciaCentavos : 0), detalle: 'Diferencias absolutas detectadas', tono: 'salida' },
+      ]}
+    />}
     <article className={styles.panelTabla} aria-busy={cargando}><div className={styles.resumenTabla}><div><strong>{configuracion.titulo}</strong><small>{cargando ? 'Actualizando información…' : 'Los filtros, el ordenamiento y la exportación se procesan en el servidor.'}</small></div><div className={styles.accionesResumen}>{resultado && <span>{resultado.total} registros</span>}{hayFiltros && <button type="button" onClick={limpiarFiltros}>Limpiar filtros</button>}</div></div>{resultado?.items.length ? <><TablaDatos descripcion={`${configuracion.titulo} con filtros por columna`} datos={resultado.items} columnas={configuracion.columnas} filtros={filtros} ordenamiento={ordenamiento} obtenerIdFila={(item) => item.id} onFiltrosChange={(valor) => { setFiltros(valor); setPagina(1) }} onOrdenamientoChange={(valor) => { setOrdenamiento(valor.length ? valor : [{ id: 'fecha', desc: true }]); setPagina(1) }} /><PaginacionTabla pagina={resultado.pagina} tamanoPagina={resultado.tamanoPagina} total={resultado.total} totalPaginas={resultado.totalPaginas} unidadSingular={configuracion.singular} unidadPlural={configuracion.plural} onPaginaChange={setPagina} onTamanoPaginaChange={(valor) => { setTamanoPagina(valor); setPagina(1) }} /></> : !cargando && !error ? <div className={styles.estadoVacio}><h2>{hayFiltros ? 'Sin coincidencias' : `No hay ${configuracion.plural} registradas`}</h2><p>{hayFiltros ? 'Ajusta o limpia los filtros aplicados.' : 'Los registros aparecerán conforme se complete la operación.'}</p>{puedeCrear && !hayFiltros && <button type="button" onClick={() => onNavegar(configuracion.rutaNueva)}>Iniciar registro</button>}</div> : null}</article>
     <ModalEstado abierto={Boolean(errorExportacion)} tipo="error" titulo="No se pudo exportar" mensaje={errorExportacion ?? ''} textoAccionPrincipal="Entendido" onAccionPrincipal={() => setErrorExportacion(null)} onCerrar={() => setErrorExportacion(null)} />
   </section>

@@ -64,6 +64,7 @@ export const etiquetasEstadoTransferencia: Record<EstadoTransferenciaEfectivo, s
   PREPARADA: 'Preparada',
   ENTREGADA: 'Entregada',
   RECIBIDA: 'Recibida',
+  DEPOSITADA: 'Depositada',
   RECHAZADA: 'Rechazada',
   CANCELADA: 'Cancelada',
 }
@@ -118,6 +119,12 @@ export function formatearFechaHora(valor: string | null): string {
 export function formatearFecha(valor: string): string {
   return new Intl.DateTimeFormat('es-GT', { dateStyle: 'medium', timeZone: 'UTC' })
     .format(new Date(`${valor.slice(0, 10)}T00:00:00Z`))
+}
+
+export function fechaActualCaja(fecha = new Date()): string {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Guatemala', year: 'numeric', month: '2-digit', day: '2-digit',
+  }).format(fecha)
 }
 
 export function convertirQuetzalesACentavos(valor: string): number | null {

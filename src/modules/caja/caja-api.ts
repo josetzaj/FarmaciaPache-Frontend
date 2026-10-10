@@ -1,6 +1,7 @@
 import type { AuditoriaPaginada, ConsultaAuditoria } from '../../shared/auditoria'
 import { solicitarApi } from '../../shared/api/cliente-api'
 import { descargarArchivoApi } from '../../shared/api/descargar-archivo-api'
+import type { ConsultaComercial, Paginado, VentaComercial } from '../comercial/comercial.types'
 import type {
   AbrirTurnoRequest,
   AccionConMotivoRequest,
@@ -12,6 +13,7 @@ import type {
   ConsolidacionDiariaCaja,
   CajaConfiguracion,
   CobrarVentaCajaRequest,
+  ActualizarCuentaBancariaCajaRequest,
   ConfigurarPoliticaCajaRequest,
   CrearCajaRequest,
   CrearCuentaBancariaCajaRequest,
@@ -23,6 +25,7 @@ import type {
   CompensarMovimientoRequest,
   ConsultaCaja,
   DenominacionCaja,
+  DiaTurnosCaja,
   DepositoEfectivo,
   EvidenciaCaja,
   FiltrosExportacionCaja,
@@ -30,9 +33,13 @@ import type {
   OpcionesFiltrosCaja,
   PoliticaCaja,
   RecursoCaja,
+  RecursoResumenCaja,
+  ResumenCobrosPendientesCaja,
+  ResumenOperativoCaja,
   RegistrarArqueoRequest,
   PrepararDepositoRequest,
   RecibirTransferenciaRequest,
+  ReponerFaltanteArqueoRequest,
   RegistrarDepositoRequest,
   RegistrarMovimientoRequest,
   ResultadoPaginado,
@@ -78,6 +85,21 @@ function consultaCaja(parametros: ConsultaCaja): URLSearchParams {
   return consulta
 }
 
+function consultaVentasPendientes(parametros: ConsultaComercial): URLSearchParams {
+  const consulta = new URLSearchParams({
+    pagina: String(parametros.pagina),
+    tamanoPagina: String(parametros.tamanoPagina),
+    orden: parametros.orden ?? 'fecha',
+    direccion: parametros.direccion ?? 'desc',
+  })
+  if (parametros.busqueda) consulta.set('busqueda', parametros.busqueda)
+  if (parametros.desde) consulta.set('desde', parametros.desde)
+  if (parametros.hasta) consulta.set('hasta', parametros.hasta)
+  if (parametros.totalMin !== undefined) consulta.set('totalMin', String(parametros.totalMin))
+  if (parametros.totalMax !== undefined) consulta.set('totalMax', String(parametros.totalMax))
+  return consulta
+}
+
 export async function listarCaja<T extends CajaConfiguracion | PoliticaCaja | DenominacionCaja | TurnoCaja | MovimientoCaja | ArqueoCaja | CierreCaja | TransferenciaEfectivo | CuentaBancariaCaja | DepositoEfectivo | IncidenciaCaja | RendicionRepartidor | ConciliacionCaja | ConsolidacionDiariaCaja>(
   recurso: RecursoCaja,
   parametros: ConsultaCaja,
@@ -88,6 +110,16 @@ export async function listarCaja<T extends CajaConfiguracion | PoliticaCaja | De
     `${ruta}?${consultaCaja(parametros).toString()}`,
     { signal },
   )
+  return respuesta.data
+}
+
+export async function listarDiasTurnosCaja(parametros: ConsultaCaja, signal?: AbortSignal): Promise<ResultadoPaginado<DiaTurnosCaja>> {
+  const respuesta = await solicitarApi<RespuestaApi<ResultadoPaginado<DiaTurnosCaja>>>(`/caja/turnos-dias?${consultaCaja(parametros).toString()}`, { signal })
+  return respuesta.data
+}
+
+export async function obtenerResumenOperativoCaja<T extends ResumenOperativoCaja>(recurso: RecursoResumenCaja, parametros: ConsultaCaja, signal?: AbortSignal): Promise<T> {
+  const respuesta = await solicitarApi<RespuestaApi<T>>(`/caja/resumenes/${recurso}?${consultaCaja(parametros).toString()}`, { signal })
   return respuesta.data
 }
 
@@ -103,6 +135,26 @@ export async function obtenerDenominacionesCaja(signal?: AbortSignal): Promise<D
 
 export async function obtenerTurnoCaja(turnoId: string, signal?: AbortSignal): Promise<TurnoCaja> {
   const respuesta = await solicitarApi<RespuestaApi<TurnoCaja>>(`/caja/turnos/${turnoId}`, { signal })
+  return respuesta.data
+}
+
+export async function obtenerTurnoVentasActualCaja(signal?: AbortSignal): Promise<TurnoCaja | null> {
+  const respuesta = await solicitarApi<RespuestaApi<TurnoCaja | null>>('/caja/turnos/actual-ventas', { signal })
+  return respuesta.data
+}
+
+export async function listarVentasPendientesCaja(parametros: ConsultaComercial, signal?: AbortSignal): Promise<Paginado<VentaComercial>> {
+  const respuesta = await solicitarApi<RespuestaApi<Paginado<VentaComercial>>>(`/caja/ventas/pendientes?${consultaVentasPendientes(parametros).toString()}`, { signal })
+  return respuesta.data
+}
+
+export async function obtenerResumenVentasPendientesCaja(parametros: ConsultaComercial, signal?: AbortSignal): Promise<ResumenCobrosPendientesCaja> {
+  const respuesta = await solicitarApi<RespuestaApi<ResumenCobrosPendientesCaja>>(`/caja/ventas/pendientes/resumen?${consultaVentasPendientes(parametros).toString()}`, { signal })
+  return respuesta.data
+}
+
+export async function obtenerVentaPendienteCaja(ventaId: string, signal?: AbortSignal): Promise<VentaComercial> {
+  const respuesta = await solicitarApi<RespuestaApi<VentaComercial>>(`/caja/ventas/pendientes/${ventaId}`, { signal })
   return respuesta.data
 }
 
@@ -206,6 +258,11 @@ export async function aprobarArqueoCaja(arqueoId: string, datos: AccionConMotivo
   return respuesta.data
 }
 
+export async function reponerFaltanteArqueoCaja(arqueoId: string, datos: ReponerFaltanteArqueoRequest): Promise<{ id: string; numero: string; montoCentavos: number; turnoEstado: string; arqueo: ArqueoCaja }> {
+  const respuesta = await solicitarApi<RespuestaApi<{ id: string; numero: string; montoCentavos: number; turnoEstado: string; arqueo: ArqueoCaja }>>(`/caja/arqueos/${arqueoId}/reposiciones`, { method: 'POST', datos })
+  return respuesta.data
+}
+
 export async function cerrarTurnoCaja(turnoId: string, datos: CerrarTurnoRequest): Promise<{ turno: TurnoCaja; cierre: CierreCaja }> {
   const respuesta = await solicitarApi<RespuestaApi<{ turno: TurnoCaja; cierre: CierreCaja }>>(`/caja/turnos/${turnoId}/cierres`, { method: 'POST', datos })
   return respuesta.data
@@ -226,6 +283,11 @@ export async function crearCuentaBancariaCaja(datos: CrearCuentaBancariaCajaRequ
   return respuesta.data
 }
 
+export async function actualizarCuentaBancariaCaja(id: string, datos: ActualizarCuentaBancariaCajaRequest): Promise<CuentaBancariaCaja> {
+  const respuesta = await solicitarApi<RespuestaApi<CuentaBancariaCaja>>(`/caja/cuentas/${id}`, { method: 'PUT', datos })
+  return respuesta.data
+}
+
 export async function crearCajaConfiguracion(datos: CrearCajaRequest): Promise<CajaConfiguracion> {
   const respuesta = await solicitarApi<RespuestaApi<CajaConfiguracion>>('/caja/cajas', { method: 'POST', datos })
   return respuesta.data
@@ -236,9 +298,8 @@ export async function actualizarCajaConfiguracion(cajaId: string, datos: Actuali
   return respuesta.data
 }
 
-export async function configurarPoliticaCaja(datos: ConfigurarPoliticaCajaRequest, sucursalId?: string): Promise<PoliticaCaja> {
-  const ruta = sucursalId ? `/caja/politicas/${sucursalId}` : '/caja/politica'
-  const respuesta = await solicitarApi<RespuestaApi<PoliticaCaja>>(ruta, { method: 'PUT', datos })
+export async function configurarPoliticaCaja(datos: ConfigurarPoliticaCajaRequest, sucursalId: string): Promise<PoliticaCaja> {
+  const respuesta = await solicitarApi<RespuestaApi<PoliticaCaja>>(`/caja/politicas/${sucursalId}`, { method: 'PUT', datos })
   return respuesta.data
 }
 

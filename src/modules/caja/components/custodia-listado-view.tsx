@@ -6,10 +6,11 @@ import { ErrorApi } from '../../../shared/api/cliente-api'
 import { BotonExportar, type FormatoExportacion } from '../../../shared/components/boton-exportar'
 import { PaginacionTabla, TablaDatos, type ColumnaTabla, type ColumnFiltersState, type SortingState } from '../../../shared/components/tabla-datos'
 import { ModalEstado } from '../../../shared/components/modal-estado'
-import { exportarCaja, listarCaja, obtenerOpcionesCaja } from '../caja-api'
-import { convertirDiferenciaACentavos, convertirQuetzalesACentavos, etiquetasCustodia, etiquetasEstadoDeposito, etiquetasEstadoTransferencia, formatearCentavos, formatearFechaHora } from '../caja-formatos'
-import type { ConsultaCaja, DepositoEfectivo, EstadoDepositoEfectivo, EstadoTransferenciaEfectivo, OpcionesFiltrosCaja, ResultadoPaginado, TransferenciaEfectivo } from '../caja.types'
+import { exportarCaja, listarCaja, obtenerOpcionesCaja, obtenerResumenOperativoCaja } from '../caja-api'
+import { convertirDiferenciaACentavos, convertirQuetzalesACentavos, etiquetasCustodia, etiquetasEstadoDeposito, etiquetasEstadoTransferencia, fechaActualCaja, formatearCentavos, formatearFechaHora } from '../caja-formatos'
+import type { ConsultaCaja, DepositoEfectivo, EstadoDepositoEfectivo, EstadoTransferenciaEfectivo, OpcionesFiltrosCaja, ResultadoPaginado, ResumenOperativoCaja, TransferenciaEfectivo } from '../caja.types'
 import { CajaBreadcrumb } from './caja-breadcrumb'
+import { ResumenOperativoCaja as TarjetasResumen, type IndicadorCaja } from './resumen-operativo-caja'
 import styles from './caja.module.css'
 
 type Props = { permisos: readonly string[]; onNavegar: (ruta: string) => void }
@@ -27,7 +28,7 @@ function valoresFiltro(filtros: ColumnFiltersState, id: string): string[] | unde
   return valores.length ? valores : undefined
 }
 function claseTransferencia(estado: EstadoTransferenciaEfectivo): string {
-  if (estado === 'RECIBIDA') return styles.estadoExito
+  if (estado === 'RECIBIDA' || estado === 'DEPOSITADA') return styles.estadoExito
   if (estado === 'RECHAZADA' || estado === 'CANCELADA') return styles.estadoPeligro
   if (estado === 'ENTREGADA') return styles.estadoAdvertencia
   return styles.estadoInfo
@@ -41,14 +42,16 @@ function claseDeposito(estado: EstadoDepositoEfectivo): string {
 
 function CustodiaListadoView({ recurso, permisos, onNavegar }: Props & { recurso: RecursoCustodia }) {
   const esTransferencia = recurso === 'transferencias'
+  const hoy = fechaActualCaja()
   const [resultado, setResultado] = useState<ResultadoPaginado<RegistroCustodia> | null>(null)
+  const [resumen, setResumen] = useState<ResumenOperativoCaja | null>(null)
   const [opciones, setOpciones] = useState<OpcionesFiltrosCaja>(opcionesIniciales)
   const [pagina, setPagina] = useState(1)
   const [tamanoPagina, setTamanoPagina] = useState(50)
   const [busquedaEntrada, setBusquedaEntrada] = useState('')
   const [busqueda, setBusqueda] = useState('')
-  const [desde, setDesde] = useState('')
-  const [hasta, setHasta] = useState('')
+  const [desde, setDesde] = useState(hoy)
+  const [hasta, setHasta] = useState(hoy)
   const [montoMinimo, setMontoMinimo] = useState('')
   const [montoMaximo, setMontoMaximo] = useState('')
   const [diferenciaMinima, setDiferenciaMinima] = useState('')
@@ -57,6 +60,8 @@ function CustodiaListadoView({ recurso, permisos, onNavegar }: Props & { recurso
   const [ordenamiento, setOrdenamiento] = useState<SortingState>([{ id: 'fecha', desc: true }])
   const [solicitudFinalizada, setSolicitudFinalizada] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [errorResumen, setErrorResumen] = useState<string | null>(null)
+  const [resumenSolicitudFinalizada, setResumenSolicitudFinalizada] = useState('')
   const [errorOpciones, setErrorOpciones] = useState<string | null>(null)
   const [errorExportacion, setErrorExportacion] = useState<string | null>(null)
   const [revision, setRevision] = useState(0)
@@ -73,9 +78,11 @@ function CustodiaListadoView({ recurso, permisos, onNavegar }: Props & { recurso
   }), [busqueda, desde, diferenciaMaxima, diferenciaMinima, esTransferencia, filtros, hasta, montoMaximo, montoMinimo, ordenamiento, pagina, tamanoPagina])
   const claveSolicitud = useMemo(() => JSON.stringify({ recurso, parametros, revision }), [parametros, recurso, revision])
   const cargando = solicitudFinalizada !== claveSolicitud
+  const resumenCargando = resumenSolicitudFinalizada !== claveSolicitud
   useEffect(() => { const controlador = new AbortController(); void obtenerOpcionesCaja(controlador.signal).then((dato) => { setOpciones(dato); setErrorOpciones(null) }).catch((errorActual: unknown) => { if (!controlador.signal.aborted) setErrorOpciones(errorActual instanceof ErrorApi ? errorActual.message : 'No fue posible cargar las opciones de filtros.') }); return () => controlador.abort() }, [revision])
   useEffect(() => { const temporizador = window.setTimeout(() => { setBusqueda(busquedaEntrada.trim().replace(/\s+/g, ' ')); setPagina(1) }, 400); return () => window.clearTimeout(temporizador) }, [busquedaEntrada])
   useEffect(() => { const controlador = new AbortController(); void listarCaja<RegistroCustodia>(recurso, parametros, controlador.signal).then((dato) => { if (dato.totalPaginas > 0 && pagina > dato.totalPaginas) { setPagina(dato.totalPaginas); return } setResultado(dato); setError(null) }).catch((errorActual: unknown) => { if (!controlador.signal.aborted) setError(errorActual instanceof ErrorApi ? errorActual.message : `No fue posible cargar ${esTransferencia ? 'las transferencias' : 'los depósitos'}.`) }).finally(() => { if (!controlador.signal.aborted) setSolicitudFinalizada(claveSolicitud) }); return () => controlador.abort() }, [claveSolicitud, esTransferencia, pagina, parametros, recurso])
+  useEffect(() => { const controlador = new AbortController(); void obtenerResumenOperativoCaja(recurso, parametros, controlador.signal).then((dato) => { setResumen(dato); setErrorResumen(null) }).catch((errorActual: unknown) => { if (!controlador.signal.aborted) setErrorResumen(errorActual instanceof ErrorApi ? errorActual.message : 'No fue posible cargar el resumen monetario.') }).finally(() => { if (!controlador.signal.aborted) setResumenSolicitudFinalizada(claveSolicitud) }); return () => controlador.abort() }, [claveSolicitud, parametros, recurso])
 
   const opcionesSucursales = useMemo(() => opciones.sucursales.map((item) => ({ valor: item.id, etiqueta: item.nombre, descripcion: item.codigo })), [opciones.sucursales])
   const columnaSucursal = useMemo(() => opcionesSucursales.length ? [{ id: 'sucursal', titulo: 'Sucursal', obtenerValor: (item: RegistroCustodia) => opciones.sucursales.find((x) => x.id === item.sucursalId)?.nombre ?? item.sucursalId, filtro: { tipo: 'opciones' as const, etiqueta: 'Seleccionar sucursales', multiple: true, opciones: opcionesSucursales }, celda: (item: RegistroCustodia) => opciones.sucursales.find((x) => x.id === item.sucursalId)?.nombre ?? item.sucursalId }] : [], [opciones.sucursales, opcionesSucursales])
@@ -87,8 +94,8 @@ function CustodiaListadoView({ recurso, permisos, onNavegar }: Props & { recurso
     { id: 'monto', titulo: 'Monto', obtenerValor: (item) => item.montoCentavos, ordenable: true, celda: (item) => <strong>{formatearCentavos(item.montoCentavos)}</strong> },
     { id: 'estado', titulo: 'Estado', obtenerValor: (item) => item.estado, ordenable: true, filtro: { tipo: 'opciones', etiqueta: 'Seleccionar estados', multiple: true, buscable: false, opciones: opciones.transferencias.estados.map((estado) => ({ valor: estado, etiqueta: etiquetasEstadoTransferencia[estado] })) }, celda: (item) => <span className={`${styles.estado} ${claseTransferencia(item.estado)}`}>{etiquetasEstadoTransferencia[item.estado]}</span> },
     { id: 'fecha', titulo: 'Entrega', obtenerValor: (item) => item.entregadoEn ?? item.creadoEn, ordenable: true, celda: (item) => formatearFechaHora(item.entregadoEn ?? item.creadoEn) },
-    { id: 'acciones', titulo: 'Acciones', tituloSoloLectores: true, obtenerValor: (item) => item.id, celda: (item) => <div className={styles.accionesFila}><button type="button" title="Ver detalle" aria-label={`Ver transferencia ${item.numero}`} onClick={() => onNavegar(`/caja/transferencias/${item.id}`)}><img src={iconoVer} alt="" /></button></div> },
-  ], [columnaSucursal, onNavegar, opciones.transferencias])
+    { id: 'acciones', titulo: 'Acciones', tituloSoloLectores: true, obtenerValor: (item) => item.id, celda: (item) => <div className={styles.accionesFila}><button type="button" title="Ver detalle" aria-label={`Ver transferencia ${item.numero}`} onClick={() => onNavegar(`/caja/transferencias/${item.id}`)}><img src={iconoVer} alt="" /></button>{permisos.includes('CAJA.TRANSFERENCIAS.RECIBIR') && item.estado === 'ENTREGADA' && <button className={styles.accionTexto} type="button" onClick={() => onNavegar(`/caja/transferencias/${item.id}?accion=recibir`)}>Recibir</button>}{permisos.includes('CAJA.DEPOSITOS.PREPARAR') && item.estado === 'RECIBIDA' && ['CAJA_FUERTE', 'PENDIENTE_DEPOSITO', 'TRANSITO'].includes(item.custodiaDestino) && <button className={styles.accionTexto} type="button" onClick={() => onNavegar(`/caja/depositos/nuevo?transferenciaId=${encodeURIComponent(item.id)}`)}>Preparar depósito</button>}</div> },
+  ], [columnaSucursal, onNavegar, opciones.transferencias, permisos])
   const columnasDepositos = useMemo<ColumnaTabla<DepositoEfectivo>[]>(() => [
     { id: 'numero', titulo: 'Depósito', obtenerValor: (item) => item.numero, ordenable: true, celda: (item) => <div className={styles.identidad}><strong>{item.numero}</strong><small>{item.referenciaBancaria ?? 'Sin referencia bancaria'}</small></div> },
     { id: 'cuenta', titulo: 'Cuenta bancaria', obtenerValor: (item) => item.cuenta?.alias ?? item.cuentaBancariaId, celda: (item) => <div className={styles.identidad}><strong>{item.cuenta?.alias ?? 'Cuenta'}</strong><small>{item.cuenta ? `${item.cuenta.banco} · ${item.cuenta.cuentaEnmascarada}` : item.cuentaBancariaId}</small></div> },
@@ -97,18 +104,30 @@ function CustodiaListadoView({ recurso, permisos, onNavegar }: Props & { recurso
     { id: 'diferencia', titulo: 'Diferencia', obtenerValor: (item) => item.diferenciaCentavos ?? 0, ordenable: true, celda: (item) => <strong className={item.diferenciaCentavos ? styles.montoSalida : undefined}>{formatearCentavos(item.diferenciaCentavos)}</strong> },
     { id: 'estado', titulo: 'Estado', obtenerValor: (item) => item.estado, ordenable: true, filtro: { tipo: 'opciones', etiqueta: 'Seleccionar estados', multiple: true, buscable: false, opciones: opciones.depositos.estados.map((estado) => ({ valor: estado, etiqueta: etiquetasEstadoDeposito[estado] })) }, celda: (item) => <span className={`${styles.estado} ${claseDeposito(item.estado)}`}>{etiquetasEstadoDeposito[item.estado]}</span> },
     { id: 'fecha', titulo: 'Preparación', obtenerValor: (item) => item.preparadoEn, ordenable: true, celda: (item) => formatearFechaHora(item.preparadoEn) },
-    { id: 'acciones', titulo: 'Acciones', tituloSoloLectores: true, obtenerValor: (item) => item.id, celda: (item) => <div className={styles.accionesFila}><button type="button" title="Ver detalle" aria-label={`Ver depósito ${item.numero}`} onClick={() => onNavegar(`/caja/depositos/${item.id}`)}><img src={iconoVer} alt="" /></button></div> },
-  ], [columnaSucursal, onNavegar, opciones.depositos])
+    { id: 'acciones', titulo: 'Acciones', tituloSoloLectores: true, obtenerValor: (item) => item.id, celda: (item) => <div className={styles.accionesFila}><button type="button" title="Ver detalle" aria-label={`Ver depósito ${item.numero}`} onClick={() => onNavegar(`/caja/depositos/${item.id}`)}><img src={iconoVer} alt="" /></button>{permisos.includes('CAJA.DEPOSITOS.REGISTRAR') && ['PREPARADO', 'EN_CUSTODIA'].includes(item.estado) && <button className={styles.accionTexto} type="button" onClick={() => onNavegar(`/caja/depositos/${item.id}?accion=registrar`)}>Registrar</button>}{permisos.includes('CAJA.DEPOSITOS.CONFIRMAR') && ['REGISTRADO', 'DIFERENCIA'].includes(item.estado) && <button className={styles.accionTexto} type="button" onClick={() => onNavegar(`/caja/depositos/${item.id}?accion=confirmar`)}>Autorizar</button>}</div> },
+  ], [columnaSucursal, onNavegar, opciones.depositos, permisos])
 
-  const hayFiltros = Boolean(busqueda || desde || hasta || montoMinimo || montoMaximo || diferenciaMinima || diferenciaMaxima || filtros.length)
-  const limpiar = () => { setBusquedaEntrada(''); setBusqueda(''); setDesde(''); setHasta(''); setMontoMinimo(''); setMontoMaximo(''); setDiferenciaMinima(''); setDiferenciaMaxima(''); setFiltros([]); setPagina(1) }
+  const hayFiltros = Boolean(busqueda || desde !== hoy || hasta !== hoy || montoMinimo || montoMaximo || diferenciaMinima || diferenciaMaxima || filtros.length)
+  const limpiar = () => { setBusquedaEntrada(''); setBusqueda(''); setDesde(hoy); setHasta(hoy); setMontoMinimo(''); setMontoMaximo(''); setDiferenciaMinima(''); setDiferenciaMaxima(''); setFiltros([]); setPagina(1) }
   const exportar = async (formato: FormatoExportacion) => { const { pagina: _pagina, tamanoPagina: _tamanoPagina, ...filtrosExportacion } = parametros; setErrorExportacion(null); try { await exportarCaja(recurso, formato, filtrosExportacion) } catch (errorActual: unknown) { setErrorExportacion(errorActual instanceof ErrorApi ? errorActual.message : 'No fue posible generar la exportación.') } }
   const puedeCrear = permisos.includes(esTransferencia ? 'CAJA.TRANSFERENCIAS.CREAR' : 'CAJA.DEPOSITOS.PREPARAR')
   const puedeExportar = permisos.includes(esTransferencia ? 'CAJA.TRANSFERENCIAS.EXPORTAR' : 'CAJA.DEPOSITOS.EXPORTAR')
   const titulo = esTransferencia ? 'Custodia y transferencias' : 'Depósitos bancarios'
   const rutaNueva = esTransferencia ? '/caja/transferencias/nueva' : '/caja/depositos/nuevo'
-  return <section className={styles.pagina} aria-labelledby="titulo-listado-custodia"><header className={styles.cabeceraPagina}><CajaBreadcrumb seccion={titulo} onNavegar={onNavegar} /><div className={styles.filaCabecera}><div><h1 id="titulo-listado-custodia">{titulo}</h1><p>{esTransferencia ? 'Controla entregas, recepción y ubicación física del efectivo.' : 'Controla preparación, registro bancario, evidencia y confirmación.'}</p></div>{puedeCrear && <button className={styles.botonNuevo} type="button" onClick={() => onNavegar(rutaNueva)}><img src={iconoAgregar} alt="" />{esTransferencia ? 'Nueva transferencia' : 'Preparar depósito'}</button>}{puedeExportar && <BotonExportar deshabilitado={cargando} onExportar={exportar} />}<label className={styles.busquedaGeneral}><span>Búsqueda general</span><span className={styles.controlBusqueda}><img src={iconoBusqueda} alt="" /><input type="search" value={busquedaEntrada} maxLength={150} placeholder={esTransferencia ? 'Número, bolsa, sello o motivo' : 'Número, referencia, bolsa o sello'} onChange={(e) => setBusquedaEntrada(e.target.value)} /></span></label></div></header>
+  const indicadores = useMemo<IndicadorCaja[]>(() => {
+    if (resumen?.recurso === 'transferencias') return [
+      { etiqueta: 'Efectivo en custodia', valor: formatearCentavos(resumen.custodiaActualCentavos), detalle: 'Saldo actual recibido y todavía no depositado', tono: 'informacion' },
+      { etiqueta: 'Efectivo en tránsito', valor: formatearCentavos(resumen.enTransitoCentavos), detalle: `${resumen.transferenciasCantidad} transferencias en el período`, tono: 'salida' },
+    ]
+    if (resumen?.recurso === 'depositos') return [
+      { etiqueta: 'Pendiente de confirmar', valor: formatearCentavos(resumen.pendienteCentavos), detalle: 'Depósitos que continúan en proceso bancario', tono: 'informacion' },
+      { etiqueta: 'Depositado en el período', valor: formatearCentavos(resumen.depositadoCentavos), detalle: `${resumen.depositosCantidad} depósitos consultados`, tono: 'entrada' },
+    ]
+    return []
+  }, [resumen])
+  return <section className={styles.pagina} aria-labelledby="titulo-listado-custodia"><header className={styles.cabeceraPagina}><CajaBreadcrumb seccion={titulo} onNavegar={onNavegar} /><div className={styles.filaCabecera}><h1 id="titulo-listado-custodia">{titulo}</h1>{puedeCrear && <button className={styles.botonNuevo} type="button" onClick={() => onNavegar(rutaNueva)}><img src={iconoAgregar} alt="" />{esTransferencia ? 'Nueva transferencia' : 'Preparar depósito'}</button>}{puedeExportar && <BotonExportar deshabilitado={cargando} onExportar={exportar} />}<div className={styles.busquedaGeneral}><span className={styles.controlBusqueda}><img src={iconoBusqueda} alt="" /><input type="search" value={busquedaEntrada} maxLength={150} placeholder={esTransferencia ? 'Número, bolsa, sello o motivo' : 'Número, referencia, bolsa o sello'} aria-label="Búsqueda general" onChange={(e) => setBusquedaEntrada(e.target.value)} /></span></div></div></header>
     <div className={`${styles.filtrosGenerales} ${!esTransferencia ? styles.filtrosSeis : ''}`} aria-label="Filtros generales"><label>Desde<input type="date" value={desde} max={hasta || undefined} onChange={(e) => { setDesde(e.target.value); setPagina(1) }} /></label><label>Hasta<input type="date" value={hasta} min={desde || undefined} onChange={(e) => { setHasta(e.target.value); setPagina(1) }} /></label><label>Monto mínimo (Q)<input type="number" min="0" step="0.01" value={montoMinimo} placeholder="0.00" onChange={(e) => { setMontoMinimo(e.target.value); setPagina(1) }} /></label><label>Monto máximo (Q)<input type="number" min="0" step="0.01" value={montoMaximo} placeholder="0.00" onChange={(e) => { setMontoMaximo(e.target.value); setPagina(1) }} /></label>{!esTransferencia && <><label>Diferencia mínima (Q)<input type="number" step="0.01" value={diferenciaMinima} placeholder="-100.00" onChange={(e) => { setDiferenciaMinima(e.target.value); setPagina(1) }} /></label><label>Diferencia máxima (Q)<input type="number" step="0.01" value={diferenciaMaxima} placeholder="100.00" onChange={(e) => { setDiferenciaMaxima(e.target.value); setPagina(1) }} /></label></>}</div>
+    <TarjetasResumen indicadores={indicadores} cargando={resumenCargando} error={errorResumen} onReintentar={() => setRevision((valor) => valor + 1)} />
     {errorOpciones && <div className={styles.alertaError} role="alert"><p>{errorOpciones}</p><button type="button" onClick={() => setRevision((v) => v + 1)}>Reintentar</button></div>}{error && <div className={styles.alertaError} role="alert"><p>{error}</p><button type="button" onClick={() => setRevision((v) => v + 1)}>Reintentar</button></div>}
     <article className={styles.panelTabla} aria-busy={cargando}><div className={styles.resumenTabla}><div><strong>{titulo}</strong><small>{cargando ? 'Actualizando información…' : 'Los filtros y la exportación se procesan en el servidor.'}</small></div><div className={styles.accionesResumen}>{resultado && <span>{resultado.total} registros</span>}{hayFiltros && <button type="button" onClick={limpiar}>Limpiar filtros</button>}</div></div>{resultado?.items.length ? <><TablaDatos descripcion={`${titulo} con filtros por columna`} datos={resultado.items} columnas={(esTransferencia ? columnasTransferencias : columnasDepositos) as ColumnaTabla<RegistroCustodia>[]} filtros={filtros} ordenamiento={ordenamiento} obtenerIdFila={(item) => item.id} onFiltrosChange={(s) => { setFiltros(s); setPagina(1) }} onOrdenamientoChange={(s) => { setOrdenamiento(s.length ? s : [{ id: 'fecha', desc: true }]); setPagina(1) }} /><PaginacionTabla pagina={resultado.pagina} tamanoPagina={resultado.tamanoPagina} total={resultado.total} totalPaginas={resultado.totalPaginas} unidadSingular={esTransferencia ? 'transferencia' : 'depósito'} unidadPlural={esTransferencia ? 'transferencias' : 'depósitos'} onPaginaChange={setPagina} onTamanoPaginaChange={(tamano) => { setTamanoPagina(tamano); setPagina(1) }} /></> : !cargando && !error ? <div className={styles.estadoVacio}><h2>{hayFiltros ? 'Sin coincidencias' : `No hay ${esTransferencia ? 'transferencias' : 'depósitos'} registrados`}</h2><p>{hayFiltros ? 'Ajusta o limpia los filtros aplicados.' : `Los ${esTransferencia ? 'traslados de custodia' : 'depósitos bancarios'} aparecerán al registrar la primera operación.`}</p>{puedeCrear && !hayFiltros && <button type="button" onClick={() => onNavegar(rutaNueva)}>{esTransferencia ? 'Nueva transferencia' : 'Preparar depósito'}</button>}</div> : null}</article>
     <ModalEstado abierto={Boolean(errorExportacion)} tipo="error" titulo="No se pudo exportar" mensaje={errorExportacion ?? ''} textoAccionPrincipal="Entendido" onAccionPrincipal={() => setErrorExportacion(null)} onCerrar={() => setErrorExportacion(null)} />

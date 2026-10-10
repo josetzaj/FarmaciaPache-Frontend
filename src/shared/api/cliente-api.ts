@@ -17,6 +17,7 @@ type RespuestaErrorApi = {
 
 type OpcionesSolicitud = Omit<RequestInit, 'body'> & {
   datos?: unknown
+  mostrarCargaGlobal?: boolean
 }
 
 export class ErrorApi extends Error {
@@ -59,8 +60,8 @@ export async function solicitarApi<T>(
   ruta: string,
   opciones: OpcionesSolicitud = {},
 ): Promise<T> {
-  const finalizarCarga = iniciarCargaGlobal()
-  const { datos, headers: headersIniciales, ...requestInit } = opciones
+  const { datos, mostrarCargaGlobal = true, headers: headersIniciales, ...requestInit } = opciones
+  const finalizarCarga = mostrarCargaGlobal ? iniciarCargaGlobal() : () => undefined
   const headers = new Headers(headersIniciales)
   const esFormulario = datos instanceof FormData
   headers.set('Accept', 'application/json')
